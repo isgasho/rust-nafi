@@ -7,12 +7,12 @@ fn main() {
     loop {
         buffer.clear();
         if io::stdin().read_line(&mut buffer).is_err() {
-            break
+            break;
         }
         if buffer.is_empty() {
-            break
+            break;
         }
-        let tokens = nafi_lexer::lex(&buffer);
+        let tokens = nafi_lexer::lex(buffer.trim());
         match tokens {
             Ok(tokens) => println!("{:#?}", tokens),
             Err(e) => eprintln!("{}", e),
