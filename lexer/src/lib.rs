@@ -1,6 +1,7 @@
 //! Transformation of NAFI source code into tokens
 #![forbid(bad_style, missing_debug_implementations, unconditional_recursion, future_incompatible)]
-#![deny(missing_docs, unsafe_code, unused)]
+//#![deny(missing_docs, unsafe_code, unused)]
+#![feature(trace_macros)]
 
 #[macro_use]
 extern crate nom;
@@ -11,10 +12,10 @@ mod tokens;
 pub use tokens::Token;
 
 /// Lex NAFI source into its component tokens
-pub fn lex(str: &str) -> Result<Vec<Token>, nom::Err<&str>> {
+pub fn lex(str: &str) -> Vec<Token> {
     match lexer::tokens(str) {
-        nom::IResult::Done(_, tokens) => Ok(tokens),
-        nom::IResult::Error(e) => Err(e),
+        nom::IResult::Done(_, tokens) => tokens,
+        nom::IResult::Error(e) => unreachable!("Lexer failed to recover from error {}", e),
         nom::IResult::Incomplete(_) => unreachable!("Lexer failed to finish"),
     }
 }
