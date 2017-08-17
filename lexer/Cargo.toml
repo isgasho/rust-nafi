@@ -1,0 +1,12 @@
+[package]
+name = "nafi-lexer"
+version = "0.0.1"
+publish = false
+
+[dependencies.nom]
+version = "3.2"
+features = [ "nightly" ]
+
+[[bin]]
+name = "nafi-lexer-repl"
+path = "repl/main.rs"

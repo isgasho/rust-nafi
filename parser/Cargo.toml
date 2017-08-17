@@ -1,7 +1,0 @@
-[package]
-name = "nafi-parser"
-version = "0.0.1"
-publish = false
-
-[dependencies]
-nom = "3.2"
