@@ -6,4 +6,5 @@ pub enum Token {
 
     // == Literals == //
     IntegerLiteral(u64),
+    StringLiteral(String),
 }
