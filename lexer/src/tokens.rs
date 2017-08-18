@@ -2,7 +2,7 @@
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Token {
     _Unknown,
-    _Whitespace,
+    Whitespace,
 
     // == Literals == //
     IntegerLiteral(u64),

@@ -2,9 +2,9 @@ use lexer::unicode::white_space;
 use tokens::Token;
 use nom::{not_line_ending, IResult};
 
-/// Token::_Whitespace
+/// Token::Whitespace
 named! {
-    pub _whitespace<&str, Token>,
+    pub whitespace<&str, Token>,
     do_parse!(
         many1!(
             alt_complete!(
@@ -12,7 +12,7 @@ named! {
                 do_parse!(white_space >> ())
             )
         ) >>
-        (Token::_Whitespace)
+        (Token::Whitespace)
     )
 }
 
