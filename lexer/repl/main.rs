@@ -13,9 +13,6 @@ fn main() {
             break;
         }
         let tokens = nafi_lexer::lex(buffer.trim());
-        match tokens {
-            Ok(tokens) => println!("{:#?}", tokens),
-            Err(e) => eprintln!("{}", e),
-        }
+        println!("{:#?}", tokens);
     }
 }
