@@ -60,7 +60,7 @@ fn take_block_comment(i: &str) -> IResult<&str, ()> {
                             IResult::<&str, &str, u32>::is_done(&eof!(i,),) ||
                                 IResult::<&str, &str, u32>::is_done(&eof!(take!(i, 1).unwrap().0,),)
                         );
-                        break;
+                        return IResult::Done("", ()); // Allow eof to close block comment
                     },
                     e @ IResult::Error(_) => return e.map(|_| ()),
                 }
@@ -91,10 +91,7 @@ mod test {
 
     #[test]
     fn block_comment() {
-        assert_eq!(
-            take_block_comment("/** /* */*/"),
-            IResult::Done("", ())
-        );
+        assert_eq!(take_block_comment("/** /* */*/"), IResult::Done("", ()));
     }
 
     #[test]
