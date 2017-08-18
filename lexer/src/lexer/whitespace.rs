@@ -1,5 +1,6 @@
+use lexer::unicode::white_space;
 use tokens::Token;
-use nom::{line_ending, not_line_ending, space, IResult};
+use nom::{not_line_ending, IResult};
 
 /// Token::_Whitespace
 named! {
@@ -8,7 +9,7 @@ named! {
         many1!(
             alt_complete!(
                 take_comment |
-                take_whitespace
+                do_parse!(white_space >> ())
             )
         ) >>
         (Token::_Whitespace)
@@ -69,20 +70,6 @@ fn take_block_comment(i: &str) -> IResult<&str, ()> {
         },
         result => result.map(|_| ()),
     }
-}
-
-/// Consume as much whitespace as possible
-named! {
-    take_whitespace<&str, ()>,
-    do_parse!(
-        many1!(
-            alt_complete!(
-                // TODO: Pattern_White_Space
-                space | line_ending
-            )
-        ) >>
-        ()
-    )
 }
 
 #[cfg(test)]

@@ -1,7 +1,6 @@
 //! Transformation of NAFI source code into tokens
 #![forbid(bad_style, missing_debug_implementations, unconditional_recursion, future_incompatible)]
 #![deny(missing_docs, unsafe_code, unused)]
-#![feature(trace_macros)]
 
 #[macro_use]
 extern crate nom;

@@ -1,10 +1,11 @@
 use tokens::Token;
 
 mod literals;
+mod unicode;
 mod whitespace;
 
-use self::literals::integer_literal;
-use self::whitespace::_whitespace;
+use lexer::literals::integer_literal;
+use lexer::whitespace::_whitespace;
 
 /// Vec<Token>
 named! {
