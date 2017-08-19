@@ -5,6 +5,7 @@
 #[macro_use]
 extern crate nom;
 extern crate num;
+extern crate single;
 
 mod lexer;
 mod tokens;

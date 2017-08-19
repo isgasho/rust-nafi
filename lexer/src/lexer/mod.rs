@@ -4,7 +4,7 @@ mod literals;
 mod unicode;
 mod whitespace;
 
-use lexer::literals::integer_literal;
+use lexer::literals::{integer_literal, string_literal};
 use lexer::whitespace::whitespace;
 
 /// Vec<Token>
@@ -18,6 +18,7 @@ named! {
     token<&str, Token>,
     alt_complete!(
         integer_literal |
+        string_literal |
         whitespace |
         _unknown
     )

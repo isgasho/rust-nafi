@@ -3,6 +3,9 @@ name = "nafi-lexer"
 version = "0.0.1"
 publish = false
 
+[dependencies]
+single = "0.2"
+
 [dependencies.nom]
 version = "3.2"
 features = [ "verbose-errors" ]

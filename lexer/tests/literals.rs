@@ -6,9 +6,7 @@ extern crate num;
 use nafi_lexer::{lex, Token};
 use num::bigint::BigUint;
 
-fn literal_num<N: Into<BigUint>>(int: N) -> Vec<Token> {
-    vec![Token::IntegerLiteral(int.into())]
-}
+fn literal_num<N: Into<BigUint>>(int: N) -> Vec<Token> { vec![Token::IntegerLiteral(int.into())] }
 
 #[test]
 fn integer_literal_base_10() {
@@ -27,5 +25,8 @@ fn integer_literal_base_10() {
 #[test]
 fn integer_literal_allows_very_big_numbers() {
     let bignum = "1234567890123456789012345678901234567890"; // roughly 2 ^ 129.859
-    assert_eq!(lex(bignum), vec![Token::IntegerLiteral(bignum.parse().unwrap())])
+    assert_eq!(
+        lex(bignum),
+        vec![Token::IntegerLiteral(bignum.parse().unwrap())]
+    )
 }
