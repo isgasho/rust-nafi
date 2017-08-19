@@ -23,9 +23,11 @@ fn string_literal(input: &str) -> IResult<&str, Token> {
                 match take!(i, 1) {
                     IResult::Done(_i, o) if o == "\\" => {
                         // Escape
+                        unimplemented!()
                     },
                     IResult::Done(_i, o) if o == "\"" => {
                         // Quote end
+                        unimplemented!()
                     },
                     IResult::Done(_i, o) => {
                         // Regular string contents
@@ -41,6 +43,6 @@ fn string_literal(input: &str) -> IResult<&str, Token> {
                 }
             }
         },
-        result => result.map(|_| unreachable!())
+        result => result.map(|_| unreachable!()),
     }
 }

@@ -1,3 +1,5 @@
+use num::bigint::BigUint;
+
 #[allow(missing_docs)]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Token {
@@ -5,6 +7,6 @@ pub enum Token {
     Whitespace,
 
     // == Literals == //
-    IntegerLiteral(u64),
+    IntegerLiteral(BigUint),
     StringLiteral(String),
 }

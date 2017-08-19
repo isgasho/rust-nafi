@@ -7,6 +7,11 @@ publish = false
 version = "3.2"
 features = [ "verbose-errors" ]
 
+[dependencies.num]
+version = "0.1"
+default-features = false
+features = [ "bigint" ]
+
 [[bin]]
 name = "nafi-lexer-repl"
 path = "repl/main.rs"

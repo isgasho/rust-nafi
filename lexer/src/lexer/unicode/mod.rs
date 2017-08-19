@@ -1,6 +1,7 @@
 //! Unicode adapters for nom parsers
 
 use nom::{self, IResult};
+use num::bigint::BigUint;
 
 // FIXME: match on Pattern_White_Space
 /// Recognize one or more unicode whitespaces
@@ -14,12 +15,12 @@ pub fn white_space(input: &str) -> IResult<&str, &str> {
             }
         }
     }
-    return IResult::Done("", input)
+    return IResult::Done("", input);
 }
 
 // FIXME: match on Numeric_Type=Decimal
 /// Parse a decimal number
-pub fn decimal_number(input: &str) -> IResult<&str, u64> {
+pub fn decimal_number(input: &str) -> IResult<&str, BigUint> {
     let len = input
         .char_indices()
         .find(|&(_, char)| !char.is_digit(10))
@@ -29,15 +30,9 @@ pub fn decimal_number(input: &str) -> IResult<&str, u64> {
     if len == 0 {
         IResult::Error(error_position!(nom::ErrorKind::Digit, input))
     } else {
-        match input[..len].parse::<u64>() {
-            Ok(num) => IResult::Done(&input[len..], num),
-            Err(_) => {
-                eprintln!(
-                    "Decimal number `{}` is too big. Expect strange lexer results.",
-                    &input[..len]
-                );
-                IResult::Error(error_position!(nom::ErrorKind::MapRes, input))
-            },
-        }
+        IResult::Done(
+            &input[len..],
+            input[..len].parse().unwrap_or_else(|_| unreachable!()),
+        )
     }
 }
