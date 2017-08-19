@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/nafi-interpreter.iml" filepath="$PROJECT_DIR$/nafi-interpreter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rust-nafi.iml" filepath="$PROJECT_DIR$/rust-nafi.iml" />
     </modules>
   </component>
 </project>
