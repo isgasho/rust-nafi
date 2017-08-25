@@ -1,0 +1,4 @@
+[package]
+name = "nnom"
+version = "0.0.1"
+publish = false
