@@ -7,8 +7,9 @@
 
 mod macros;
 mod result;
-mod slice;
+pub mod slice;
 
 pub use result::Result;
 pub use slice::PositionedStr;
 pub use slice::PositionedSlice;
+pub use slice::PositionedIndex;
