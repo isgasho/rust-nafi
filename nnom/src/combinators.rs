@@ -1,8 +1,8 @@
 //! Simple combinator fn of other parser fn
 
 mod protected {
-    use std::ops;
     use prelude::{PositionedSlice, PositionedStr};
+    use std::ops;
 
     pub trait Slice<'a, T: 'a + ?Sized>: ops::Deref<Target = T>
     where
@@ -25,9 +25,9 @@ mod protected {
     }
 }
 
-use std::fmt;
-use Result;
 use self::protected::Slice;
+use Result;
+use std::fmt;
 
 /// Construct a new parser that matches a subparser zero or more times.
 ///

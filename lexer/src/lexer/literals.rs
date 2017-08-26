@@ -1,6 +1,8 @@
 use std::{char, u32};
+
 use lexer::unicode::decimal_number;
 use tokens::{StringFragments, Token};
+
 use nom::IResult;
 
 /// Token::IntegerLiteral

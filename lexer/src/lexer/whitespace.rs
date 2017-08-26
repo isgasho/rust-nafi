@@ -1,5 +1,6 @@
 use lexer::unicode::white_space;
 use tokens::Token;
+
 use nom::{not_line_ending, IResult};
 
 /// Token::Whitespace
