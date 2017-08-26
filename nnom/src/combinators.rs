@@ -4,7 +4,7 @@ mod protected {
     use prelude::{PositionedSlice, PositionedStr};
     use std::ops;
 
-    pub trait Slice<'a, T: 'a + ?Sized>: ops::Deref<Target = T>
+    pub trait Slice<'a, T: 'a + ?Sized>: ops::Deref<Target = T> + Copy
     where
         &'a T: Slice<'a, T>,
     {
@@ -54,7 +54,7 @@ pub fn many0<'a, T: 'a + ?Sized, In, Out, Error, Parser>(
     parser: Parser,
 ) -> impl Fn(In) -> Result<In, Vec<Out>, !>
 where
-    In: Slice<'a, T> + Copy,
+    In: Slice<'a, T>,
     Parser: Fn(In) -> Result<In, Out, Error>,
     &'a T: Slice<'a, T>,
 {
@@ -63,8 +63,8 @@ where
 
         while !input.is_empty() {
             match parser(input) {
-                Ok((o, i)) => {
-                    res.push(o);
+                Ok((out, i)) => {
+                    res.push(out);
                     input = i;
                 },
                 Err(_) => break,
@@ -73,4 +73,16 @@ where
 
         Ok((res, input))
     }
+}
+
+/// Run a parser without consuming anything.
+pub fn peek<'a, T: 'a + ?Sized, In, Out, Error, Parser>(
+    parser: Parser,
+) -> impl Fn(In) -> Result<In, Out, Error>
+where
+    In: Slice<'a, T>,
+    Parser: Fn(In) -> Result<In, Out, Error>,
+    &'a T: Slice<'a, T>,
+{
+    move |input: In| parser(input).map(|(out, _)| (out, input))
 }
