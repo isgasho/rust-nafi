@@ -1,21 +1,23 @@
 //! A minimal presentation of a nom-like parser combinator framework.
 //!
 //! Heavily inspired by [`synom`](https://dtolnay.github.io/syn/synom/),
-//! but only the parts I need and a bit more space to support decent error handling.
+//! but using only the parts I need.
 //!
-//! At the most basic, a parser fn takes the form `fn(input: Slice) -> nnom::Result<Slice>`
-//! for some `Slice`, usually `nnom::slice::PositionedIndex`. It then returns
-//! `nnom::Result::Done(leftover_input, matched_input)` or the appropriate failure case.
-//! To that end, parsers are usually bound to work only on sliceable (`&slice[..]`) types.
+//! At the most basic, a parser fn takes the form
+//! `fn(input: Slice) -> nnom::Result<Slice, Slice, Error>` for some `Slice` and `Error`.
+//! It then returns `Ok((parsed, remaining_input))` or the appropriate error.
 #![forbid(bad_style, missing_debug_implementations, unconditional_recursion, future_incompatible)]
 #![deny(missing_docs, unsafe_code, unused)]
-#![feature(conservative_impl_trait)]
+#![recursion_limit = "1024"]
+#![feature(conservative_impl_trait, never_type)]
 
 pub mod combinators;
-mod result;
 pub mod slice;
 
-pub use result::Result;
+/// Standard result type for parsing.
+///
+/// Ok is a tuple of the parsed output and the remaining unused input.
+pub type Result<In, Out, Error> = ::std::result::Result<(Out, In), Error>;
 
 #[allow(missing_docs)]
 pub mod prelude {

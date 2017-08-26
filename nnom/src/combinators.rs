@@ -27,34 +27,35 @@ mod protected {
 
 use self::protected::Slice;
 use Result;
-use std::fmt;
 
 /// Construct a new parser that matches a subparser zero or more times.
+///
+/// This combinator swallows any errors from the subparser and returns
+/// a vector of outputs excluding the first parse to error.
 ///
 /// # Example
 ///
 /// ```
 /// # use nnom::prelude::*;
-/// fn type_keyword(input: &str) -> Result<&str> {
+/// fn type_keyword(input: &str) -> Result<&str, &str, ()> {
 ///     if input.starts_with("type") {
-///         Result::Done(&input[4..], &input[..4])
+///         Ok(input.split_at(4))
 ///     } else {
-///         Result::Pass
+///         Err(())
 ///     }
 /// }
 ///
 /// assert_eq!(
 ///     many0(type_keyword)("typetypetipe"),
-///     Result::Done("tipe", vec!["type", "type"])
+///     Ok((vec!["type", "type"], "tipe"))
 /// )
 /// ```
-pub fn many0<'a, T: 'a + ?Sized, In, Out, Failure, Parser>(
+pub fn many0<'a, T: 'a + ?Sized, In, Out, Error, Parser>(
     parser: Parser,
-) -> impl Fn(In) -> Result<In, Vec<Out>, Failure>
+) -> impl Fn(In) -> Result<In, Vec<Out>, !>
 where
     In: Slice<'a, T> + Copy,
-    Parser: Fn(In) -> Result<In, Out, Failure>,
-    Failure: fmt::Display,
+    Parser: Fn(In) -> Result<In, Out, Error>,
     &'a T: Slice<'a, T>,
 {
     move |mut input: In| {
@@ -62,15 +63,14 @@ where
 
         while !input.is_empty() {
             match parser(input) {
-                Result::Done(i, o) => {
+                Ok((o, i)) => {
                     res.push(o);
                     input = i;
                 },
-                Result::Abort(failure) => return Result::Abort(failure),
-                Result::Pass => break,
+                Err(_) => break,
             }
         }
 
-        Result::Done(input, res)
+        Ok((res, input))
     }
 }
