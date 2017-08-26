@@ -1,14 +1,13 @@
+//! Types for working with slices while retaining position information
+
 use std::ops;
 
 /// A slice with additional information of where it starts in the source buffer.
 #[derive(Clone, Copy, Debug)]
-pub struct PositionedIndex<'a, T: 'a>
+pub struct PositionedIndex<'a, T: 'a + ?Sized>
 where
     T: ops::Index<ops::RangeFrom<usize>>,
-    T: ops::Index<ops::Range<usize>>,
     T: ops::Index<ops::RangeTo<usize>>,
-    T: ops::Index<ops::RangeFull>,
-    T: ?Sized,
 {
     slice: &'a T,
     start: usize,
@@ -23,9 +22,7 @@ pub type PositionedSlice<'a, T> = PositionedIndex<'a, [T]>;
 impl<'a, T> PositionedIndex<'a, T>
 where
     T: ops::Index<ops::RangeFrom<usize>, Output = T>,
-    T: ops::Index<ops::Range<usize>, Output = T>,
     T: ops::Index<ops::RangeTo<usize>, Output = T>,
-    T: ops::Index<ops::RangeFull, Output = T>,
 {
     /// The wrapped slice.
     pub fn raw_slice(&self) -> &T { self.slice }
