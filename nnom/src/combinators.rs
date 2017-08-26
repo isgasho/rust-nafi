@@ -2,7 +2,6 @@
 
 mod protected {
     use std::ops;
-    use slice::PositionedIndex;
 
     pub trait Slice<'a, T: 'a + ?Sized>: ops::Deref<Target = T>
     where
