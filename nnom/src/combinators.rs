@@ -2,6 +2,7 @@
 
 mod protected {
     use std::ops;
+    use prelude::{PositionedSlice, PositionedStr};
 
     pub trait Slice<'a, T: 'a + ?Sized>: ops::Deref<Target = T>
     where
@@ -13,8 +14,13 @@ mod protected {
     impl<'a> Slice<'a, str> for &'a str {
         fn is_empty(&self) -> bool { (self as &str).is_empty() }
     }
-
+    impl<'a> Slice<'a, str> for PositionedStr<'a> {
+        fn is_empty(&self) -> bool { (self as &str).is_empty() }
+    }
     impl<'a, T: 'a> Slice<'a, [T]> for &'a [T] {
+        fn is_empty(&self) -> bool { (self as &[T]).is_empty() }
+    }
+    impl<'a, T: 'a> Slice<'a, [T]> for PositionedSlice<'a, T> {
         fn is_empty(&self) -> bool { (self as &[T]).is_empty() }
     }
 }
@@ -42,15 +48,16 @@ use self::protected::Slice;
 ///     Result::Done("tipe", vec!["type", "type"])
 /// )
 /// ```
-pub fn many0<'a, T: 'a + ?Sized, Out, Failure, Parser>(
+pub fn many0<'a, T: 'a + ?Sized, In, Out, Failure, Parser>(
     parser: Parser,
-) -> impl Fn(&'a T) -> Result<&'a T, Vec<Out>, Failure>
+) -> impl Fn(In) -> Result<In, Vec<Out>, Failure>
 where
-    Parser: Fn(&'a T) -> Result<&'a T, Out, Failure>,
+    In: Slice<'a, T> + Copy,
+    Parser: Fn(In) -> Result<In, Out, Failure>,
     Failure: fmt::Display,
     &'a T: Slice<'a, T>,
 {
-    move |mut input: &'a T| {
+    move |mut input: In| {
         let mut res = Vec::new();
 
         while !input.is_empty() {

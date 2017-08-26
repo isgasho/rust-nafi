@@ -7,7 +7,7 @@ use std::ops;
 /// This acts like a `&T` in that it derefs to `T`; this means that methods on `T` are available.
 /// More importantly, it means that indexing is possible, but it goes from 0 as do all other slices,
 /// rather than the offset start recorded by this type.
-#[derive(Clone, Copy, Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct PositionedIndex<'a, T: 'a + ?Sized>
 where
     T: ops::Index<ops::RangeFrom<usize>>,
@@ -17,7 +17,22 @@ where
     start: usize,
 }
 
-impl<'a, T> ops::Deref for PositionedIndex<'a, T>
+impl<'a, T: 'a + ?Sized> Copy for PositionedIndex<'a, T>
+where
+    T: ops::Index<ops::RangeFrom<usize>>,
+    T: ops::Index<ops::RangeTo<usize>>,
+{
+}
+
+impl<'a, T: 'a + ?Sized> Clone for PositionedIndex<'a, T>
+where
+    T: ops::Index<ops::RangeFrom<usize>>,
+    T: ops::Index<ops::RangeTo<usize>>,
+{
+    fn clone(&self) -> Self { *self }
+}
+
+impl<'a, T: ?Sized> ops::Deref for PositionedIndex<'a, T>
 where
     T: ops::Index<ops::RangeFrom<usize>>,
     T: ops::Index<ops::RangeTo<usize>>,
@@ -33,11 +48,14 @@ pub type PositionedStr<'a> = PositionedIndex<'a, str>;
 /// An array slice with associated start position in the original source slice.
 pub type PositionedSlice<'a, T> = PositionedIndex<'a, [T]>;
 
-impl<'a, T> PositionedIndex<'a, T>
+impl<'a, T: 'a + ?Sized> PositionedIndex<'a, T>
 where
     T: ops::Index<ops::RangeFrom<usize>, Output = T>,
     T: ops::Index<ops::RangeTo<usize>, Output = T>,
 {
+    /// Create a new positioned slice from a raw slice and start position
+    pub fn new(slice: &'a T, start: usize) -> Self { PositionedIndex { slice, start } }
+
     /// The starting index of this slice.
     pub fn start(&self) -> usize { self.start }
 
@@ -48,7 +66,7 @@ where
     ///
     /// The first slice is before the index (exclusive) (`&slice[..idx]`).
     /// The second slice is after the index (inclusive) (`&slice[idx..]`).
-    pub fn split(&'a self, idx: usize) -> (PositionedIndex<'a, T>, PositionedIndex<'a, T>) {
+    pub fn split_at(&self, idx: usize) -> (Self, Self) {
         (
             PositionedIndex {
                 slice: &self.slice[..idx],
