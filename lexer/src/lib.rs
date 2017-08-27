@@ -2,10 +2,10 @@
 #![forbid(bad_style, missing_debug_implementations, unconditional_recursion, future_incompatible)]
 #![deny(missing_docs, unsafe_code, unused)]
 
+extern crate nafi_tokens as tokens;
 #[macro_use]
 extern crate nom;
 extern crate num;
-extern crate nafi_tokens as tokens;
 
 mod lexer;
 

@@ -6,13 +6,13 @@ fn main() {
     let mut buffer = String::with_capacity(80);
     loop {
         buffer.clear();
-        if io::stdin().read_line(&mut buffer).is_err() {
+        io::stdin().read_line(&mut buffer).expect("IO Failure");
+        let line = buffer.trim();
+        if line.is_empty() {
+            println!("Goodbye!");
             break;
         }
-        if buffer.is_empty() {
-            break;
-        }
-        let tokens = nafi_lexer::lex(buffer.trim());
+        let tokens = nafi_lexer::lex(line);
         println!("{:#?}", tokens);
     }
 }
