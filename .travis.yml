@@ -1,12 +1,15 @@
 language: rust
 
+before_install:
+- openssl aes-256-cbc -K $encrypted_6c6066c61167_key -iv $encrypted_6c6066c61167_iv
+  -in travis_id_rsa.enc -out ~\/.ssh/id_rsa -d
+
 rust:
-  - nightly
+- nightly
 
 script:
-  - cargo build --all
-  - cargo test  --all
-  - cargo doc   --all --lib --no-deps
+- cargo build --all
+- cargo test  --all
+- cargo doc   --all --lib --no-deps
 
-after_success:
-  cat .travis/travis-doc-upload.sh | sh
+after_success: cat .travis/travis-doc-upload.sh | sh
