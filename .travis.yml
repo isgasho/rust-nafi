@@ -1,7 +1,7 @@
 language: rust
 
 before_install:
-- openssl enc -K $SSL_ENC_KEY -iv $SSL_ENC_IV -in ./.travis/id_rsa -out ~/.ssh/id_rsa -d
+- openssl enc -K $SSL_ENC_KEY -iv $SSL_ENC_IV -in ./.travis/id_rsa.enc -out ~/.ssh/id_rsa -d
 
 rust:
 - nightly
