@@ -20,7 +20,7 @@ pub mod combinators;
 pub mod result;
 pub mod slice;
 
-#[allow(missing_docs)]
+/// The commonly used types of this crate
 pub mod prelude {
     pub use combinators::many0;
     pub use result::{ParseOutput, Result};
