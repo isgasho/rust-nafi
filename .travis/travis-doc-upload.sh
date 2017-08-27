@@ -8,7 +8,7 @@ set -ev
 git clone --branch gh-pages git@github.com:${TRAVIS_REPO_SLUG} docs
 cd docs
 
-find -maxdepth 1 -not -name "index.html" -not -name ".git" | xargs --verbose rm -vr
+ls | grep --invert-match "index.html"  | xargs --verbose rm -r
 mv -f ../target/doc/* .
 
 git add -vA
