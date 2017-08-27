@@ -1,0 +1,9 @@
+[package]
+name = "nafi-tokens"
+version = "0.0.1"
+publish = false
+
+[dependencies.num]
+version = "0.1"
+default-features = false
+features = [ "bigint" ]

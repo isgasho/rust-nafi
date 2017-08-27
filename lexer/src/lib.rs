@@ -5,10 +5,9 @@
 #[macro_use]
 extern crate nom;
 extern crate num;
-extern crate single;
+extern crate nafi_tokens as tokens;
 
 mod lexer;
-mod tokens;
 
 pub use tokens::Token;
 
