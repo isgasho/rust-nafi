@@ -11,7 +11,7 @@ echo "<meta http-equiv=\"refresh\" content=\"0; url=nafi_lexer/index.html\">
 git clone --branch gh-pages git@github.com:${TRAVIS_REPO_SLUG} docs
 
 cd docs
-mv ../target/doc/* . --force
+mv -f ../target/doc/* .
 git add -A
 git commit -m "Automatic Travis doc build"
 git push origin gh-pages
