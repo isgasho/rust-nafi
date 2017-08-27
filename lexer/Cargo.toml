@@ -4,11 +4,9 @@ version = "0.0.1"
 publish = false
 
 [dependencies]
+error-chain = "0.11.0-rc.2"
 nafi-tokens = { path = "../tokens/" }
-
-[dependencies.nom]
-version = "3.2"
-features = [ "verbose-errors" ]
+nnom = { path = "../nnom/" }
 
 [dependencies.num]
 version = "0.1"

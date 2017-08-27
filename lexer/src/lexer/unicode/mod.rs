@@ -1,26 +1,49 @@
 //! Unicode adapters for nom parsers
 
-use nom::{self, IResult};
+use error::*;
+use nnom::prelude::{ParseOutput, PositionedStr, Result};
 use num::bigint::BigUint;
 
+// FIXME: use an actual unicode rule
+/// Recognize characters that are part of a newline
+pub fn is_newline_char(char: char) -> bool { char == '\r' || char == '\n' }
+
 // FIXME: match on Pattern_White_Space
+/// Recognize whitespace characters
+pub fn is_whitespace_char(char: char) -> bool {
+    char == ' ' || char == '\t' || char == '\r' || char == '\n'
+}
+
 /// Recognize one or more unicode whitespaces
-pub fn white_space(input: &str) -> IResult<&str, &str> {
+pub fn white_space(input: PositionedStr) -> Result<PositionedStr, PositionedStr, Error> {
+    let mut index = None;
+
     for (idx, char) in input.char_indices() {
-        if !(char == ' ' || char == '\t' || char == '\r' || char == '\n') {
-            if idx == 0 {
-                return IResult::Error(error_position!(nom::ErrorKind::MultiSpace, input));
-            } else {
-                return IResult::Done(&input[idx..], &input[..idx]);
-            }
+        if !is_whitespace_char(char) {
+            index = Some(idx);
+            break;
         }
     }
-    return IResult::Done("", input);
+
+    let index = index.unwrap_or(input.len());
+
+    if index == 0 {
+        bail!(ErrorKind::NoMatch(
+            input.start(),
+            "lexer::unicode::white_space"
+        ));
+    }
+
+    let split = input.split_at(index);
+    Ok(ParseOutput {
+        output: split.0,
+        remaining_input: split.1,
+    })
 }
 
 // FIXME: match on Numeric_Type=Decimal
 /// Parse a decimal number
-pub fn decimal_number(input: &str) -> IResult<&str, BigUint> {
+pub fn decimal_number(input: PositionedStr) -> Result<PositionedStr, (usize, BigUint), Error> {
     let len = input
         .char_indices()
         .find(|&(_, char)| !char.is_digit(10))
@@ -28,11 +51,15 @@ pub fn decimal_number(input: &str) -> IResult<&str, BigUint> {
         .unwrap_or(input.len());
 
     if len == 0 {
-        IResult::Error(error_position!(nom::ErrorKind::Digit, input))
-    } else {
-        IResult::Done(
-            &input[len..],
-            input[..len].parse().unwrap_or_else(|_| unreachable!()),
-        )
+        bail!(ErrorKind::NoMatch(
+            input.start(),
+            "lexer::unicode::decimal_number"
+        ));
     }
+
+    let split = input.split_at(len);
+    Ok(ParseOutput {
+        output: (input.start(), split.0.parse().unwrap()),
+        remaining_input: split.1,
+    })
 }

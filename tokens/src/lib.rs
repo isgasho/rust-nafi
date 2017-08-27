@@ -11,12 +11,12 @@ use std::borrow::Cow;
 #[allow(missing_docs)]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Token {
-    #[doc(hidden)] _Unknown,
-    Whitespace,
+    #[doc(hidden)] _Unknown(usize),
+    Whitespace(usize),
 
     // == Literals == //
-    IntegerLiteral(BigUint),
-    StringLiteral(StringFragments),
+    IntegerLiteral(usize, BigUint),
+    StringLiteral(usize, StringFragments),
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]

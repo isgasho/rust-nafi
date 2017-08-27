@@ -3,7 +3,7 @@
 extern crate nafi_lexer;
 use nafi_lexer::{lex, Token};
 
-fn whitespace() -> Vec<Token> { vec![Token::Whitespace] }
+fn whitespace() -> Vec<Token> { vec![Token::Whitespace(0)] }
 
 #[test]
 fn ascii_white_space() {
