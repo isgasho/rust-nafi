@@ -1,5 +1,4 @@
 language: rust
-sudo: true
 
 rust:
   - nightly
@@ -10,5 +9,4 @@ script:
   - cargo doc   --all --lib --no-deps
 
 after_success:
-  script:
-    .travis/travis-doc-upload.sh
+  .travis/travis-doc-upload.sh
