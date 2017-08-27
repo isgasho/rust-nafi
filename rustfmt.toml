@@ -3,4 +3,5 @@ match_block_trailing_comma = true
 reorder_imported_names = true
 reorder_imports = true
 reorder_imports_in_group = true
+struct_lit_width = 35
 use_try_shorthand = true

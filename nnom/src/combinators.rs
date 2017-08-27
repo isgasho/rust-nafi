@@ -26,7 +26,7 @@ mod protected {
 }
 
 use self::protected::Slice;
-use Result;
+use result::*;
 
 /// Construct a new parser that matches a subparser zero or more times.
 ///
@@ -39,15 +39,19 @@ use Result;
 /// # use nnom::prelude::*;
 /// fn type_keyword(input: &str) -> Result<&str, &str, ()> {
 ///     if input.starts_with("type") {
-///         Ok(input.split_at(4))
+///         let (output, remaining_input) = input.split_at(4);
+///         Ok(ParseOutput { remaining_input, output })
 ///     } else {
 ///         Err(())
 ///     }
 /// }
 ///
 /// assert_eq!(
-///     many0(type_keyword)("typetypetipe"),
-///     Ok((vec!["type", "type"], "tipe"))
+///     many0(type_keyword)("typetype_other"),
+///     Ok(ParseOutput {
+///         remaining_input: "_other",
+///         output: vec!["type", "type"],
+///     })
 /// )
 /// ```
 pub fn many0<'a, T: 'a + ?Sized, In, Out, Error, Parser>(
@@ -59,19 +63,22 @@ where
     &'a T: Slice<'a, T>,
 {
     move |mut input: In| {
-        let mut res = Vec::new();
+        let mut result = Vec::new();
 
         while !input.is_empty() {
             match parser(input) {
-                Ok((out, i)) => {
-                    res.push(out);
-                    input = i;
+                Ok(ParseOutput { remaining_input, output }) => {
+                    result.push(output);
+                    input = remaining_input;
                 },
                 Err(_) => break,
             }
         }
 
-        Ok((res, input))
+        Ok(ParseOutput {
+            remaining_input: input,
+            output: result,
+        })
     }
 }
 
@@ -84,5 +91,9 @@ where
     Parser: Fn(In) -> Result<In, Out, Error>,
     &'a T: Slice<'a, T>,
 {
-    move |input: In| parser(input).map(|(out, _)| (out, input))
+    move |input: In| {
+        parser(input).map(|ParseOutput { output, .. }| {
+            ParseOutput { remaining_input: input, output }
+        })
+    }
 }
