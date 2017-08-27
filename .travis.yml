@@ -9,4 +9,4 @@ script:
   - cargo doc   --all --lib --no-deps
 
 after_success:
-  .travis/travis-doc-upload.sh
+  cat .travis/travis-doc-upload.sh | sh
