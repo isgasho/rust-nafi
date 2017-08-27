@@ -3,12 +3,9 @@
   <component name="BashSupportProjectSettings">
     <option name="globalVariables">
       <set>
-        <option value="PROJECT_NAME" />
         <option value="TRAVIS_BRANCH" />
         <option value="TRAVIS_PULL_REQUEST" />
         <option value="TRAVIS_REPO_SLUG" />
-        <option value="encrypted_6c6066c61167_iv" />
-        <option value="encrypted_6c6066c61167_key" />
       </set>
     </option>
   </component>
