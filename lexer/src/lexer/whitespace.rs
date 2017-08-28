@@ -1,4 +1,3 @@
-
 use error::*;
 use lexer::unicode::{is_newline_char, white_space};
 use nnom::prelude::{ParseOutput, PositionedStr, Result};
@@ -81,20 +80,29 @@ fn block_comment(input: PositionedStr) -> Result<PositionedStr, PositionedStr, E
     })
 }
 
-//#[cfg(test)]
-//mod test {
-//    use super::*;
-//
-//    #[test]
-//    fn block_comment() {
-//        assert_eq!(take_block_comment("/** /* */*/"), IResult::Done("", ()));
-//    }
-//
-//    #[test]
-//    fn line_comment() {
-//        assert_eq!(
-//            take_line_comment("// any amount of stupid text you want"),
-//            IResult::Done("", ())
-//        );
-//    }
-//}
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn block_comment() {
+        assert_eq!(
+            super::block_comment("/** /* */*/".into()).map_err(|e| e.to_string()),
+            Ok(ParseOutput {
+                output: "/** /* */*/".into(),
+                remaining_input: PositionedStr::new("", 11),
+            })
+        );
+    }
+
+    #[test]
+    fn line_comment() {
+        assert_eq!(
+            super::line_comment("// any amount of text you want".into()).map_err(|e| e.to_string()),
+            Ok(ParseOutput {
+                output: "// any amount of text you want".into(),
+                remaining_input: PositionedStr::new("", 30),
+            })
+        );
+    }
+}

@@ -48,16 +48,38 @@ pub fn string_literal(input: PositionedStr) -> Result<PositionedStr, Token, Erro
             },
             Some('\\') => {
                 let simple_escape_len = remaining_input.chars().take(2).map(char::len_utf8).sum();
-                let (escape, rest) = remaining_input.split_at(simple_escape_len);
-                remaining_input = rest;
+                let (escape, mut rest) = remaining_input.split_at(simple_escape_len);
                 match &*escape {
                     "\\\\" => string.push('\\'),
                     "\\\"" => string.push('\"'),
                     "\\n" => string.push('\n'),
                     "\\t" => string.push('\t'),
-                    "\\u" => unimplemented!(), // FIXME
+                    "\\u" => {
+                        // FIXME: refactor: extract fn
+                        if rest.starts_with("{") {
+                            if let Some(close_idx) = rest.find("}") {
+                                let split = rest.split_at(close_idx + 1);
+                                rest = split.1;
+                                let codepoint = &split.0[1..close_idx];
+                                if let Ok(Some(char)) =
+                                    u32::from_str_radix(codepoint, 16).map(char::from_u32)
+                                {
+                                    string.push(char)
+                                } else {
+                                    string.push_invalid_escape(&remaining_input[1..close_idx + 3])
+                                }
+                            } else {
+                                let split = remaining_input.split_at(remaining_input.len());
+                                rest = split.1;
+                                string.push_invalid_escape(&split.0[1..]);
+                            }
+                        } else {
+                            string.push_invalid_escape("u")
+                        }
+                    },
                     s @ _ => string.push_invalid_escape(&s[1..]),
                 }
+                remaining_input = rest;
             },
             Some(_) => {
                 let first_interesting_index = remaining_input
@@ -75,68 +97,78 @@ pub fn string_literal(input: PositionedStr) -> Result<PositionedStr, Token, Erro
         remaining_input,
         output: Token::StringLiteral(pos, string),
     })
-
-    //IResult::Done(mut __i, o) if o == "u" => {
-    //    // FIXME: So many bad names and magic numbers
-    //    // FIXME: This should be a separate parser bit (string between {})
-    //    if __i.chars().next() == Some('{') {
-    //        if let Some(idx) = __i.find('}') {
-    //            let codepoint = &__i[1..idx];
-    //            i = &__i[idx + 1..];
-    //            if let Ok(Some(char)) =
-    //                u32::from_str_radix(codepoint, 16).map(char::from_u32)
-    //            {
-    //                string.push(char);
-    //            } else {
-    //                string.push_invalid_escape(&_i[..idx + 2]);
-    //            }
-    //        } else {
-    //            string.push_invalid_escape(_i);
-    //            i = "";
-    //        }
-    //    } else {
-    //        string.push_invalid_escape("u");
-    //        i = __i;
-    //    }
-    //},
 }
 
-//#[cfg(test)]
-//mod tests {
-//    use super::*;
-//
-//    #[test]
-//    fn string_escapes() {
-//        assert_eq!(
-//            string_literal("\"\\\"\""), // "\""
-//            IResult::Done("", Token::StringLiteral("\"".into()))
-//        );
-//        assert_eq!(
-//            string_literal("\"\\n\""), // "\n"
-//            IResult::Done("", Token::StringLiteral("\n".into()))
-//        );
-//        assert_eq!(
-//            string_literal("\"\\t\""), // "\t"
-//            IResult::Done("", Token::StringLiteral("\t".into()))
-//        );
-//        assert_eq!(
-//            string_literal("\"\\u{FFFF}\""), // "\u{FFFF}"
-//            IResult::Done("", Token::StringLiteral("\u{FFFF}".into()))
-//        );
-//    }
-//
-//    #[test]
-//    fn invalid_string_escapes() {
-//        assert_eq!(
-//            string_literal("\"\\u{}\""),
-//            IResult::Done(
-//                "",
-//                Token::StringLiteral({
-//                    let mut fragments = StringFragments::new();
-//                    fragments.push_invalid_escape("u{}");
-//                    fragments
-//                })
-//            )
-//        )
-//    }
-//}
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn string_escapes() {
+        assert_eq!(
+            string_literal("\"\\\"\"".into()).map_err(|e| e.to_string()), // "\""
+            Ok(ParseOutput {
+                output: Token::StringLiteral(0, "\"".into()),
+                remaining_input: PositionedStr::new("", 4),
+            })
+        );
+        assert_eq!(
+            string_literal("\"\\n\"".into()).map_err(|e| e.to_string()), // "\n"
+            Ok(ParseOutput {
+                output: Token::StringLiteral(0, "\n".into()),
+                remaining_input: PositionedStr::new("", 4),
+            })
+        );
+        assert_eq!(
+            string_literal("\"\\t\"".into()).map_err(|e| e.to_string()), // "\t"
+            Ok(ParseOutput {
+                output: Token::StringLiteral(0, "\t".into()),
+                remaining_input: PositionedStr::new("", 4),
+            })
+        );
+        assert_eq!(
+            string_literal("\"\\u{FFFF}\"".into()).map_err(|e| e.to_string()), // "\u{FFFF}"
+            Ok(ParseOutput {
+                output: Token::StringLiteral(0, "\u{FFFF}".into()),
+                remaining_input: PositionedStr::new("", 10),
+            })
+        );
+    }
+
+    #[test]
+    fn invalid_string_escapes() {
+        assert_eq!(
+            string_literal("\"\\u{}\"".into()).map_err(|e| e.to_string()), // "\u{}"
+            Ok(ParseOutput {
+                remaining_input: PositionedStr::new("", 6),
+                output: Token::StringLiteral(0, {
+                    let mut fragments = StringFragments::new();
+                    fragments.push_invalid_escape("u{}");
+                    fragments
+                }),
+            })
+        );
+        assert_eq!(
+            string_literal("\"\\u{110000}\"".into()).map_err(|e| e.to_string()), // "\u{110000}"
+            Ok(ParseOutput {
+                remaining_input: PositionedStr::new("", 12),
+                output: Token::StringLiteral(0, {
+                    let mut fragments = StringFragments::new();
+                    fragments.push_invalid_escape("u{110000}");
+                    fragments
+                }),
+            })
+        );
+        assert_eq!(
+            string_literal("\"\\u{XXXX}\"".into()).map_err(|e| e.to_string()), // "\u{XXXX}"
+            Ok(ParseOutput {
+                remaining_input: PositionedStr::new("", 10),
+                output: Token::StringLiteral(0, {
+                    let mut fragments = StringFragments::new();
+                    fragments.push_invalid_escape("u{XXXX}");
+                    fragments
+                }),
+            })
+        );
+    }
+}
