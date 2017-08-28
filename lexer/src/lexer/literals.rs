@@ -26,7 +26,6 @@ pub fn integer_literal(input: PositionedStr) -> Result<PositionedStr, Token, Err
 
 // NOTE: Allow other quotation marks <https://unicode-table.com/en/sets/quotation-marks/> ?
 // NOTE: Other quotation marks might be used as special string-like literals
-// FIXME: Monolith with i, _i, and __i
 /// Token::StringLiteral
 pub fn string_literal(input: PositionedStr) -> Result<PositionedStr, Token, Error> {
     if !input.starts_with("\"") {

@@ -22,7 +22,7 @@ pub fn whitespace(input: PositionedStr) -> Result<PositionedStr, Token, Error> {
 
 /// Consume some whitespace.
 fn some_whitespace(input: PositionedStr) -> Result<PositionedStr, PositionedStr, Error> {
-    // FIXME chain errors!
+    // FIXME: chain errors!
     white_space(input)
         .or_else(|_| line_comment(input))
         .or_else(|_| block_comment(input))
