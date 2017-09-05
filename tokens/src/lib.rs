@@ -19,6 +19,18 @@ pub enum Token {
     StringLiteral(usize, StringFragments),
 }
 
+impl Token {
+    /// The start location of this token.
+    pub fn position(&self) -> usize {
+        match *self {
+            Token::_Unknown(pos) |
+            Token::Whitespace(pos) |
+            Token::IntegerLiteral(pos, _) |
+            Token::StringLiteral(pos, _) => pos
+        }
+    }
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 enum StringFragment {
     Str(String),
