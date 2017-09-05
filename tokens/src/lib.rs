@@ -19,6 +19,8 @@ pub enum Token {
     Whitespace(usize),
     Symbol(usize, Symbol),
     Literal(usize, Literal),
+    Keyword(usize, Keyword),
+    Identifier(usize, String),
 }
 
 impl Token {
@@ -28,7 +30,19 @@ impl Token {
             Token::_Unknown(pos) |
             Token::Whitespace(pos) |
             Token::Symbol(pos, _) |
-            Token::Literal(pos, _) => pos,
+            Token::Literal(pos, _) |
+            Token::Keyword(pos, _) |
+            Token::Identifier(pos, _) => pos,
         }
     }
+}
+
+/// A reserved identifier-like in the source code.
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[allow(missing_docs)]
+pub enum Keyword {
+    Let,
+    Mutable,
+    If,
+    Else,
 }
