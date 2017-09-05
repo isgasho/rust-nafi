@@ -1,4 +1,4 @@
-use tokens::{Token, Keyword};
+use tokens::{Token, Keyword, Symbol};
 
 mod literals;
 mod unicode;
@@ -21,6 +21,7 @@ pub fn tokens(input: PositionedStr) -> Result<(), Vec<Token>, !> {
 /// Token
 fn token(input: PositionedStr) -> Result<PositionedStr, Token, Error> {
     identifier_like(input)
+        .or_else(|_| symbol(input))
         .or_else(|_| integer_literal(input))
         .or_else(|_| string_literal(input))
         .or_else(|_| whitespace(input))
@@ -45,7 +46,22 @@ fn identifier_like(input: PositionedStr) -> Result<PositionedStr, Token, Error> 
                 }
             }
         })
-        .chain_err(ErrorKind::NoMatch(input.start(), "lexer::identifier_like"))
+        .chain_err(|| ErrorKind::NoMatch(input.start(), "lexer::identifier_like"))
+}
+
+/// Token::Symbol
+fn symbol(input: PositionedStr) -> Result<PositionedStr, Token, Error> {
+    let tok = input.chars().next().and_then(|c| Symbol::try_from(c).ok());
+    match tok {
+        None => bail!(ErrorKind::NoMatch(input.start(), "lexer::symbol")),
+        Some(symbol) => {
+            let split = input.split_at(symbol.as_char().len_utf8());
+            Ok(ParseOutput {
+                remaining_input: split.1,
+                output: Token::Symbol(input.start(), symbol),
+            })
+        },
+    }
 }
 
 /// Token::_Unknown

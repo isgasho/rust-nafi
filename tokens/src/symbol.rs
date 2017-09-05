@@ -76,3 +76,43 @@ impl Symbol {
         }
     }
 }
+
+impl Symbol {
+    /// Convert a character to a `Symbol`.
+    pub fn try_from(char: char) -> Result<Self, ()> {
+        use Symbol::*;
+        Ok(match char {
+            '!' => ExclamationMark,
+            '#' => NumberSign,
+            '$' => DollarSign,
+            '%' => PercentSign,
+            '&' => Ampersand,
+            '(' => LeftParenthesis,
+            ')' => RightParenthesis,
+            '*' => Asterisk,
+            '+' => PlusSign,
+            ',' => Comma,
+            '-' => HyphenMinus,
+            '.' => FullStop,
+            '/' => Solidus,
+            ':' => Colon,
+            ';' => Semicolon,
+            '<' => LessThanSign,
+            '=' => EqualsSign,
+            '>' => GreaterThanSign,
+            '?' => QuestionMark,
+            '@' => CommercialAt,
+            '[' => LeftSquareBracket,
+            '\\' => ReverseSolidus,
+            ']' => RightSquareBracket,
+            '^' => CircumflexAccent,
+            '_' => LowLine,
+            '`' => GraveAccent,
+            '{' => LeftCurlyBracket,
+            '|' => VerticalLine,
+            '}' => RightCurlyBracket,
+            '~' => Tilde,
+            _ => return Err(()),
+        })
+    }
+}
