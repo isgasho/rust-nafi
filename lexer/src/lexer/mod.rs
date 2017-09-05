@@ -21,10 +21,10 @@ pub fn tokens(input: PositionedStr) -> Result<(), Vec<Token>, !> {
 /// Token
 fn token(input: PositionedStr) -> Result<PositionedStr, Token, Error> {
     identifier_like(input)
+        .or_else(|_| whitespace(input))
         .or_else(|_| symbol(input))
         .or_else(|_| integer_literal(input))
         .or_else(|_| string_literal(input))
-        .or_else(|_| whitespace(input))
         .or_else(|_| _unknown(input))
         .map_err(|e| {
             e.chain_err(|| ErrorKind::NoMatch(input.start(), "lexer::token"))
