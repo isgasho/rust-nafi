@@ -19,13 +19,12 @@ pub fn tokens(input: PositionedStr) -> Result<(), Vec<Token>, !> {
 
 /// Token
 fn token(input: PositionedStr) -> Result<PositionedStr, Token, Error> {
-    // FIXME: chain errors!
     integer_literal(input)
         .or_else(|_| string_literal(input))
         .or_else(|_| whitespace(input))
         .or_else(|_| _unknown(input))
-        .map_err(|_| {
-            Error::from_kind(ErrorKind::NoMatch(input.start(), "lexer::token"))
+        .map_err(|e| {
+            e.chain_err(|| ErrorKind::NoMatch(input.start(), "lexer::token"))
         })
 }
 
