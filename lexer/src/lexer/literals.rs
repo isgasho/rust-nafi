@@ -5,7 +5,7 @@ use lexer::unicode::decimal_number;
 use nnom::prelude::{ParseOutput, PositionedStr, Result};
 use tokens::{StringFragments, Token};
 
-/// Token::IntegerLiteral
+/// Token::Literal(Literal::Integer)
 pub fn integer_literal(input: PositionedStr) -> Result<PositionedStr, Token, Error> {
     decimal_number(input)
         .map(
@@ -26,7 +26,7 @@ pub fn integer_literal(input: PositionedStr) -> Result<PositionedStr, Token, Err
 
 // NOTE: Allow other quotation marks <https://unicode-table.com/en/sets/quotation-marks/> ?
 // NOTE: Other quotation marks might be used as special string-like literals
-/// Token::StringLiteral
+/// Token::Literal(Literal::String)
 pub fn string_literal(input: PositionedStr) -> Result<PositionedStr, Token, Error> {
     if !input.starts_with("\"") {
         bail!(ErrorKind::NoMatch(

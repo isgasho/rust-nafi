@@ -1,6 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Check lexer" type="CargoCommandRunConfiguration" factoryName="Cargo Command" folderName="lexer" singleton="false">
-  <configuration default="false" name="Check lexer" type="CargoCommandRunConfiguration" factoryName="Cargo Command" folderName="lexer" singleton="true">
+  <configuration default="false" name="Check lexer" type="CargoCommandRunConfiguration" factoryName="Cargo Command" folderName="lexer">
     <option name="channel" value="DEFAULT" />
     <option name="command" value="check --package=nafi-lexer" />
     <option name="nocapture" value="false" />

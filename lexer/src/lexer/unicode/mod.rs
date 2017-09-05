@@ -63,3 +63,31 @@ pub fn decimal_number(input: PositionedStr) -> Result<PositionedStr, (usize, Big
         remaining_input: split.1,
     })
 }
+
+// FIXME: Use Unicode UAX31-R1 instead of this simple definition
+/// Parse an identifier
+pub fn identifier(input: PositionedStr) -> Result<PositionedStr, String, Error> {
+    let mut chars = input.chars();
+    if let Some(char) = chars.next() {
+        if !is_id_start(char) {
+            bail!(ErrorKind::NoMatch(input.start(), "lexer::unicode::identifier"))
+        }
+        let idx = chars.take_while(|c| is_id_continue(*c)).count() + 1;
+        let (matched, remaining) = input.split_at(idx);
+        Ok(ParseOutput {
+            remaining_input: remaining,
+            output: (*matched).into(),
+        })
+    } else {
+        bail!(ErrorKind::NoMatch(input.start(), "lexer::unicode::identifier"))
+    }
+}
+
+fn is_id_start(ch: char) -> bool {
+    (('a' as u32 <= ch as u32) && (ch as u32 <= 'z' as u32)) ||
+        (('A' as u32 <= ch as u32) && (ch as u32 <= 'Z' as u32))
+}
+
+fn is_id_continue(ch: char) -> bool {
+    is_id_start(ch) || ch == '_' || (('0' as u32 <= ch as u32) && (ch as u32 <= '9' as u32))
+}
