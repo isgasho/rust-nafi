@@ -14,7 +14,7 @@ pub fn integer_literal(input: PositionedStr) -> Result<PositionedStr, Token, Err
                  remaining_input,
              }| {
                 ParseOutput {
-                    output: Token::IntegerLiteral(pos, integer),
+                    output: Token::Literal(pos, integer.into()),
                     remaining_input,
                 }
             },
@@ -94,7 +94,7 @@ pub fn string_literal(input: PositionedStr) -> Result<PositionedStr, Token, Erro
 
     Ok(ParseOutput {
         remaining_input,
-        output: Token::StringLiteral(pos, string),
+        output: Token::Literal(pos, string.into()),
     })
 }
 
@@ -107,28 +107,28 @@ mod tests {
         assert_eq!(
             string_literal("\"\\\"\"".into()).map_err(|e| e.to_string()), // "\""
             Ok(ParseOutput {
-                output: Token::StringLiteral(0, "\"".into()),
+                output: Token::Literal(0, "\"".into()),
                 remaining_input: PositionedStr::new("", 4),
             })
         );
         assert_eq!(
             string_literal("\"\\n\"".into()).map_err(|e| e.to_string()), // "\n"
             Ok(ParseOutput {
-                output: Token::StringLiteral(0, "\n".into()),
+                output: Token::Literal(0, "\n".into()),
                 remaining_input: PositionedStr::new("", 4),
             })
         );
         assert_eq!(
             string_literal("\"\\t\"".into()).map_err(|e| e.to_string()), // "\t"
             Ok(ParseOutput {
-                output: Token::StringLiteral(0, "\t".into()),
+                output: Token::Literal(0, "\t".into()),
                 remaining_input: PositionedStr::new("", 4),
             })
         );
         assert_eq!(
             string_literal("\"\\u{FFFF}\"".into()).map_err(|e| e.to_string()), // "\u{FFFF}"
             Ok(ParseOutput {
-                output: Token::StringLiteral(0, "\u{FFFF}".into()),
+                output: Token::Literal(0, "\u{FFFF}".into()),
                 remaining_input: PositionedStr::new("", 10),
             })
         );
@@ -140,10 +140,10 @@ mod tests {
             string_literal("\"\\u{}\"".into()).map_err(|e| e.to_string()), // "\u{}"
             Ok(ParseOutput {
                 remaining_input: PositionedStr::new("", 6),
-                output: Token::StringLiteral(0, {
+                output: Token::Literal(0, {
                     let mut fragments = StringFragments::new();
                     fragments.push_invalid_escape("u{}");
-                    fragments
+                    fragments.into()
                 }),
             })
         );
@@ -151,10 +151,10 @@ mod tests {
             string_literal("\"\\u{110000}\"".into()).map_err(|e| e.to_string()), // "\u{110000}"
             Ok(ParseOutput {
                 remaining_input: PositionedStr::new("", 12),
-                output: Token::StringLiteral(0, {
+                output: Token::Literal(0, {
                     let mut fragments = StringFragments::new();
                     fragments.push_invalid_escape("u{110000}");
-                    fragments
+                    fragments.into()
                 }),
             })
         );
@@ -162,10 +162,10 @@ mod tests {
             string_literal("\"\\u{XXXX}\"".into()).map_err(|e| e.to_string()), // "\u{XXXX}"
             Ok(ParseOutput {
                 remaining_input: PositionedStr::new("", 10),
-                output: Token::StringLiteral(0, {
+                output: Token::Literal(0, {
                     let mut fragments = StringFragments::new();
                     fragments.push_invalid_escape("u{XXXX}");
-                    fragments
+                    fragments.into()
                 }),
             })
         );

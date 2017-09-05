@@ -2,7 +2,7 @@
 
 use error::*;
 use nnom::prelude::{ParseOutput, PositionedStr, Result};
-use num::bigint::BigUint;
+use tokens::BigUint;
 
 // FIXME: use an actual unicode rule
 /// Recognize characters that are part of a newline

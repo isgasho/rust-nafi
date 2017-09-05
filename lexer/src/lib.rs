@@ -8,7 +8,6 @@ extern crate error_chain;
 
 extern crate nafi_tokens as tokens;
 extern crate nnom;
-extern crate num;
 
 /// `error-chain` error types
 pub mod error {

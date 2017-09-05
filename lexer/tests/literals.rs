@@ -1,13 +1,13 @@
 //! Test literals in NAFI source code, e.g. numbers, strings
 
 extern crate nafi_lexer;
-extern crate num;
+extern crate nafi_tokens;
 
 use nafi_lexer::{lex, Token};
-use num::bigint::BigUint;
+use nafi_tokens::BigUint;
 
 fn literal_num<N: Into<BigUint>>(int: N) -> Vec<Token> {
-    vec![Token::IntegerLiteral(0, int.into())]
+    vec![Token::Literal(0, int.into().into())]
 }
 
 #[test]
@@ -29,6 +29,6 @@ fn integer_literal_allows_very_big_numbers() {
     let bignum = "1234567890123456789012345678901234567890"; // roughly 2 ^ 129.859
     assert_eq!(
         lex(bignum),
-        vec![Token::IntegerLiteral(0, bignum.parse().unwrap())]
+        vec![Token::Literal(0, bignum.parse::<BigUint>().unwrap().into())]
     )
 }
