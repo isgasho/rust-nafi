@@ -7,6 +7,12 @@ before_install:
 rust:
 - nightly
 
+branches:
+  only:
+    - staging
+    - trying
+    - master
+
 script:
 - cargo build --all
 - cargo test  --all
