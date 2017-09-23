@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Check AST" type="CargoCommandRunConfiguration" factoryName="Cargo Command" folderName="ast">
+    <option name="channel" value="DEFAULT" />
+    <option name="command" value="check --package=nafi-ast" />
+    <option name="nocapture" value="true" />
+    <option name="backtrace" value="SHORT" />
+    <envs />
+    <method />
+  </configuration>
+</component>
