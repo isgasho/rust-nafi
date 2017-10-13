@@ -13,6 +13,7 @@
       <sourceFolder url="file://$MODULE_DIR$/nnom/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/nnom/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/tokens/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ast/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

@@ -1,8 +1,8 @@
 language: rust
 
-before_install:
-- openssl enc -K $SSL_ENC_KEY -iv $SSL_ENC_IV -in ./.travis/id_rsa.enc -out ~/.ssh/id_rsa -d
-- chmod 600 ~/.ssh/id_rsa
+# before_install:
+# - openssl enc -K $SSL_ENC_KEY -iv $SSL_ENC_IV -in ./.travis/id_rsa.enc -out ~/.ssh/id_rsa -d
+# - chmod 600 ~/.ssh/id_rsa
 
 rust:
 - nightly
@@ -18,4 +18,4 @@ script:
 - cargo test  --all
 - cargo doc   --all --lib --no-deps
 
-after_success: cat .travis/travis-doc-upload.sh | sh
+# after_success: cat .travis/travis-doc-upload.sh | sh
