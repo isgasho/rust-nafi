@@ -27,7 +27,7 @@ It's intended to create a working version in time to [compete in a challenge][CO
 
 Thank you for considering contributing to Nafi!
 I am deeply humbled that you would consider this project worthy of your time.
-See the [CONTRIBUTING] for more information on contributing,
+See [CONTRIBUTING] for more information on contributing,
 but always, feel free to submit a PR that improves something about this project!
 
 [travis]: <https://travis-ci.org/nafi-lang/rust-nafi>
@@ -36,3 +36,4 @@ but always, feel free to submit a PR that improves something about this project!
 [docs]: <https://nafi-lang.github.io/rust-nafi/>
 [gitter]: <https://gitter.im/nafi-lang/rust-nafi>
 [CODE REVIEW]: <https://codereview.meta.stackexchange.com/q/8442/100439>
+[CONTRIBUTING]: <CONTRIBUTING.md>

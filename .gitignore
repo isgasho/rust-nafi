@@ -111,3 +111,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+### Custom ignore rules
+
+.idea/misc.xml # IntelliJ Rust keeps computer-specific path to cargo here
