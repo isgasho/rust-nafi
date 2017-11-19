@@ -3,6 +3,7 @@ use std::borrow::Cow;
 
 /// A literal in the source code, e.g. a string or number.
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[allow(missing_docs)]
 pub enum Literal {
     Integer(BigUint),
     String(StringFragments),
@@ -43,7 +44,7 @@ impl StringFragments {
     /// Push a character onto the end of this string.
     pub fn push_char(&mut self, ch: char) {
         match self.fragments.last_mut() {
-            Some(StringFragment::String(mut string)) => string.push(ch),
+            Some(StringFragment::String(string)) => string.push(ch),
             _ => self.fragments.push(ch.to_string().into()),
         }
     }
@@ -51,8 +52,7 @@ impl StringFragments {
     /// Push a string onto the end of this string.
     pub fn push_string<'a, S: Into<Cow<'a, str>>>(&mut self, s: S) {
         match self.fragments.last_mut() {
-            // removing the `ref` from the following line causes an ICE for some reason
-            Some(StringFragment::String(ref mut string)) => string.push_str(s.into().as_ref()),
+            Some(StringFragment::String(string)) => string.push_str(s.into().as_ref()),
             _ => self.fragments.push(s.into().into_owned().into()),
         }
     }
@@ -61,4 +61,40 @@ impl StringFragments {
     pub fn push_invalid_escape<S: Into<String>>(&mut self, s: S) {
         self.fragments.push(StringFragment::InvalidEscape(s.into()))
     }
+
+    /// Try to turn this string into a normal string.
+    ///
+    /// Fails if any invalid escapes are present.
+    pub fn try_into_string(self) -> Result<String, InvalidEscapes> {
+        if self.fragments.len() == 1 {
+            if let StringFragment::String(_) = self.fragments[0] {
+                if let Some(StringFragment::String(string)) = self.fragments.into_iter().next() {
+                    return Ok(string);
+                } else {
+                    unreachable!()
+                }
+            }
+        }
+        Err(InvalidEscapes(
+            self.fragments
+                .into_iter()
+                .filter_map(|fragment| match fragment {
+                    StringFragment::InvalidEscape(escape) => Some(escape),
+                    _ => None,
+                })
+                .collect(),
+        ))
+    }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Fail)]
+#[fail(display = "StringFragments contained (an) invalid escape(s)")]
+pub struct InvalidEscapes(Vec<String>);
+
+impl InvalidEscapes {
+    /// Create an iterator over the invalid escapes.
+    ///
+    /// You get what was attached after the `\`.
+    /// E.g. `\w` gives `w` and `\u{INVALID}` gives `u{INVALID}`
+    pub fn iter<'a>(&'a self) -> impl Iterator<Item = &'a str> { self.0.iter().map(String::as_str) }
 }
