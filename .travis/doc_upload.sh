@@ -3,7 +3,7 @@
 set -ev
 
 [ ${TRAVIS_BRANCH} = master ]
-[ ${TRAVIS_PULL_REQUREST} = false ]
+[ ${TRAVIS_PULL_REQUEST} = false ]
 
 git clone --branch gh-pages git@github.com:${TRAVIS_REPO_SLUG} docs
 cd docs
