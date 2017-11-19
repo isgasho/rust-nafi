@@ -2,4 +2,5 @@
 
 members = [
     './nnom/',
+    './tokens/',
 ]
