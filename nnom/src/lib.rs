@@ -17,8 +17,4 @@ pub mod combinators;
 mod result;
 pub mod slice;
 
-#[allow(missing_docs)]
-pub mod prelude {
-    pub use result::{ParseOutput, ParseResult};
-    pub use slice::{PositionedSlice, PositionedStr};
-}
+pub use result::{ParseOutput, ParseResult};
