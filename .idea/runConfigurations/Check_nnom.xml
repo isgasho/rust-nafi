@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Check nnom" type="CargoCommandRunConfiguration" factoryName="Cargo Command" folderName="nnom">
+    <option name="channel" value="DEFAULT" />
+    <option name="command" value="check" />
+    <option name="nocapture" value="true" />
+    <option name="backtrace" value="SHORT" />
+    <option name="workingDirectory" value="file://$PROJECT_DIR$/nnom" />
+    <envs />
+    <method />
+  </configuration>
+</component>
