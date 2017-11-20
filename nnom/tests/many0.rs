@@ -1,6 +1,7 @@
 extern crate nnom;
+use nnom::*;
 use nnom::combinators::many0;
-use nnom::prelude::*;
+use nnom::slice::*;
 
 #[test]
 fn many0_str() {

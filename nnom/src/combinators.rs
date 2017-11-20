@@ -39,7 +39,7 @@ use self::protected::Slice;
 /// # Example
 ///
 /// ```
-/// # use nnom::prelude::*;
+/// use nnom::{ParseOutput, ParseResult};
 /// use nnom::combinators::many0;
 ///
 /// fn type_keyword(input: &str) -> ParseResult<&str, &str, ()> {
