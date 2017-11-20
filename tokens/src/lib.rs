@@ -21,7 +21,7 @@ pub use literal::{BigUint, Literal, StringFragments};
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[allow(missing_docs)]
 pub enum Token {
-    Identifier(usize, Rc<String>),
+    Identifier(usize, Rc<str>),
     Keyword(usize, Keyword),
     Literal(usize, Literal),
     Whitespace(usize),
