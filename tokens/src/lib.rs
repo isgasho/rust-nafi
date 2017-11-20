@@ -14,8 +14,8 @@ use std::rc::Rc;
 mod literal;
 mod symbol;
 
-pub use symbol::Symbol;
 pub use literal::{BigUint, Literal, StringFragments};
+pub use symbol::Symbol;
 
 /// A token in the source code. A simple atomic unit.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -23,6 +23,7 @@ pub use literal::{BigUint, Literal, StringFragments};
 pub enum Token {
     Identifier(usize, Rc<str>),
     Keyword(usize, Keyword),
+    Symbol(usize, Symbol),
     Literal(usize, Literal),
     Whitespace(usize),
     #[doc(hidden)] _Unknown(usize),
@@ -34,6 +35,7 @@ impl Token {
         match *self {
             Token::Identifier(pos, _) |
             Token::Keyword(pos, _) |
+            Token::Symbol(pos, _) |
             Token::Literal(pos, _) |
             Token::Whitespace(pos) |
             Token::_Unknown(pos) => pos,
