@@ -1,6 +1,8 @@
 [workspace]
 
 members = [
+    './lexer/',
     './nnom/',
+    './str-intern/',
     './tokens/',
 ]

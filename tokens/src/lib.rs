@@ -9,7 +9,7 @@ extern crate failure;
 extern crate failure_derive;
 extern crate num_bigint as bigint;
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 mod literal;
 mod symbol;
@@ -21,12 +21,12 @@ pub use symbol::Symbol;
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[allow(missing_docs)]
 pub enum Token {
-    Identifier(usize, Rc<str>),
+    Identifier(usize, Arc<str>),
     Keyword(usize, Keyword),
     Symbol(usize, Symbol),
     Literal(usize, Literal),
     Whitespace(usize),
-    #[doc(hidden)] _Unknown(usize),
+    #[doc(hidden)] _Unknown(usize, char),
 }
 
 impl Token {
@@ -38,7 +38,7 @@ impl Token {
             Token::Symbol(pos, _) |
             Token::Literal(pos, _) |
             Token::Whitespace(pos) |
-            Token::_Unknown(pos) => pos,
+            Token::_Unknown(pos, _) => pos,
         }
     }
 }

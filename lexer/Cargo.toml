@@ -1,0 +1,15 @@
+[package]
+name = "nafi-lexer"
+version = "0.0.0"
+publish = false
+
+[dependencies]
+matches = "0.1"
+nafi-tokens = { path = "../tokens/" }
+nnom = { path = "../nnom/" }
+str-intern = { path = "../str-intern/" }
+unic-ucd-category = "0.6"
+
+[[bin]]
+name = "nafi-lexer-repl"
+path = "./repl/main.rs"

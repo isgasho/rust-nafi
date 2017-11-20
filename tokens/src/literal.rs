@@ -1,3 +1,4 @@
+use Token;
 pub use bigint::BigUint;
 use std::borrow::Cow;
 
@@ -17,6 +18,11 @@ impl From<BigUint> for Literal {
 enum StringFragment {
     String(String),
     InvalidEscape(String),
+    Interpolation(Vec<Token>),
+}
+
+impl From<StringFragments> for Literal {
+    fn from(fragments: StringFragments) -> Self { Literal::String(fragments) }
 }
 
 impl<S: Into<String>> From<S> for StringFragment {
@@ -60,6 +66,14 @@ impl StringFragments {
     /// Push an invalid escape onto the end of this string.
     pub fn push_invalid_escape<S: Into<String>>(&mut self, s: S) {
         self.fragments.push(StringFragment::InvalidEscape(s.into()))
+    }
+
+    /// Push the tokens inside string interpolation onto the end of this string.
+    pub fn push_interpolation(&mut self, mut t: Vec<Token>) {
+        match self.fragments.last_mut() {
+            Some(StringFragment::Interpolation(tokens)) => tokens.append(&mut t),
+            _ => self.fragments.push(StringFragment::Interpolation(t)),
+        }
     }
 
     /// Try to turn this string into a normal string.
