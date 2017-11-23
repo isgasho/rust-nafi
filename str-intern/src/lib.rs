@@ -13,8 +13,5 @@ pub fn interned(s: &str) -> Arc<str> {
     if !cache.contains(s) {
         cache.insert(Arc::from(s));
     }
-    cache
-        .get(s)
-        .unwrap_or_else(|| unreachable!("Just added"))
-        .clone()
+    Arc::clone(cache.get(s).unwrap_or_else(|| unreachable!("Just added")))
 }

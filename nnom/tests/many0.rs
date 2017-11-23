@@ -6,7 +6,7 @@ use nnom::slice::*;
 #[test]
 fn many0_str() {
     fn tag(input: &str) -> ParseResult<&str, &str, ()> {
-        if input.starts_with("Q") {
+        if input.starts_with('Q') {
             let (output, remaining_input) = input.split_at(1);
             Ok(ParseOutput {
                 remaining_input,
@@ -52,7 +52,7 @@ fn many0_slice() {
 #[test]
 fn many0_positioned_str() {
     fn tag(input: PositionedStr) -> ParseResult<PositionedStr, PositionedStr, ()> {
-        if input.starts_with("Q") {
+        if input.starts_with('Q') {
             let (output, remaining_input) = input.split_at(1);
             Ok(ParseOutput {
                 remaining_input,

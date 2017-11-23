@@ -37,7 +37,7 @@ fn token(input: PositionedStr) -> ParseResult<PositionedStr, Token, ()> {
         .or_else(|_| _unknown(input))
 }
 
-/// Token::Identifier or Token::Keyword
+/// `Token::Identifier` or `Token::Keyword`
 fn identifier_like(input: PositionedStr) -> ParseResult<PositionedStr, Token, ()> {
     identifier(input).map(
         |ParseOutput {
@@ -58,7 +58,7 @@ fn identifier_like(input: PositionedStr) -> ParseResult<PositionedStr, Token, ()
     )
 }
 
-/// Token::Symbol
+/// `Token::Symbol`
 fn symbol(input: PositionedStr) -> ParseResult<PositionedStr, Token, ()> {
     let ch = input.chars().next().ok_or(())?;
     let category = GeneralCategory::of(ch);
@@ -72,7 +72,7 @@ fn symbol(input: PositionedStr) -> ParseResult<PositionedStr, Token, ()> {
     }
 }
 
-/// Token::_Unknown
+/// `Token::_Unknown`
 fn _unknown(input: PositionedStr) -> ParseResult<PositionedStr, Token, ()> {
     let ch = input.chars().next().ok_or(())?;
     Ok(ParseOutput {

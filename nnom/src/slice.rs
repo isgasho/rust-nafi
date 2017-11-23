@@ -34,6 +34,7 @@ pub struct PositionedIndex<'a, T: Slice + 'a + ?Sized> {
 
 // These impls should apply even when T is not Copy
 impl<'a, T: Slice + 'a + ?Sized> Copy for PositionedIndex<'a, T> {}
+#[cfg_attr(feature = "cargo-clippy", allow(expl_impl_clone_on_copy))]
 impl<'a, T: Slice + 'a + ?Sized> Clone for PositionedIndex<'a, T> {
     fn clone(&self) -> Self { *self }
 }

@@ -110,5 +110,6 @@ impl InvalidEscapes {
     ///
     /// You get what was attached after the `\`.
     /// E.g. `\w` gives `w` and `\u{INVALID}` gives `u{INVALID}`
+    #[cfg_attr(feature = "cargo-clippy", allow(needless_lifetimes))] // ICE when eliding lifetimes
     pub fn iter<'a>(&'a self) -> impl Iterator<Item = &'a str> { self.0.iter().map(String::as_str) }
 }

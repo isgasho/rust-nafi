@@ -33,12 +33,12 @@ impl Token {
     /// The start position of this token.
     pub fn position(&self) -> usize {
         match *self {
-            Token::Identifier(pos, _) |
-            Token::Keyword(pos, _) |
-            Token::Symbol(pos, _) |
-            Token::Literal(pos, _) |
-            Token::Whitespace(pos) |
-            Token::_Unknown(pos, _) => pos,
+            Token::Identifier(pos, _)
+            | Token::Keyword(pos, _)
+            | Token::Symbol(pos, _)
+            | Token::Literal(pos, _)
+            | Token::Whitespace(pos)
+            | Token::_Unknown(pos, _) => pos,
         }
     }
 }

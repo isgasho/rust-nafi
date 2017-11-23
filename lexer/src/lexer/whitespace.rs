@@ -3,7 +3,7 @@ use nnom::{ParseOutput, ParseResult};
 use nnom::slice::PositionedStr;
 use tokens::Token;
 
-/// Token::Whitespace
+/// `Token::Whitespace`
 pub fn whitespace(input: PositionedStr) -> ParseResult<PositionedStr, Token, ()> {
     let mut rest = input;
     while let Ok(ParseOutput {
@@ -36,7 +36,7 @@ fn line_comment(input: PositionedStr) -> ParseResult<PositionedStr, PositionedSt
         return Err(());
     }
 
-    let idx = input.find(is_newline).unwrap_or(input.len());
+    let idx = input.find(is_newline).unwrap_or_else(|| input.len());
     let (output, remaining_input) = input.split_at(idx);
     Ok(ParseOutput {
         remaining_input,

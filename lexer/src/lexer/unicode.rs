@@ -12,7 +12,7 @@ pub fn white_space(input: PositionedStr) -> ParseResult<PositionedStr, Positione
         .filter(|&(_, ch)| !ch.is_whitespace())
         .map(|(idx, _)| idx)
         .next()
-        .unwrap_or(input.len());
+        .unwrap_or_else(|| input.len());
     if idx != 0 {
         let (output, remaining_input) = input.split_at(idx);
         Ok(ParseOutput {

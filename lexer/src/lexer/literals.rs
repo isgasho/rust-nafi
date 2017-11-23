@@ -2,9 +2,10 @@ use super::unicode::decimal_number;
 use lexer::tokens;
 use nnom::{ParseOutput, ParseResult};
 use nnom::slice::PositionedStr;
+//use std::u32;
 use tokens::{StringFragments, Symbol, Token};
 
-/// Token::Literal(Literal::Integer)
+/// `Token::Literal(Literal::Integer)`
 pub fn integer_literal(input: PositionedStr) -> ParseResult<PositionedStr, Token, ()> {
     decimal_number(input).map(
         |ParseOutput {
@@ -21,9 +22,9 @@ pub fn integer_literal(input: PositionedStr) -> ParseResult<PositionedStr, Token
 
 // FIXME BUG: String interpolation containing a string with unbalanced {} breaks everything help
 // TODO: Break single-character escapes into reusable fn and build character_literal
-/// Token::Literal(Literal::String)
+/// `Token::Literal(Literal::String)`
 pub fn string_literal(input: PositionedStr) -> ParseResult<PositionedStr, Token, ()> {
-    if !input.starts_with("\"") {
+    if !input.starts_with('"') {
         return Err(());
     }
 
@@ -63,13 +64,7 @@ pub fn string_literal(input: PositionedStr) -> ParseResult<PositionedStr, Token,
                         // Remove leading bracket
                         output.remove(0);
                         // Remove trailing bracket (can be absent if closed by EOF)
-                        if output
-                            .last()
-                            .filter(|&tok| {
-                                matches!(*tok, Token::Symbol(_, Symbol::RightCurlyBracket))
-                            })
-                            .is_some()
-                        {
+                        if let Some(&Token::Symbol(_, Symbol::RightCurlyBracket)) = output.last() {
                             output.pop();
                         }
                         string.push_interpolation(output);
@@ -82,7 +77,7 @@ pub fn string_literal(input: PositionedStr) -> ParseResult<PositionedStr, Token,
             Some(_) => {
                 let idx = remaining_input
                     .find(|ch| matches!(ch, '\"' | '\\'))
-                    .unwrap_or(remaining_input.len());
+                    .unwrap_or_else(|| remaining_input.len());
                 let (uninteresting, rest) = remaining_input.split_at(idx);
                 string.push_string(&*uninteresting);
                 remaining_input = rest;
@@ -100,8 +95,7 @@ pub fn string_literal(input: PositionedStr) -> ParseResult<PositionedStr, Token,
 fn grab_matched_substring(
     open: char,
     close: char,
-) -> impl Fn(PositionedStr)
-    -> ParseResult<PositionedStr, PositionedStr, ()> {
+) -> impl Fn(PositionedStr) -> ParseResult<PositionedStr, PositionedStr, ()> {
     move |input: PositionedStr| {
         if !input.starts_with(open) {
             return Err(());
@@ -126,7 +120,7 @@ fn grab_matched_substring(
                 Some(_) => {
                     let idx = remaining_input
                         .find(|ch| ch == open || ch == close)
-                        .unwrap_or(remaining_input.len());
+                        .unwrap_or_else(|| remaining_input.len());
                     remaining_input = remaining_input.split_at(idx).1;
                 },
                 None => break,

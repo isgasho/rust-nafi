@@ -111,7 +111,7 @@ impl From<char> for Symbol {
             '|' => VerticalLine,
             '}' => RightCurlyBracket,
             '~' => Tilde,
-            _ => return Other(ch),
+            _ => Other(ch),
         }
     }
 }
