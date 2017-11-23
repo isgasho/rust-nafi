@@ -4,9 +4,6 @@
 #![deny(missing_docs, unsafe_code, unused)]
 #![feature(conservative_impl_trait, match_default_bindings)]
 
-extern crate failure;
-#[macro_use]
-extern crate failure_derive;
 extern crate num_bigint as bigint;
 
 use std::sync::Arc;
