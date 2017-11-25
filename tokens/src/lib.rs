@@ -4,12 +4,9 @@
 #![deny(missing_docs, unsafe_code, unused)]
 #![feature(conservative_impl_trait, match_default_bindings)]
 
-extern crate failure;
-#[macro_use]
-extern crate failure_derive;
 extern crate num_bigint as bigint;
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 mod literal;
 mod symbol;
@@ -21,24 +18,24 @@ pub use symbol::Symbol;
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[allow(missing_docs)]
 pub enum Token {
-    Identifier(usize, Rc<str>),
+    Identifier(usize, Arc<str>),
     Keyword(usize, Keyword),
     Symbol(usize, Symbol),
     Literal(usize, Literal),
     Whitespace(usize),
-    #[doc(hidden)] _Unknown(usize),
+    #[doc(hidden)] _Unknown(usize, char),
 }
 
 impl Token {
     /// The start position of this token.
     pub fn position(&self) -> usize {
         match *self {
-            Token::Identifier(pos, _) |
-            Token::Keyword(pos, _) |
-            Token::Symbol(pos, _) |
-            Token::Literal(pos, _) |
-            Token::Whitespace(pos) |
-            Token::_Unknown(pos) => pos,
+            Token::Identifier(pos, _)
+            | Token::Keyword(pos, _)
+            | Token::Symbol(pos, _)
+            | Token::Literal(pos, _)
+            | Token::Whitespace(pos)
+            | Token::_Unknown(pos, _) => pos,
         }
     }
 }

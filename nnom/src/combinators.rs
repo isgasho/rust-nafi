@@ -70,17 +70,9 @@ where
     move |mut input: In| {
         let mut result = Vec::new();
 
-        while !input.is_empty() {
-            match parser(input) {
-                Ok(ParseOutput {
-                    remaining_input,
-                    output,
-                }) => {
-                    result.push(output);
-                    input = remaining_input;
-                },
-                Err(_) => break,
-            }
+        while let Ok(parse_output) = parser(input) {
+            result.push(parse_output.output);
+            input = parse_output.remaining_input;
         }
 
         Ok(ParseOutput {
