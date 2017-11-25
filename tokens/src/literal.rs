@@ -70,10 +70,7 @@ impl StringFragments {
     }
 
     /// Push the tokens inside string interpolation onto the end of this string.
-    pub fn push_interpolation(&mut self, mut t: Vec<Token>) {
-        match self.fragments.last_mut() {
-            Some(StringFragment::Interpolation(tokens)) => tokens.append(&mut t),
-            _ => self.fragments.push(StringFragment::Interpolation(t)),
-        }
+    pub fn push_interpolation(&mut self, t: Vec<Token>) {
+        self.fragments.push(StringFragment::Interpolation(t))
     }
 }
