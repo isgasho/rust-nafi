@@ -2,7 +2,7 @@ use super::unicode::decimal_number;
 use lexer::tokens;
 use nnom::{ParseOutput, ParseResult};
 use nnom::slice::PositionedStr;
-//use std::u32;
+use std::{char, u32};
 use tokens::{StringFragments, Symbol, Token};
 
 /// `Token::Literal(Literal::Integer)`
@@ -54,6 +54,24 @@ pub fn string_literal(input: PositionedStr) -> ParseResult<PositionedStr, Token,
                     },
                     Some('t') => {
                         string.push_char('\t');
+                        remaining_input = remaining_input.split_at(1).1;
+                    },
+                    Some('u') => {
+                        if remaining_input.starts_with("u{") {
+                            if let Some(idx) = remaining_input.find('}') {
+                                let codepoint = u32::from_str_radix(&remaining_input[2..idx], 16);
+                                if let Ok(Some(ch)) = codepoint.map(char::from_u32) {
+                                    string.push_char(ch);
+                                } else {
+                                    string.push_invalid_escape(&remaining_input[..idx + 1])
+                                }
+                                remaining_input = remaining_input.split_at(idx).1;
+                            } else {
+                                string.push_invalid_escape('u'.to_string());
+                            }
+                        } else {
+                            string.push_invalid_escape('u'.to_string());
+                        }
                         remaining_input = remaining_input.split_at(1).1;
                     },
                     Some('{') => {
