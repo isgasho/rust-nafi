@@ -100,3 +100,27 @@ where
         })
     }
 }
+
+/// Construct a new parser that matches a subparser zero or one times.
+pub fn optional<'a, T: 'a + ?Sized, In, Out, Error, Parser>(
+    parser: Parser,
+) -> impl Fn(In) -> ParseResult<In, Option<Out>, !>
+where
+    In: Slice<'a, T>,
+    Parser: Fn(In) -> ParseResult<In, Out, Error>,
+    &'a T: Slice<'a, T>,
+{
+    move |input: In| {
+        if let Ok(parse_output) = parser(input) {
+            Ok(ParseOutput {
+                remaining_input: parse_output.remaining_input,
+                output: Some(parse_output.output),
+            })
+        } else {
+            Ok(ParseOutput {
+                remaining_input: input,
+                output: None,
+            })
+        }
+    }
+}
