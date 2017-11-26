@@ -59,12 +59,11 @@ use self::protected::Slice;
 ///     })
 /// )
 /// ```
-pub fn many0<'a, T: 'a + ?Sized, In, Out, Error, Parser>(
-    parser: Parser,
+pub fn many0<'a, T: 'a + ?Sized, In, Out, Error>(
+    parser: impl Fn(In) -> ParseResult<In, Out, Error>,
 ) -> impl Fn(In) -> ParseResult<In, Vec<Out>, !>
 where
     In: Slice<'a, T>,
-    Parser: Fn(In) -> ParseResult<In, Out, Error>,
     &'a T: Slice<'a, T>,
 {
     move |mut input: In| {
@@ -83,12 +82,11 @@ where
 }
 
 /// Run a parser fragment without consuming anything.
-pub fn peek<'a, T: 'a + ?Sized, In, Out, Error, Parser>(
-    parser: Parser,
+pub fn peek<'a, T: 'a + ?Sized, In, Out, Error>(
+    parser: impl Fn(In) -> ParseResult<In, Out, Error>,
 ) -> impl Fn(In) -> ParseResult<In, Out, Error>
 where
     In: Slice<'a, T>,
-    Parser: Fn(In) -> ParseResult<In, Out, Error>,
     &'a T: Slice<'a, T>,
 {
     move |input: In| {
@@ -102,12 +100,11 @@ where
 }
 
 /// Construct a new parser that matches a subparser zero or one times.
-pub fn optional<'a, T: 'a + ?Sized, In, Out, Error, Parser>(
-    parser: Parser,
+pub fn optional<'a, T: 'a + ?Sized, In, Out, Error>(
+    parser: impl Fn(In) -> ParseResult<In, Out, Error>,
 ) -> impl Fn(In) -> ParseResult<In, Option<Out>, !>
 where
     In: Slice<'a, T>,
-    Parser: Fn(In) -> ParseResult<In, Out, Error>,
     &'a T: Slice<'a, T>,
 {
     move |input: In| {

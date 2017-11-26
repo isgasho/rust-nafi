@@ -11,7 +11,7 @@
 
 #![forbid(bad_style, missing_debug_implementations, unconditional_recursion, future_incompatible)]
 #![deny(missing_docs, unsafe_code, unused)]
-#![feature(conservative_impl_trait, never_type)]
+#![feature(conservative_impl_trait, universal_impl_trait, never_type)]
 
 pub mod combinators;
 mod result;
