@@ -51,7 +51,7 @@ fn identifier_like(input: PositionedStr) -> ParseResult<PositionedStr, Token, ()
                     "mutable" => Token::Keyword(input.start(), Keyword::Mutable),
                     "if" => Token::Keyword(input.start(), Keyword::If),
                     "else" => Token::Keyword(input.start(), Keyword::Else),
-                    _ => Token::Identifier(input.start(), output),
+                    _ => Token::Identifier(input.start(), output.into()),
                 },
             }
         },

@@ -14,7 +14,7 @@ impl Expression {
         match *self {
             Expression::Identifier(pos, _)
             | Expression::Parenthesized(pos, _)
-            | Expression::Operator(pos, _) => pos
+            | Expression::Operator(pos, _) => pos,
         }
     }
 }

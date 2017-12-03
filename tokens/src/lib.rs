@@ -44,6 +44,10 @@ impl Token {
 #[allow(missing_docs)]
 pub struct Identifier(Arc<str>);
 
+impl From<Arc<str>> for Identifier {
+    fn from(arc: Arc<str>) -> Identifier { Identifier(arc) }
+}
+
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[allow(missing_docs)]
 pub enum Keyword {
