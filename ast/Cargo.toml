@@ -5,3 +5,4 @@ publish = false
 
 [dependencies]
 nafi-tokens = { path = "../tokens" }
+num-bigint = "0.1"
