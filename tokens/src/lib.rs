@@ -18,7 +18,7 @@ pub use symbol::Symbol;
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[allow(missing_docs)]
 pub enum Token {
-    Identifier(usize, Arc<str>),
+    Identifier(usize, Identifier),
     Keyword(usize, Keyword),
     Symbol(usize, Symbol),
     Literal(usize, Literal),
@@ -39,6 +39,10 @@ impl Token {
         }
     }
 }
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[allow(missing_docs)]
+pub struct Identifier(Arc<str>);
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[allow(missing_docs)]

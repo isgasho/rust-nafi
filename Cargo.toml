@@ -1,6 +1,7 @@
 [workspace]
 
 members = [
+    './ast/',
     './lexer/',
     './nnom/',
     './str-intern/',

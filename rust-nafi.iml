@@ -10,6 +10,7 @@
       <sourceFolder url="file://$MODULE_DIR$/lexer/repl" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/plru-str-intern/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/str-intern/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ast/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
