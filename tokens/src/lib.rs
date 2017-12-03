@@ -18,7 +18,7 @@ pub use symbol::Symbol;
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[allow(missing_docs)]
 pub enum Token {
-    Identifier(usize, Arc<str>),
+    Identifier(usize, Identifier),
     Keyword(usize, Keyword),
     Symbol(usize, Symbol),
     Literal(usize, Literal),
@@ -38,6 +38,14 @@ impl Token {
             | Token::_Unknown(pos, _) => pos,
         }
     }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[allow(missing_docs)]
+pub struct Identifier(Arc<str>);
+
+impl From<Arc<str>> for Identifier {
+    fn from(arc: Arc<str>) -> Identifier { Identifier(arc) }
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
