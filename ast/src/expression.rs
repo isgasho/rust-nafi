@@ -1,3 +1,4 @@
+use bigint;
 use tokens;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -6,6 +7,7 @@ pub enum Expression {
     Identifier(usize, tokens::Identifier),
     Parenthesized(usize, Box<Expression>),
     Operator(usize, Box<OperatorExpression>),
+    Literal(usize, Box<LiteralExpression>),
 }
 
 impl Expression {
@@ -14,9 +16,17 @@ impl Expression {
         match *self {
             Expression::Identifier(pos, _)
             | Expression::Parenthesized(pos, _)
-            | Expression::Operator(pos, _) => pos,
+            | Expression::Operator(pos, _)
+            | Expression::Literal(pos, _) => pos,
         }
     }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[allow(missing_docs)]
+pub enum LiteralExpression {
+    Integer(bigint::BigInt),
+    String(tokens::StringFragments),
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
