@@ -1,7 +1,5 @@
 use nnom::{ParseOutput, ParseResult};
 use nnom::slice::PositionedStr;
-use std::sync::Arc;
-use str_intern::interned;
 use tokens::BigUint;
 
 pub fn is_newline(ch: char) -> bool { matches!(ch as u32, 0xA..=0xD | 0x85 | 0x2028 | 0x2029) }
@@ -24,7 +22,7 @@ pub fn white_space(input: PositionedStr) -> ParseResult<PositionedStr, Positione
     }
 }
 
-pub fn identifier(input: PositionedStr) -> ParseResult<PositionedStr, Arc<str>, ()> {
+pub fn identifier(input: PositionedStr) -> ParseResult<PositionedStr, PositionedStr, ()> {
     // TODO: Use Unicode UAX31-R1 instead of this simple definition
     let mut chars = input.chars();
     if let Some(ch) = chars.next() {
@@ -35,7 +33,7 @@ pub fn identifier(input: PositionedStr) -> ParseResult<PositionedStr, Arc<str>, 
         let (matched, remaining_input) = input.split_at(idx);
         Ok(ParseOutput {
             remaining_input,
-            output: interned(&matched),
+            output: matched,
         })
     } else {
         Err(())

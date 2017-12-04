@@ -7,7 +7,6 @@ publish = false
 matches = "0.1"
 nafi-tokens = { path = "../tokens/" }
 nnom = { path = "../nnom/" }
-str-intern = { path = "../str-intern/" }
 unic-ucd-category = "0.6"
 
 [[bin]]
