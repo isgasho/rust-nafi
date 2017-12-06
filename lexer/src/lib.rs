@@ -8,7 +8,6 @@
 extern crate matches;
 extern crate nafi_tokens as tokens;
 extern crate nnom;
-extern crate str_intern;
 extern crate unic_ucd_category;
 
 use nnom::ParseOutput;

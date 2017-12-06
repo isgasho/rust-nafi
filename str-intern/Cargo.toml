@@ -1,7 +1,0 @@
-[package]
-name = "str-intern"
-version = "0.0.0"
-publish = false
-
-[dependencies]
-lazy_static = "0.2"
