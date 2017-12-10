@@ -5,9 +5,7 @@
     <option name="nocapture" value="true" />
     <option name="backtrace" value="SHORT" />
     <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-    <envs>
-      <env name="CFG_RELEASE_CHANNEL" value="nightly" />
-    </envs>
+    <envs />
     <method />
   </configuration>
 </component>
