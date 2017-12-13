@@ -1,54 +1,24 @@
-use nnom::{ParseOutput, ParseResult};
-use nnom::slice::PositionedStr;
+use nom::IResult;
+use Span;
 use tokens::BigUint;
+use nom::{InputLength, Slice, alpha, digit};
 
 pub fn is_newline(ch: char) -> bool { matches!(ch as u32, 0xA..=0xD | 0x85 | 0x2028 | 0x2029) }
+pub fn is_digit(ch: char) -> bool { matches!(ch as u32, 0x30..=0x39) }
 
-pub fn white_space(input: PositionedStr) -> ParseResult<PositionedStr, PositionedStr, ()> {
-    let idx = input
-        .char_indices()
-        .filter(|&(_, ch)| !ch.is_whitespace())
-        .map(|(idx, _)| idx)
-        .next()
-        .unwrap_or_else(|| input.len());
-    if idx != 0 {
-        let (output, remaining_input) = input.split_at(idx);
-        Ok(ParseOutput {
-            remaining_input,
-            output,
-        })
-    } else {
-        Err(())
-    }
+pub fn white_space(i: Span) -> IResult<Span, Span> {
+    take_while1!(i, char::is_whitespace)
 }
 
-pub fn identifier(input: PositionedStr) -> ParseResult<PositionedStr, PositionedStr, ()> {
+pub fn identifier(i: Span) -> IResult<Span, Span> {
     // TODO: Use Unicode UAX31-R1 instead of this simple definition
-    let mut chars = input.chars();
-    if let Some(ch) = chars.next() {
-        if !ch.is_alphabetic() {
-            return Err(());
-        }
-        let idx = chars.take_while(|ch| ch.is_alphanumeric()).count() + 1;
-        let (matched, remaining_input) = input.split_at(idx);
-        Ok(ParseOutput {
-            remaining_input,
-            output: matched,
-        })
-    } else {
-        Err(())
-    }
+    do_parse!(i,
+        peek!(alpha) >>
+        o: take_while!(char::is_alphanumeric) >>
+        (o)
+    )
 }
 
-pub fn decimal_number(input: PositionedStr) -> ParseResult<PositionedStr, BigUint, ()> {
-    let idx = input.chars().take_while(|ch| ch.is_digit(10)).count();
-    if idx != 0 {
-        let (matched, remaining_input) = input.split_at(idx);
-        Ok(ParseOutput {
-            remaining_input,
-            output: matched.parse().unwrap(),
-        })
-    } else {
-        Err(())
-    }
+pub fn decimal_number(i: Span) -> IResult<Span, BigUint> {
+    digit(i).map(|(i, o)| (i, o.fragment.parse().unwrap()))
 }

@@ -6,9 +6,19 @@ publish = false
 [dependencies]
 matches = "0.1"
 nafi-tokens = { path = "../tokens/" }
-nnom = { path = "../nnom/" }
 unic-ucd-category = "0.6"
+nom_locate = { git = "https://github.com/nafi-lang/nom_locate.git" }
+memchr = "1.0"
+
+[dependencies.nom]
+git = "https://github.com/Geal/nom.git"
+rev = "a53febdfdf99d16c0177f5c605bd98481a4ec50f"
+features = ["nightly", "verbose-errors"]
 
 [[bin]]
 name = "nafi-lexer-repl"
 path = "./repl/main.rs"
+
+[patch.crates-io.nom]
+git = "https://github.com/Geal/nom.git"
+rev = "a53febdfdf99d16c0177f5c605bd98481a4ec50f"
