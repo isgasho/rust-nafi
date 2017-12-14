@@ -6,14 +6,25 @@ publish = false
 [dependencies]
 matches = "0.1"
 nafi-tokens = { path = "../tokens/" }
-unic-ucd-category = "0.6"
 nom_locate = { git = "https://github.com/nafi-lang/nom_locate.git" }
 memchr = "1.0"
+regex = "0.2"
 
 [dependencies.nom]
 git = "https://github.com/Geal/nom.git"
 rev = "a53febdfdf99d16c0177f5c605bd98481a4ec50f"
-features = ["nightly", "verbose-errors"]
+features = ["nightly", "verbose-errors", "regexp", "regexp_macros"]
+
+[dependencies.lazy_static]
+version = "1.0"
+features = ["nightly"]
+
+[build-dependencies]
+regex = "0.2"
+
+[build-dependencies.lazy_static]
+version = "1.0"
+features = ["nightly"]
 
 [[bin]]
 name = "nafi-lexer-repl"

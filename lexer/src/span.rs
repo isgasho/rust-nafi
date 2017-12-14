@@ -4,7 +4,9 @@
 //! The source code is available on [Github](https://github.com/fflorent/nom_locate)
 //!
 //! ## How to use it
-//! The explanations are given in the [README](https://github.com/fflorent/nom_locate/blob/master/README.md) of the Github repository. You may also consult the [FAQ](https://github.com/fflorent/nom_locate/blob/master/FAQ.md).
+//! The explanations are given in the
+//! [README](https://github.com/fflorent/nom_locate/blob/master/README.md) of the Github repository.
+//! You may also consult the [FAQ](https://github.com/fflorent/nom_locate/blob/master/FAQ.md).
 //!
 //! ````
 //! #[macro_use]
@@ -45,20 +47,18 @@
 //!     assert_eq!(position.get_column(), 2);
 //! }
 //! ````
-extern crate nom;
 extern crate memchr;
+extern crate nom;
 
 use std;
 use std::iter::{Enumerate, Map};
-use std::ops::{Range, RangeTo, RangeFrom, RangeFull};
+use std::ops::{Range, RangeFrom, RangeFull, RangeTo};
 use std::slice::Iter;
 use std::str::{CharIndices, Chars, FromStr, Utf8Error};
 
 use self::memchr::Memchr;
-use self::nom::{
-    InputLength, Slice, InputIter, Compare, CompareResult,
-    Offset, FindToken, FindSubstring, ParseTo, AsBytes, AtEof
-};
+use self::nom::{AsBytes, AtEof, Compare, CompareResult, FindSubstring, FindToken, InputIter,
+                InputLength, Offset, ParseTo, Slice};
 
 /// A LocatedSpan is a set of meta information about the location of a token.
 ///
@@ -80,7 +80,6 @@ pub struct LocatedSpan<T> {
 }
 
 impl<T: AsBytes> LocatedSpan<T> {
-
     /// Create a span for a particular input with default `offset` and
     /// `line` values. You can compute the column through the `get_column` or `get_column_utf8`
     /// methods.
@@ -106,7 +105,7 @@ impl<T: AsBytes> LocatedSpan<T> {
         LocatedSpan {
             line: 1,
             offset: 0,
-            fragment: program
+            fragment: program,
         }
     }
 
@@ -114,16 +113,17 @@ impl<T: AsBytes> LocatedSpan<T> {
         let self_bytes = self.fragment.as_bytes();
         let self_ptr = self_bytes.as_ptr();
         let before_self = unsafe {
-            assert!(self.offset <= isize::max_value() as usize, "offset is too big");
+            assert!(
+                self.offset <= isize::max_value() as usize,
+                "offset is too big"
+            );
             let orig_input_ptr = self_ptr.offset(-(self.offset as isize));
             std::slice::from_raw_parts(orig_input_ptr, self.offset)
         };
 
         let column = match memchr::memrchr(b'\n', before_self) {
             None => self.offset + 1,
-            Some(pos) => {
-                self.offset - pos
-            }
+            Some(pos) => self.offset - pos,
         };
 
         (column, &before_self[self.offset - (column - 1)..])
@@ -147,9 +147,7 @@ impl<T: AsBytes> LocatedSpan<T> {
     /// assert_eq!(span.slice(3..).get_column(), 4);
     /// # }
     /// ```
-    pub fn get_column(&self) -> usize {
-        self.get_columns_and_bytes_before().0
-    }
+    pub fn get_column(&self) -> usize { self.get_columns_and_bytes_before().0 }
 
     /// Return the column index for a UTF8 text.
     ///
@@ -174,16 +172,12 @@ impl<T: AsBytes> LocatedSpan<T> {
     /// ```
     pub fn get_column_utf8(&self) -> Result<usize, Utf8Error> {
         let before_self = self.get_columns_and_bytes_before().1;
-        Ok(std::str::from_utf8(before_self)?
-            .chars()
-            .count() + 1)
+        Ok(std::str::from_utf8(before_self)?.chars().count() + 1)
     }
 }
 
 impl<T: InputLength> InputLength for LocatedSpan<T> {
-    fn input_len(&self) -> usize {
-        self.fragment.input_len()
-    }
+    fn input_len(&self) -> usize { self.fragment.input_len() }
 }
 
 /// Implement nom::InputIter for a specific fragment type
@@ -225,7 +219,8 @@ macro_rules! impl_input_iter {
               self.fragment.iter_elements()
             }
             #[inline]
-            fn position<P>(&self, predicate: P) -> Option<usize> where P: Fn(Self::RawItem) -> bool {
+            fn position<P>(&self, predicate: P) -> Option<usize>
+            where P: Fn(Self::RawItem) -> bool {
                 self.fragment.position(predicate)
             }
             #[inline]
@@ -237,9 +232,13 @@ macro_rules! impl_input_iter {
 }
 
 impl_input_iter!(&'a str, char, char, CharIndices<'a>, Chars<'a>);
-impl_input_iter!(&'a [u8], u8, u8, Enumerate<Self::IterElem>,
-                 Map<Iter<'a, Self::Item>, fn(&u8) -> u8>);
-
+impl_input_iter!(
+    &'a [u8],
+    u8,
+    u8,
+    Enumerate<Self::IterElem>,
+    Map<Iter<'a, Self::Item>, fn(&u8) -> u8>
+);
 
 /// Implement nom::Compare for a specific fragment type.
 ///
@@ -417,10 +416,10 @@ impl_find_token! { &'b u8, &'a str}
 impl_find_token! { u8, &'a [u8]}
 impl_find_token! { &'b u8, &'a [u8]}
 
-
 impl<'a, T> FindSubstring<&'a str> for LocatedSpan<T>
-    where T: FindSubstring<&'a str> {
-
+where
+    T: FindSubstring<&'a str>,
+{
     #[inline]
     fn find_substring(&self, substr: &'a str) -> Option<usize> {
         self.fragment.find_substring(substr)
@@ -428,12 +427,11 @@ impl<'a, T> FindSubstring<&'a str> for LocatedSpan<T>
 }
 
 impl<R: FromStr, T> ParseTo<R> for LocatedSpan<T>
-    where T: ParseTo<R> {
-
+where
+    T: ParseTo<R>,
+{
     #[inline]
-    fn parse_to(&self) -> Option<R> {
-        self.fragment.parse_to()
-    }
+    fn parse_to(&self) -> Option<R> { self.fragment.parse_to() }
 }
 
 /// Implement nom::Offset for a specific fragment type.
@@ -502,9 +500,7 @@ impl_at_eof! {&'a [u8]}
 
 impl<T: ToString> ToString for LocatedSpan<T> {
     #[inline]
-    fn to_string(&self) -> String {
-        self.fragment.to_string()
-    }
+    fn to_string(&self) -> String { self.fragment.to_string() }
 }
 
 /// Capture the position of the current fragment

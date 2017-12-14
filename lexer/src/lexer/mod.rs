@@ -13,10 +13,12 @@ use self::unicode::identifier;
 //use self::whitespace::whitespace;
 
 pub fn tokens(i: Span) -> IResult<Span, Vec<Token>> {
+    #[cfg_attr(rustfmt, rustfmt_skip)]
     complete!(i, many0!(token))
 }
 
 fn token(i: Span) -> IResult<Span, Token> {
+    #[cfg_attr(rustfmt, rustfmt_skip)]
     alt_complete!(i,
         symbol |
         identifier_like |
@@ -30,6 +32,7 @@ fn symbol(i: Span) -> IResult<Span, Token> {
     let (i, o) = take_s!(i, 1)?;
     let ch = o.fragment.chars().next().unwrap();
     let category = GeneralCategory::of(ch);
+    #[cfg_attr(rustfmt, rustfmt_skip)]
     cond_reduce!(i,
         category.is_symbol() || category.is_punctuation(),
         value!(Token::Symbol(pos, ch.into()))
@@ -38,6 +41,7 @@ fn symbol(i: Span) -> IResult<Span, Token> {
 
 /// `Token::Identifier` or `Token::Keyword`
 fn identifier_like(i: Span) -> IResult<Span, Token> {
+    #[cfg_attr(rustfmt, rustfmt_skip)]
     do_parse!(i,
         pos: position!() >>
         o: call!(identifier) >>
@@ -47,13 +51,14 @@ fn identifier_like(i: Span) -> IResult<Span, Token> {
             "mutable" => Token::Keyword(pos.offset, Keyword::Mutable),
             "if" => Token::Keyword(pos.offset, Keyword::If),
             "else" => Token::Keyword(pos.offset, Keyword::Else),
-            ident => Token::Identifier(pos.offset, ident.into())
+            ident => Token::Identifier(pos.offset, ident.into()),
         })
     )
 }
 
 /// `Token::_Unknown`
 fn _unknown(i: Span) -> IResult<Span, Token> {
+    #[cfg_attr(rustfmt, rustfmt_skip)]
     do_parse!(i,
         pos: position!() >>
         ch: take_s!(1) >>

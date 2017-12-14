@@ -10,12 +10,14 @@
 extern crate nom;
 
 #[macro_use]
+extern crate lazy_static;
+#[macro_use]
 extern crate matches;
 extern crate nafi_tokens as tokens;
-extern crate unic_ucd_category;
+extern crate regex;
 
-use tokens::Token;
 use nom::IResult;
+use tokens::Token;
 
 #[macro_use]
 mod span;
