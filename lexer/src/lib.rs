@@ -15,6 +15,7 @@ extern crate lazy_static;
 extern crate matches;
 extern crate nafi_tokens as tokens;
 extern crate regex;
+extern crate single;
 
 use nom::IResult;
 use tokens::Token;

@@ -1,15 +1,16 @@
 use nom::IResult;
+use single::Single;
 
 use Span;
 use tokens::{Keyword, Symbol, Token};
-use unic_ucd_category::GeneralCategory;
 
 //mod literals;
 mod unicode;
+mod regex;
 //mod whitespace;
 
 //use self::literals::{integer_literal, string_literal};
-use self::unicode::identifier;
+use lexer::regex::restore_span;
 //use self::whitespace::whitespace;
 
 pub fn tokens(i: Span) -> IResult<Span, Vec<Token>> {
@@ -29,14 +30,10 @@ fn token(i: Span) -> IResult<Span, Token> {
 /// `Token::Symbol`
 fn symbol(i: Span) -> IResult<Span, Token> {
     let pos = i.offset;
-    let (i, o) = take_s!(i, 1)?;
-    let ch = o.fragment.chars().next().unwrap();
-    let category = GeneralCategory::of(ch);
-    #[cfg_attr(rustfmt, rustfmt_skip)]
-    cond_reduce!(i,
-        category.is_symbol() || category.is_punctuation(),
-        value!(Token::Symbol(pos, ch.into()))
-    )
+    unicode::symbol(i).map(|(i, o)| {
+        let ch = o.fragment.chars().single().unwrap();
+        (i, Token::Symbol(pos, ch.into()))
+    })
 }
 
 /// `Token::Identifier` or `Token::Keyword`
@@ -44,7 +41,7 @@ fn identifier_like(i: Span) -> IResult<Span, Token> {
     #[cfg_attr(rustfmt, rustfmt_skip)]
     do_parse!(i,
         pos: position!() >>
-        o: call!(identifier) >>
+        o: call!(unicode::identifier) >>
         (match o.fragment {
             // TODO: Keyword map
             "let" => Token::Keyword(pos.offset, Keyword::Let),
@@ -62,7 +59,7 @@ fn _unknown(i: Span) -> IResult<Span, Token> {
     do_parse!(i,
         pos: position!() >>
         ch: take_s!(1) >>
-        (Token::_Unknown(pos.offset, ch.fragment.chars().next().unwrap()))
+        (Token::_Unknown(pos.offset, ch.fragment.chars().single().unwrap()))
     )
 }
 
