@@ -4,10 +4,9 @@ version = "0.0.0"
 publish = false
 
 [dependencies]
-matches = "0.1"
 nafi-tokens = { path = "../tokens/" }
 nom_locate = { git = "https://github.com/nafi-lang/nom_locate.git" }
-memchr = "1.0"
+memchr = "2.0"
 regex = "0.2"
 single = "0.3"
 

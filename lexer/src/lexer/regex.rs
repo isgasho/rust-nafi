@@ -1,7 +1,10 @@
 use Span;
 use nom::{IResult, Slice};
 
-pub fn restore_span<'a>(span: Span<'a>, result: IResult<&str, &str>) -> IResult<Span<'a>, Span<'a>> {
+pub fn restore_span<'a>(
+    span: Span<'a>,
+    result: IResult<&str, &str>,
+) -> IResult<Span<'a>, Span<'a>> {
     result
         .map(|(_, o)| (span.slice(o.len()..), span.slice(..o.len())))
         .map_err(|e| {

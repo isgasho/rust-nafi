@@ -1,4 +1,5 @@
 // nom_locate by https://github.com/fflorent/nom_locate
+#![allow(unsafe_code, unused)]
 //! nom_locate, a special input type to locate tokens
 //!
 //! The source code is available on [Github](https://github.com/fflorent/nom_locate)

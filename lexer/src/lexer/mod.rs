@@ -2,7 +2,7 @@ use nom::IResult;
 use single::Single;
 
 use Span;
-use tokens::{Keyword, Symbol, Token};
+use tokens::{Keyword, Token};
 
 //mod literals;
 mod unicode;
@@ -10,7 +10,6 @@ mod regex;
 //mod whitespace;
 
 //use self::literals::{integer_literal, string_literal};
-use lexer::regex::restore_span;
 //use self::whitespace::whitespace;
 
 pub fn tokens(i: Span) -> IResult<Span, Vec<Token>> {
