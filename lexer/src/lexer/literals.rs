@@ -15,6 +15,8 @@ pub fn integer_literal(i: Span) -> IResult<Span, Token> {
     )
 }
 
+// TODO: Consider returning `Err(nom::Err::Incomplete(nom::Needed))` instead of closing with EOF
+// TODO: Consider returning `Err(nom::Err::Failure(nom::Context))` instead of above options
 /// `Token::Literal(Literal::String)`
 pub fn string_literal(mut i: Span) -> IResult<Span, Token> {
     let pos = i.offset;
@@ -35,31 +37,19 @@ pub fn string_literal(mut i: Span) -> IResult<Span, Token> {
             },
             Some('\\') => {
                 i = i.slice(1..);
+                macro_rules! push {
+                    ($to:expr) => {{
+                        string.push_char($to);
+                        i = i.slice(1..);
+                    }};
+                }
                 match i.fragment.chars().next() {
-                    Some('"') => {
-                        string.push_char('"');
-                        i = i.slice(1..);
-                    },
-                    Some('\'') => {
-                        string.push_char('\'');
-                        i = i.slice(1..);
-                    },
-                    Some('\\') => {
-                        string.push_char('\\');
-                        i = i.slice(1..);
-                    },
-                    Some('r') => {
-                        string.push_char('\r');
-                        i = i.slice(1..);
-                    },
-                    Some('n') => {
-                        string.push_char('\n');
-                        i = i.slice(1..);
-                    },
-                    Some('t') => {
-                        string.push_char('\t');
-                        i = i.slice(1..);
-                    },
+                    Some('\"') => push!('\"'),
+                    Some('\'') => push!('\''),
+                    Some('\\') => push!('\\'),
+                    Some('r') => push!('\r'),
+                    Some('n') => push!('\n'),
+                    Some('t') => push!('\t'),
                     Some('u') => {
                         // We can't slice off the `u` yet because if we get an escape of
                         // `\u{invalid}` the invalid escape slice contains the `u`
