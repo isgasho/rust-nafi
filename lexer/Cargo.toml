@@ -5,7 +5,6 @@ publish = false
 
 [dependencies]
 nafi-tokens = { path = "../tokens/" }
-nom_locate = { git = "https://github.com/nafi-lang/nom_locate.git" }
 memchr = "2.0"
 single = "0.3"
 
