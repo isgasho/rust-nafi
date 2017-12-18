@@ -39,17 +39,13 @@ fn block_comment(i: Span) -> IResult<Span, Span> {
 
     while depth > 0 && idx < i.input_len() {
         let i = i.slice(idx..);
-        if tag!(i, "/*").is_ok() {
-            depth += 1;
-            idx += 2;
-        } else if tag!(i, "*/").is_ok() {
-            depth -= 1;
-            idx += 2;
-        } else if let Ok((_, o)) = take_until_either!(i, "/*") {
-            idx += o.input_len();
-        } else {
-            idx += take_s!(i, 1).unwrap().1.input_len()
-        }
+        #[cfg_attr(rustfmt, rustfmt_skip)]
+        alt_complete!(i,
+            tag!("/*")               => {|_:Span| { depth += 1; idx += 2; }} |
+            tag!("*/")               => {|_:Span| { depth -= 1; idx += 2; }} |
+            take_until_either!("/*") => {|o:Span| { idx += o.input_len(); }} |
+            take_s!(1)               => {|o:Span| { idx += o.input_len(); }}
+        );
     }
 
     Ok((i.slice(idx..), i.slice(..idx)))
