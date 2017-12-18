@@ -1,7 +1,7 @@
 use Span;
 use lexer::token;
 use lexer::unicode::decimal_number;
-use nom::{self, IResult, InputLength, Slice};
+use nom::{IResult, InputLength, Slice};
 use std::{char, u32};
 use tokens::{StringFragments, Symbol, Token};
 
@@ -21,10 +21,7 @@ pub fn integer_literal(i: Span) -> IResult<Span, Token> {
 pub fn string_literal(mut i: Span) -> IResult<Span, Token> {
     let pos = i.offset;
 
-    if !i.fragment.starts_with('"') {
-        #[cfg_attr(rustfmt, rustfmt_skip)]
-        return Err(nom::Err::Error(error_position!(i, nom::ErrorKind::Custom(0))));
-    }
+    tag!(i, "\"")?;
 
     i = i.slice(1..);
     let mut string = StringFragments::new();

@@ -17,7 +17,7 @@ extern crate single;
 use tokens::Token;
 
 #[macro_use]
-mod span;
+pub mod span;
 mod lexer;
 
 type Span<'a> = span::LocatedSpan<&'a str>;

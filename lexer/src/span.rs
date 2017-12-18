@@ -9,7 +9,7 @@
 //! [README](https://github.com/fflorent/nom_locate/blob/master/README.md) of the Github repository.
 //! You may also consult the [FAQ](https://github.com/fflorent/nom_locate/blob/master/FAQ.md).
 //!
-//! ````
+//! ````no_compile
 //! #[macro_use]
 //! extern crate nom;
 //! #[macro_use(position)]
@@ -89,7 +89,7 @@ impl<T: AsBytes> LocatedSpan<T> {
     ///
     /// # Example of use
     ///
-    /// ```
+    /// ```no_compile
     /// # extern crate nom_locate;
     /// use self::nom_locate::LocatedSpan;
     ///
@@ -135,7 +135,7 @@ impl<T: AsBytes> LocatedSpan<T> {
     /// Use it for ascii text, or use get_column_utf8 for UTF8.
     ///
     /// # Example of use
-    /// ```
+    /// ```no_compile
     ///
     /// # extern crate nom_locate;
     /// # extern crate nom;
@@ -156,7 +156,7 @@ impl<T: AsBytes> LocatedSpan<T> {
     /// `get_column()` if your input is an ASCII-only text.
     ///
     /// # Example of use
-    /// ```
+    /// ```no_compile
     ///
     /// # extern crate nom_locate;
     /// # extern crate nom;

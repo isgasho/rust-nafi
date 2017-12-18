@@ -7,10 +7,10 @@ use tokens::{Keyword, Token};
 mod literals;
 mod unicode;
 mod regex;
-//mod whitespace;
+mod whitespace;
 
 use self::literals::{integer_literal, string_literal};
-//use self::whitespace::whitespace;
+use self::whitespace::whitespace;
 
 pub fn tokens(i: Span) -> IResult<Span, Vec<Token>> {
     #[cfg_attr(rustfmt, rustfmt_skip)]
@@ -20,6 +20,7 @@ pub fn tokens(i: Span) -> IResult<Span, Vec<Token>> {
 fn token(i: Span) -> IResult<Span, Token> {
     #[cfg_attr(rustfmt, rustfmt_skip)]
     alt_complete!(i,
+        whitespace |
         string_literal |
         integer_literal |
         identifier_like |

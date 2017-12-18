@@ -6,7 +6,7 @@ use tokens::BigUint;
 #[allow(unused)]
 pub fn white_space(i: Span) -> IResult<Span, Span> {
     #[cfg_attr(rustfmt, rustfmt_skip)]
-    restore_span(i, re_find_static!(i.fragment, r"^\w+"))
+    restore_span(i, re_find_static!(i.fragment, r"^\s+"))
 }
 
 pub fn symbol(i: Span) -> IResult<Span, Span> {

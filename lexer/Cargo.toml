@@ -7,8 +7,11 @@ publish = false
 nafi-tokens = { path = "../tokens/" }
 nom_locate = { git = "https://github.com/nafi-lang/nom_locate.git" }
 memchr = "2.0"
-regex = "0.2"
 single = "0.3"
+
+[dependencies.regex]
+version = "0.2"
+features = ["pattern"]
 
 [dependencies.nom]
 git = "https://github.com/Geal/nom.git"
