@@ -13,8 +13,8 @@ version = "0.2"
 features = ["pattern"]
 
 [dependencies.nom]
-git = "https://github.com/Geal/nom.git"
-rev = "a53febdfdf99d16c0177f5c605bd98481a4ec50f"
+git = "https://github.com/CAD97/nom.git"
+rev = "53c66c0af8e138c75bba294525c46d24714fc609"
 features = ["nightly", "verbose-errors", "regexp", "regexp_macros"]
 
 [dependencies.lazy_static]

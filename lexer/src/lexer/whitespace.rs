@@ -1,4 +1,3 @@
-#![allow(unused)]
 use Span;
 use lexer::unicode::white_space;
 use nom::{IResult, InputLength, Slice};
@@ -45,7 +44,7 @@ fn block_comment(i: Span) -> IResult<Span, Span> {
             tag!("*/")               => {|_:Span| { depth -= 1; idx += 2; }} |
             take_until_either!("/*") => {|o:Span| { idx += o.input_len(); }} |
             take_s!(1)               => {|o:Span| { idx += o.input_len(); }}
-        );
+        )?;
     }
 
     Ok((i.slice(idx..), i.slice(..idx)))

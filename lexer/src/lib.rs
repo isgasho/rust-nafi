@@ -3,7 +3,6 @@
 #![forbid(missing_debug_implementations, unconditional_recursion, future_incompatible)]
 #![deny(bad_style, missing_docs, unsafe_code, unused)]
 #![feature(dotdoteq_in_patterns)]
-//#![feature(conservative_impl_trait, const_fn, dotdoteq_in_patterns, never_type, option_filter)]
 
 #[macro_use]
 extern crate nom;

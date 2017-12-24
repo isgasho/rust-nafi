@@ -64,15 +64,3 @@ fn _unknown(i: Span) -> IResult<Span, Token> {
         (Token::_Unknown(pos.offset, ch.fragment.chars().single().unwrap()))
     )
 }
-
-/*
-fn token(input: PositionedStr) -> ParseResult<PositionedStr, Token, ()> {
-    Err(())
-        .or_else(|_| whitespace(input))
-        .or_else(|_| integer_literal(input))
-        .or_else(|_| string_literal(input))
-        .or_else(|_| identifier_like(input))
-        .or_else(|_| symbol(input))
-        .or_else(|_| _unknown(input))
-}
-*/
