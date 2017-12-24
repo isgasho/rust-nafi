@@ -1,82 +1,66 @@
-use nnom::{ParseOutput, ParseResult};
-use nnom::combinators::many0;
-use nnom::slice::PositionedStr;
-use tokens::{Keyword, Symbol, Token};
-use unic_ucd_category::GeneralCategory;
+use nom::IResult;
+use single::Single;
+
+use Span;
+use tokens::{Keyword, Token};
 
 mod literals;
 mod unicode;
+mod regex;
 mod whitespace;
 
 use self::literals::{integer_literal, string_literal};
-use self::unicode::identifier;
 use self::whitespace::whitespace;
 
-pub fn tokens(input: PositionedStr) -> ParseResult<(), Vec<Token>, !> {
-    many0(token)(input).map(
-        |ParseOutput {
-             remaining_input,
-             output,
-         }| {
-            assert!(remaining_input.is_empty());
-            ParseOutput {
-                remaining_input: (),
-                output,
-            }
-        },
-    )
+pub fn tokens(i: Span) -> IResult<Span, Vec<Token>> {
+    #[cfg_attr(rustfmt, rustfmt_skip)]
+    complete!(i, many0!(token))
 }
 
-fn token(input: PositionedStr) -> ParseResult<PositionedStr, Token, ()> {
-    Err(())
-        .or_else(|_| whitespace(input))
-        .or_else(|_| integer_literal(input))
-        .or_else(|_| string_literal(input))
-        .or_else(|_| identifier_like(input))
-        .or_else(|_| symbol(input))
-        .or_else(|_| _unknown(input))
-}
-
-/// `Token::Identifier` or `Token::Keyword`
-fn identifier_like(input: PositionedStr) -> ParseResult<PositionedStr, Token, ()> {
-    identifier(input).map(
-        |ParseOutput {
-             remaining_input,
-             output,
-         }| {
-            ParseOutput {
-                remaining_input,
-                output: match &*output {
-                    "let" => Token::Keyword(input.start(), Keyword::Let),
-                    "mutable" => Token::Keyword(input.start(), Keyword::Mutable),
-                    "if" => Token::Keyword(input.start(), Keyword::If),
-                    "else" => Token::Keyword(input.start(), Keyword::Else),
-                    _ => Token::Identifier(input.start(), (&*output).into()),
-                },
-            }
-        },
+fn token(i: Span) -> IResult<Span, Token> {
+    #[cfg_attr(rustfmt, rustfmt_skip)]
+    alt_complete!(i,
+        whitespace |
+        string_literal |
+        integer_literal |
+        identifier_like |
+        symbol |
+        _unknown
     )
 }
 
 /// `Token::Symbol`
-fn symbol(input: PositionedStr) -> ParseResult<PositionedStr, Token, ()> {
-    let ch = input.chars().next().ok_or(())?;
-    let category = GeneralCategory::of(ch);
-    if category.is_symbol() || category.is_punctuation() {
-        Ok(ParseOutput {
-            remaining_input: input.split_at(ch.len_utf8()).1,
-            output: Token::Symbol(input.start(), Symbol::from(ch)),
+fn symbol(i: Span) -> IResult<Span, Token> {
+    let pos = i.offset;
+    unicode::symbol(i).map(|(i, o)| {
+        let ch = o.fragment.chars().single().unwrap();
+        (i, Token::Symbol(pos, ch.into()))
+    })
+}
+
+/// `Token::Identifier` or `Token::Keyword`
+fn identifier_like(i: Span) -> IResult<Span, Token> {
+    #[cfg_attr(rustfmt, rustfmt_skip)]
+    do_parse!(i,
+        pos: position!() >>
+        o: call!(unicode::identifier) >>
+        (match o.fragment {
+            // TODO: Keyword map
+            "let" => Token::Keyword(pos.offset, Keyword::Let),
+            "mutable" => Token::Keyword(pos.offset, Keyword::Mutable),
+            "if" => Token::Keyword(pos.offset, Keyword::If),
+            "else" => Token::Keyword(pos.offset, Keyword::Else),
+            ident => Token::Identifier(pos.offset, ident.into()),
         })
-    } else {
-        Err(())
-    }
+    )
 }
 
 /// `Token::_Unknown`
-fn _unknown(input: PositionedStr) -> ParseResult<PositionedStr, Token, ()> {
-    let ch = input.chars().next().ok_or(())?;
-    Ok(ParseOutput {
-        remaining_input: input.split_at(ch.len_utf8()).1,
-        output: Token::_Unknown(input.start(), ch),
-    })
+fn _unknown(i: Span) -> IResult<Span, Token> {
+    #[cfg_attr(rustfmt, rustfmt_skip)]
+    do_parse!(i,
+        pos: position!() >>
+        ch: take_s!(1) >>
+        (Token::_Unknown(pos.offset, ch.fragment.chars().single().unwrap()))
+    )
 }

@@ -90,11 +90,9 @@ where
     &'a T: Slice<'a, T>,
 {
     move |input: In| {
-        parser(input).map(|ParseOutput { output, .. }| {
-            ParseOutput {
-                remaining_input: input,
-                output,
-            }
+        parser(input).map(|ParseOutput { output, .. }| ParseOutput {
+            remaining_input: input,
+            output,
         })
     }
 }
