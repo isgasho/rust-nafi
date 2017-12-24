@@ -12,11 +12,11 @@ branches:
 script:
 - cargo build --all
 - cargo test  --all
-- cargo doc   --all --lib --no-deps
+#- cargo doc   --all --lib --no-deps
 
 before_install:
 - openssl aes-256-cbc -K $encrypted_366ad4dc9b51_key -iv $encrypted_366ad4dc9b51_iv
   -in ./.travis/id_rsa.enc -out ~/.ssh/id_rsa -d
 - chmod 600 ~/.ssh/id_rsa
 
-after_success: cat .travis/doc_upload.sh | sh
+#after_success: cat .travis/doc_upload.sh | sh
