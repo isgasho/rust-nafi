@@ -9,7 +9,8 @@
 //! use-case without macros. Macros mess up intellisense. This may cause a slight performance hit,
 //! but the purpose of this library is to enable quick prototyping, not the most efficient product.
 
-#![forbid(bad_style, missing_debug_implementations, unconditional_recursion, future_incompatible)]
+#![forbid(missing_debug_implementations, unconditional_recursion, future_incompatible)]
+// #![forbid(bad_style)] rust-lang/rust#46959
 #![deny(missing_docs, unsafe_code, unused)]
 #![feature(conservative_impl_trait, universal_impl_trait, never_type)]
 
