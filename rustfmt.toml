@@ -5,3 +5,4 @@ reorder_imports = true
 reorder_imports_in_group = true
 unstable_features = true
 use_try_shorthand = true
+merge_derives = false

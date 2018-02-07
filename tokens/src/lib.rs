@@ -2,74 +2,128 @@
 
 #![forbid(missing_debug_implementations, unconditional_recursion, future_incompatible)]
 #![deny(bad_style, missing_docs, unsafe_code, unused)]
-#![feature(conservative_impl_trait, match_default_bindings)]
+#![warn(unreachable_pub)]
 
 #[macro_use]
-extern crate lazy_static;
-extern crate num_bigint as bigint;
-extern crate string_interner;
-
-mod literal;
-mod symbol;
-
-pub use literal::{BigUint, Literal, StringFragments};
-pub use symbol::Symbol;
+extern crate derive_deref;
+#[macro_use]
+extern crate derive_more;
+#[macro_use]
+extern crate serde_derive;
+#[macro_use]
+extern crate smart_default;
 
 use std::fmt;
-use std::sync::Mutex;
 
-/// A token in the source code. A simple atomic unit.
-#[derive(Clone, Debug, Eq, PartialEq)]
+// TODO: Move to a more general position?
+/// Position in source code
+#[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Serialize, Deserialize)]
+#[derive(From, Into, Constructor)]
 #[allow(missing_docs)]
-pub enum Token {
-    Identifier(usize, Identifier),
-    Keyword(usize, Keyword),
-    Symbol(usize, Symbol),
-    Literal(usize, Literal),
-    Whitespace(usize),
-    #[doc(hidden)] _Unknown(usize, char),
+pub struct Position {
+    pub line: usize,
+    pub column: usize,
 }
 
-impl Token {
-    /// The start position of this token.
-    pub fn position(&self) -> usize {
-        match *self {
-            Token::Identifier(pos, _)
-            | Token::Keyword(pos, _)
-            | Token::Symbol(pos, _)
-            | Token::Literal(pos, _)
-            | Token::Whitespace(pos)
-            | Token::_Unknown(pos, _) => pos,
-        }
-    }
-}
-
-lazy_static! {
-    static ref CACHE: Mutex<string_interner::DefaultStringInterner> = Default::default();
-}
-
-#[derive(Clone, Debug, Eq, PartialEq)]
-#[allow(missing_docs)]
-pub struct Identifier(usize);
-
-impl fmt::Display for Identifier {
+impl fmt::Display for Position {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let cache = CACHE.lock().expect("Poisoned Mutex");
-        cache.resolve(self.0).unwrap().fmt(f)
+        write!(f, "{}:{}", self.line, self.column)
     }
 }
 
-impl<'a> From<&'a str> for Identifier {
-    fn from(s: &str) -> Identifier {
-        Identifier(CACHE.lock().expect("Poisoned Mutex").get_or_intern(s))
+/// A token of source code
+#[derive(Copy, Clone, Debug, Default, Eq, PartialEq, Hash)]
+#[derive(Serialize, Deserialize)]
+#[derive(Constructor)]
+pub struct Token<'a> {
+    position: Position,
+    source: &'a str,
+    kind: Kind,
+}
+
+impl<'a> fmt::Display for Token<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // write!(f, "{}({})@{}", self.kind, self.source.escape_debug(), self.position)
+        // FIXME(rust-lang/rust#27791): String::escape_debug is unstable
+        write!(f, "{}(", self.kind)?;
+        for c in self.source.chars() {
+            write!(f, "{}", c.escape_debug())?;
+        }
+        write!(f, ")@{}", self.position)
     }
 }
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
-#[allow(missing_docs)]
-pub enum Keyword {
-    Let,
-    Mutable,
-    If,
-    Else,
+impl<'a> Token<'a> {
+    /// The position in the original source
+    pub fn position(&self) -> Position { self.position }
+    /// The text from the original source
+    pub fn source(&self) -> &'a str { self.source }
+    /// The kind of token
+    pub fn kind(&self) -> &Kind { &self.kind }
+}
+
+/// The kind of token
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
+#[derive(Serialize, Deserialize)]
+#[derive(SmartDefault)]
+pub enum Kind {
+    /// An identifier, matching Unicode UAX31-R1 unmodified (includes keywords)
+    Identifier,
+    /// A single char symbol, matching Unicode General_Category=Punctuation|Symbol
+    Symbol,
+    /// A literal integer
+    LiteralInteger,
+    /// A literal string
+    LiteralString,
+    /// Whitespace, matching Unicode White_Space
+    Whitespace,
+    /// Any characters not matched by one of the above cases
+    #[doc(hidden)]
+    #[default]
+    _Unknown,
+}
+
+impl fmt::Display for Kind {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match *self {
+                Kind::Identifier => "Identifier",
+                Kind::Symbol => "Symbol",
+                Kind::LiteralInteger | Kind::LiteralString => "Literal",
+                Kind::Whitespace => "Whitespace",
+                Kind::_Unknown => "Unknown",
+            }
+        )
+    }
+}
+
+/// A tokenized view of the parts of a string literal
+#[derive(Clone, Debug, Default, Eq, PartialEq, Hash)]
+#[derive(Deref, DerefMut)]
+pub struct StringFragments<'a>(Vec<StringFragment<'a>>);
+
+impl<'a, S: Into<String>> From<S> for StringFragments<'a> {
+    fn from(s: S) -> Self { StringFragments(vec![s.into().into()]) }
+}
+
+/// A token in a literal string
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+pub enum StringFragment<'a> {
+    /// Literal quoted text
+    Literal(String),
+    /// An escaped character e.g. `\n` or `\u{2744}`
+    Escaped(char),
+    /// An invalid escape sequence e.g. `\u{bogus}` or `\❄`
+    InvalidEscape(Position, &'a str),
+    /// An interpolated sequence e.g. `\{name}`
+    Interpolated(Vec<Token<'a>>),
+    #[doc(hidden)]
+    _NonExhaustive,
+}
+
+impl<'a, S: Into<String>> From<S> for StringFragment<'a> {
+    fn from(s: S) -> Self { StringFragment::Literal(s.into()) }
 }
