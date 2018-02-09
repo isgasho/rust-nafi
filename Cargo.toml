@@ -2,6 +2,7 @@
 
 members = [
     './ast/',
+    './interner/',
     './lexer/',
     './tokens/',
 ]

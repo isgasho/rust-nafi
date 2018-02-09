@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Test interner" type="CargoCommandRunConfiguration" factoryName="Cargo Command" folderName="interner">
+    <option name="channel" value="DEFAULT" />
+    <option name="command" value="test --package nafi-interner" />
+    <option name="nocapture" value="false" />
+    <option name="backtrace" value="SHORT" />
+    <option name="workingDirectory" value="file://$PROJECT_DIR$/lexer" />
+    <envs />
+    <method />
+  </configuration>
+</component>

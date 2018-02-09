@@ -13,7 +13,17 @@ extern crate serde_derive;
 #[macro_use]
 extern crate smart_default;
 
-use std::fmt;
+use std::{fmt, io};
+
+/// Dump tokens to an output stream
+pub fn dump<W: io::Write>(tokens: &[Token], mut to: W) -> io::Result<()> {
+    writeln!(to, "(")?;
+    for token in tokens {
+        writeln!(to, "  {}", token)?;
+    }
+    writeln!(to, ")")?;
+    Ok(())
+}
 
 // TODO: Move to a more general position?
 /// Position in source code
