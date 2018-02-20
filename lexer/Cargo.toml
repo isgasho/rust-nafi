@@ -5,33 +5,30 @@ publish = false
 
 [dependencies]
 nafi-tokens = { path = "../tokens/" }
+nafi-interner = { path = "../interner/" }
+
+lazy_static = "1.0"
+log = "0.4"
 memchr = "2.0"
-single = "0.3"
-
-[dependencies.regex]
-version = "0.2"
-features = ["pattern"]
-
-[dependencies.nom]
-git = "https://github.com/CAD97/nom.git"
-rev = "53c66c0af8e138c75bba294525c46d24714fc609"
-features = ["nightly", "verbose-errors", "regexp", "regexp_macros"]
-
-[dependencies.lazy_static]
-version = "1.0"
-features = ["nightly"]
-
-[build-dependencies]
 regex = "0.2"
 
-[build-dependencies.lazy_static]
-version = "1.0"
-features = ["nightly"]
+[dependencies.nom]
+version = "4.0.0-alpha2"
+features = ["verbose-errors", "regexp", "regexp_macros"]
 
-[[bin]]
-name = "nafi-lexer-repl"
-path = "./repl/main.rs"
+[dependencies.nom_locate]
+version = "0.3.0"
+git = "https://github.com/CAD97/nom_locate.git"
+rev = "a5d2afa8e1bbbb9e26455c201d6e40c9c1aad256"
+
+[features]
+nightly = ["lazy_static/nightly", "nom/nightly"]
+
+[build-dependencies]
+lazy_static = "1.0"
+regex = "0.2"
 
 [patch.crates-io.nom]
+version = "4.0.0-alpha2"
 git = "https://github.com/Geal/nom.git"
-rev = "a53febdfdf99d16c0177f5c605bd98481a4ec50f"
+rev = "dd338670fb215a1ad2e35ed67dcbd96dae609595"

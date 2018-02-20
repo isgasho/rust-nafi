@@ -1,66 +1,65 @@
 use nom::IResult;
-use single::Single;
 
-use Span;
-use tokens::{Keyword, Token};
+use {Kind, Position, Span, Token};
+use interner::StringInterner;
 
-mod literals;
+macro_rules! spanned_regex {
+    ($i:ident, $re:expr) => {
+        ::lexer::unicode::restore_span($i, re_find_static!($i.fragment, $re))
+    };
+}
+
+mod literal;
 mod unicode;
-mod regex;
 mod whitespace;
 
-use self::literals::{integer_literal, string_literal};
-use self::whitespace::whitespace;
-
-pub fn tokens(i: Span) -> IResult<Span, Vec<Token>> {
-    #[cfg_attr(rustfmt, rustfmt_skip)]
-    complete!(i, many0!(token))
-}
-
-fn token(i: Span) -> IResult<Span, Token> {
-    #[cfg_attr(rustfmt, rustfmt_skip)]
-    alt_complete!(i,
-        whitespace |
-        string_literal |
-        integer_literal |
-        identifier_like |
-        symbol |
-        _unknown
+/// Parse a token from the front of the span
+pub fn token<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner)-> IResult<Span<'i>, Token<'lex>> {
+    alt!(i,
+        call!(whitespace::whitespace, pool) |
+        call!(literal::integer, pool) |
+        call!(literal::string, pool) |
+        call!(symbol, pool) |
+        call!(identifier, pool) |
+        call!(unknown, pool)
     )
 }
 
-/// `Token::Symbol`
-fn symbol(i: Span) -> IResult<Span, Token> {
-    let pos = i.offset;
-    unicode::symbol(i).map(|(i, o)| {
-        let ch = o.fragment.chars().single().unwrap();
-        (i, Token::Symbol(pos, ch.into()))
-    })
-}
-
-/// `Token::Identifier` or `Token::Keyword`
-fn identifier_like(i: Span) -> IResult<Span, Token> {
-    #[cfg_attr(rustfmt, rustfmt_skip)]
+/// `Kind::Symbol`
+fn symbol<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner)-> IResult<Span<'i>, Token<'lex>> {
     do_parse!(i,
         pos: position!() >>
-        o: call!(unicode::identifier) >>
-        (match o.fragment {
-            // TODO: Keyword map
-            "let" => Token::Keyword(pos.offset, Keyword::Let),
-            "mutable" => Token::Keyword(pos.offset, Keyword::Mutable),
-            "if" => Token::Keyword(pos.offset, Keyword::If),
-            "else" => Token::Keyword(pos.offset, Keyword::Else),
-            ident => Token::Identifier(pos.offset, ident.into()),
-        })
+        symbol: call!(unicode::symbol) >>
+        (Token::new(
+            Position(pos),
+            pool.get_or_insert(symbol.fragment),
+            Kind::Symbol,
+        ))
     )
 }
 
-/// `Token::_Unknown`
-fn _unknown(i: Span) -> IResult<Span, Token> {
-    #[cfg_attr(rustfmt, rustfmt_skip)]
+/// `Kind::Identifier`
+fn identifier<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner) -> IResult<Span<'i>, Token<'lex>> {
     do_parse!(i,
         pos: position!() >>
-        ch: take_s!(1) >>
-        (Token::_Unknown(pos.offset, ch.fragment.chars().single().unwrap()))
+        ident: call!(unicode::identifier) >>
+        (Token::new(
+            Position(pos),
+            pool.get_or_insert(ident.fragment),
+            Kind::Identifier,
+        ))
+    )
+}
+
+/// `Kind::Unknown`
+fn unknown<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner) -> IResult<Span<'i>, Token<'lex>> {
+    do_parse!(i,
+        pos: position!() >>
+        ch: take!(1) >>
+        (Token::new(
+            Position(pos),
+            pool.get_or_insert(ch.fragment),
+            Kind::Unknown,
+        ))
     )
 }

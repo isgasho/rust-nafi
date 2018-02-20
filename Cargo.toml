@@ -4,5 +4,6 @@ members = [
     './ast/',
     './interner/',
     './lexer/',
+    './repl/lexer/',
     './tokens/',
 ]

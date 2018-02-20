@@ -17,11 +17,10 @@ use std::{fmt, io};
 
 /// Dump tokens to an output stream
 pub fn dump<W: io::Write>(tokens: &[Token], mut to: W) -> io::Result<()> {
-    writeln!(to, "(")?;
     for token in tokens {
-        writeln!(to, "  {}", token)?;
+        token.dump(0, &mut to)?;
+        writeln!(to)?;
     }
-    writeln!(to, ")")?;
     Ok(())
 }
 
@@ -43,41 +42,37 @@ impl fmt::Display for Position {
 }
 
 /// A token of source code
-#[derive(Copy, Clone, Debug, Default, Eq, PartialEq, Hash)]
+#[derive(Clone, Debug, Default, Eq, PartialEq, Hash)]
 #[derive(Serialize, Deserialize)]
 #[derive(Constructor)]
 pub struct Token<'a> {
-    position: Position,
-    source: &'a str,
-    kind: Kind,
-}
-
-impl<'a> fmt::Display for Token<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        // write!(f, "{}({})@{}", self.kind, self.source.escape_debug(), self.position)
-        // FIXME(rust-lang/rust#27791): String::escape_debug is unstable
-        write!(f, "{}(", self.kind)?;
-        for c in self.source.chars() {
-            write!(f, "{}", c.escape_debug())?;
-        }
-        write!(f, ")@{}", self.position)
-    }
+    /// The position in the original source
+    pub position: Position,
+    /// The text from the original source
+    pub source: &'a str,
+    /// The kind of token
+    pub kind: Kind<'a>,
 }
 
 impl<'a> Token<'a> {
-    /// The position in the original source
-    pub fn position(&self) -> Position { self.position }
-    /// The text from the original source
-    pub fn source(&self) -> &'a str { self.source }
-    /// The kind of token
-    pub fn kind(&self) -> &Kind { &self.kind }
+    fn dump<W: io::Write>(&self, depth: usize, w: &mut W) -> io::Result<()> {
+        write!(w, "{}{}({:?})@{}", " ".repeat(depth), self.kind, self.source, self.position)?;
+        if let Kind::LiteralString(ref pieces) = self.kind {
+            for piece in &**pieces {
+                writeln!(w)?;
+                piece.dump(depth + 1, w)?;
+            }
+        }
+        Ok(())
+    }
 }
 
 /// The kind of token
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 #[derive(Serialize, Deserialize)]
+#[serde(bound(deserialize = "'de : 'a"))]
 #[derive(SmartDefault)]
-pub enum Kind {
+pub enum Kind<'a> {
     /// An identifier, matching Unicode UAX31-R1 unmodified (includes keywords)
     Identifier,
     /// A single char symbol, matching Unicode General_Category=Punctuation|Symbol
@@ -85,16 +80,16 @@ pub enum Kind {
     /// A literal integer
     LiteralInteger,
     /// A literal string
-    LiteralString,
+    LiteralString(StringFragments<'a>),
     /// Whitespace, matching Unicode White_Space
     Whitespace,
     /// Any characters not matched by one of the above cases
     #[doc(hidden)]
     #[default]
-    _Unknown,
+    Unknown,
 }
 
-impl fmt::Display for Kind {
+impl<'a> fmt::Display for Kind<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
@@ -102,9 +97,9 @@ impl fmt::Display for Kind {
             match *self {
                 Kind::Identifier => "Identifier",
                 Kind::Symbol => "Symbol",
-                Kind::LiteralInteger | Kind::LiteralString => "Literal",
+                Kind::LiteralInteger | Kind::LiteralString(_) => "Literal",
                 Kind::Whitespace => "Whitespace",
-                Kind::_Unknown => "Unknown",
+                Kind::Unknown => "Unknown",
             }
         )
     }
@@ -112,18 +107,21 @@ impl fmt::Display for Kind {
 
 /// A tokenized view of the parts of a string literal
 #[derive(Clone, Debug, Default, Eq, PartialEq, Hash)]
+#[derive(Serialize, Deserialize)]
+#[serde(bound(deserialize = "'de : 'a"))]
 #[derive(Deref, DerefMut)]
 pub struct StringFragments<'a>(Vec<StringFragment<'a>>);
 
-impl<'a, S: Into<String>> From<S> for StringFragments<'a> {
-    fn from(s: S) -> Self { StringFragments(vec![s.into().into()]) }
+impl<'a> From<&'a str> for StringFragments<'a> {
+    fn from(s: &'a str) -> Self { StringFragments(vec![s.into()]) }
 }
 
 /// A token in a literal string
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
+#[derive(Serialize, Deserialize)]
 pub enum StringFragment<'a> {
     /// Literal quoted text
-    Literal(String),
+    Literal(&'a str),
     /// An escaped character e.g. `\n` or `\u{2744}`
     Escaped(char),
     /// An invalid escape sequence e.g. `\u{bogus}` or `\❄`
@@ -134,6 +132,26 @@ pub enum StringFragment<'a> {
     _NonExhaustive,
 }
 
-impl<'a, S: Into<String>> From<S> for StringFragment<'a> {
-    fn from(s: S) -> Self { StringFragment::Literal(s.into()) }
+impl<'a> From<&'a str> for StringFragment<'a> {
+    fn from(s: &'a str) -> Self { StringFragment::Literal(s) }
+}
+
+impl<'a> StringFragment<'a> {
+    fn dump<W: io::Write>(&self, depth: usize, w: &mut W) -> io::Result<()> {
+        let indent = " ".repeat(depth);
+        match self {
+            &StringFragment::Literal(ref s) => write!(w, "{}Literal({:?})", indent, s),
+            &StringFragment::Escaped(c) => write!(w, "{}Escaped({})", indent, c),
+            &StringFragment::InvalidEscape(pos, s) => write!(w, "{}InvalidEscape({:?})@{}", indent, s, pos),
+            &StringFragment::Interpolated(ref tokens) => {
+                write!(w, "{}Interpolation", indent)?;
+                for token in tokens {
+                    writeln!(w)?;
+                    token.dump(depth + 1, w)?;
+                }
+                Ok(())
+            }
+            &StringFragment::_NonExhaustive => write!(w, "{}Unknown", indent),
+        }
+    }
 }
