@@ -141,7 +141,7 @@ impl<'a> StringFragment<'a> {
         let indent = " ".repeat(depth);
         match self {
             &StringFragment::Literal(ref s) => write!(w, "{}Literal({:?})", indent, s),
-            &StringFragment::Escaped(c) => write!(w, "{}Escaped({})", indent, c),
+            &StringFragment::Escaped(c) => write!(w, "{}Escaped({})", indent, c.escape_default()),
             &StringFragment::InvalidEscape(pos, s) => write!(w, "{}InvalidEscape({:?})@{}", indent, s, pos),
             &StringFragment::Interpolated(ref tokens) => {
                 write!(w, "{}Interpolation", indent)?;
