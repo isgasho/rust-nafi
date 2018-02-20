@@ -34,11 +34,12 @@ fn block_comment(i: Span) -> IResult<Span, Span> {
     let mut depth = 1;
 
     while depth > 0 && idx < i.input_len() {
+        // FIXME(Geal/nom#696): Unused `use` in macro
+        #[allow(unused)]
         alt!(i.slice(idx..),
             tag!("/*")                => {|_:Span| { depth += 1; idx += 2; }} |
             tag!("*/")                => {|_:Span| { depth -= 1; idx += 2; }} |
-            // FIXME(Geal/nom#680): Should be `take_until_either1!`
-            take_until_either!("/*")  => {|o:Span| { idx += o.input_len(); }} |
+            take_until_either1!("/*") => {|o:Span| { idx += o.input_len(); }} |
             take!(1)                  => {|o:Span| { idx += o.input_len(); }}
         )?;
     }

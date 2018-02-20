@@ -67,8 +67,9 @@ pub fn string<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner)-> IResult<Span<
                         }
                     },
                     _ => {
-                        // FIXME(Geal/nom#680): Should be `take_until_either1!`
-                        let (i, o) = match take_until_either!(rest, "\\\"") {
+                        // FIXME(Geal/nom#696): Unused `use` in macro
+                        #[allow(unused)]
+                        let (i, o) = match take_until_either1!(rest, "\\\"") {
                             Ok((i, o)) => (i, o),
                             Err(_) => (rest.slice(rest.input_len()..), rest),
                         };
