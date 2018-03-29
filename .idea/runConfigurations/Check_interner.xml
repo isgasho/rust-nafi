@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run lexer REPL" type="CargoCommandRunConfiguration" factoryName="Cargo Command" folderName="lexer" singleton="true">
+  <configuration default="false" name="Check interner" type="CargoCommandRunConfiguration" factoryName="Cargo Command" folderName="interner">
     <option name="channel" value="DEFAULT" />
-    <option name="command" value="run --package=nafi-lexer-repl" />
+    <option name="command" value="check --package nafi-interner" />
     <option name="nocapture" value="true" />
     <option name="backtrace" value="SHORT" />
     <option name="workingDirectory" value="file://$PROJECT_DIR$/lexer" />

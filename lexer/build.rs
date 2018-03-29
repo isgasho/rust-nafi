@@ -7,43 +7,44 @@ lazy_static! {
     static ref RE: Regex = Regex::new(r#"(?m)^([0-9A-F]{4,6})(?:..([0-9A-F]{4,6}))?\s*;"#).unwrap();
 }
 
+use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
 
-fn process(from: &Path, to: &Path) {
+fn process(from: &Path, to: &Path) -> Result<(), Box<Error>> {
     if to.exists() {
-        return;
+        return Ok(());
     }
 
     let txt = {
         let mut txt = String::new();
-        File::open(from).unwrap().read_to_string(&mut txt).unwrap();
+        File::open(from)?.read_to_string(&mut txt)?;
         txt
     };
-    let mut out = File::create(to).unwrap();
+    let mut out = File::create(to)?;
 
-    out.write(b"[").unwrap();
     for pat in RE.captures_iter(&txt) {
-        out.write(b"\\x{").unwrap();
-        out.write(pat[1].as_bytes()).unwrap();
-        out.write(b"}").unwrap();
+        write!(out, "\\x{{{}}}", &pat[1])?;
         if let Some(mat) = pat.get(2) {
-            out.write(b"-\\x{").unwrap();
-            out.write(mat.as_str().as_bytes()).unwrap();
-            out.write(b"}").unwrap();
+            write!(out, "-\\x{{{}}}", mat.as_str())?;
         }
     }
-    out.write(b"]").unwrap();
+
+    Ok(())
 }
 
 fn main() {
     process(
-        &Path::new("src/lexer/xid_continue.txt"),
-        &Path::new("src/lexer/xid_continue.regex"),
-    );
+        &Path::new("resources/xid_continue.txt"),
+        &Path::new("resources/xid_continue.regex"),
+    ).unwrap();
     process(
-        &Path::new("src/lexer/xid_start.txt"),
-        &Path::new("src/lexer/xid_start.regex"),
-    );
+        &Path::new("resources/xid_start.txt"),
+        &Path::new("resources/xid_start.regex"),
+    ).unwrap();
+    process(
+        &Path::new("resources/white_space.txt"),
+        &Path::new("resources/white_space.regex"),
+    ).unwrap();
 }

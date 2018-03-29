@@ -1,32 +1,29 @@
-use Span;
-use lexer::unicode::white_space;
-use nom::{IResult, InputLength, Slice};
-use regex::Regex;
-use tokens::Token;
+use nom::{IResult, Slice, InputLength};
 
-/// `Token::Whitespace`
-pub fn whitespace(i: Span) -> IResult<Span, Token> {
-    #[cfg_attr(rustfmt, rustfmt_skip)]
+use {Kind, Position, Span, Token};
+use interner::StringInterner;
+use lexer::unicode::white_space;
+
+/// `Kind::Whitespace`
+pub fn whitespace<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner) -> IResult<Span<'i>, Token<'lex>> {
     do_parse!(i,
         pos: position!() >>
-        fold_many1!(
-            alt_complete!(white_space | line_comment | block_comment),
-            (), |_, _| ()
+        s: fold_many1!(
+            alt!(white_space | line_comment | block_comment),
+            pos,
+            |prefix: Span<'i>, suffix: Span<'i>| i.slice(..prefix.input_len() + suffix.input_len())
         ) >>
-        (Token::Whitespace(pos.offset))
+        (Token::new(
+            Position(pos),
+            pool.get_or_insert(s.fragment),
+            Kind::Whitespace
+        ))
     )
 }
 
 /// Parse a line comment
 fn line_comment(i: Span) -> IResult<Span, Span> {
-    tag!(i, "//")?;
-
-    lazy_static! {
-        static ref NEWLINE: Regex = Regex::new(r"\n").unwrap();
-    }
-
-    let idx = i.fragment.find(&*NEWLINE).unwrap_or_else(|| i.input_len());
-    Ok((i.slice(idx..), i.slice(..idx)))
+    spanned_regex!(i, "^//.*?(?m:$)")
 }
 
 /// Parse a block comment
@@ -37,13 +34,13 @@ fn block_comment(i: Span) -> IResult<Span, Span> {
     let mut depth = 1;
 
     while depth > 0 && idx < i.input_len() {
-        let i = i.slice(idx..);
-        #[cfg_attr(rustfmt, rustfmt_skip)]
-        alt_complete!(i,
-            tag!("/*")               => {|_:Span| { depth += 1; idx += 2; }} |
-            tag!("*/")               => {|_:Span| { depth -= 1; idx += 2; }} |
-            take_until_either!("/*") => {|o:Span| { idx += o.input_len(); }} |
-            take_s!(1)               => {|o:Span| { idx += o.input_len(); }}
+        // FIXME(Geal/nom#696): Unused `use` in macro
+        #[allow(unused)]
+        alt!(i.slice(idx..),
+            tag!("/*")                => {|_:Span| { depth += 1; idx += 2; }} |
+            tag!("*/")                => {|_:Span| { depth -= 1; idx += 2; }} |
+            take_until_either1!("/*") => {|o:Span| { idx += o.input_len(); }} |
+            take!(1)                  => {|o:Span| { idx += o.input_len(); }}
         )?;
     }
 
@@ -56,10 +53,10 @@ mod test {
     use nom::Slice;
     #[test]
     fn block_comment() {
-        let comment = Span::new("/** /* */*/");
+        let comment = Span::new("/* /* *** */ */");
         assert_eq!(
             super::block_comment(comment),
-            Ok((comment.slice(11..), comment.slice(..11)))
+            Ok((comment.slice(15..), comment.slice(..15)))
         );
     }
 
