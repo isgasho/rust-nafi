@@ -1,11 +1,12 @@
 use nom::{IResult, Slice, InputLength};
 
-use {Kind, Position, Span, Token};
+use tokens::{Kind, Token};
+use {Position, Span};
 use interner::StringInterner;
 use lexer::unicode::white_space;
 
 /// `Kind::Whitespace`
-pub fn whitespace<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner) -> IResult<Span<'i>, Token<'lex>> {
+pub(crate) fn whitespace<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner) -> IResult<Span<'i>, Token<'lex>> {
     do_parse!(i,
         pos: position!() >>
         s: fold_many1!(

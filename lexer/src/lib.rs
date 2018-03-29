@@ -1,7 +1,8 @@
 //! Transformation of NAFI source code into tokens
 
 #![forbid(missing_debug_implementations, unconditional_recursion, future_incompatible)]
-#![deny(bad_style, missing_docs, unsafe_code, unused)]
+#![deny(bad_style, unsafe_code, missing_docs)]
+#![warn(edition_2018, rust_2018_idioms)]
 
 #[macro_use]
 extern crate nom;
@@ -18,7 +19,7 @@ extern crate nom_locate;
 extern crate regex;
 
 use interner::StringInterner;
-use tokens::{Kind, Token};
+use tokens::Token;
 
 #[cfg_attr(rustfmt, rustfmt_skip)] // nom macros
 mod lexer;

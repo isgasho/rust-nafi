@@ -20,8 +20,8 @@
 //! compiler's string interner.
 
 #![forbid(missing_debug_implementations, unconditional_recursion, future_incompatible)]
-#![deny(bad_style, missing_docs, unsafe_code, unused)]
-#![warn(unreachable_pub)]
+#![deny(bad_style, unsafe_code, missing_docs)]
+#![warn(edition_2018, rust_2018_idioms)]
 
 #[macro_use]
 extern crate serde_derive;
@@ -56,6 +56,7 @@ impl Default for StringInterner {
 }
 
 #[inline(always)]
+#[cfg_attr(feature = "cargo-clippy", allow(inline_always))]
 fn coerce<T>(t: T) -> T { t }
 
 #[allow(unsafe_code)]

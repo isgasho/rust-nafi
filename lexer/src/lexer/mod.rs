@@ -1,10 +1,12 @@
 use nom::IResult;
 
-use {Kind, Position, Span, Token};
+use tokens::{Kind, Token};
+use {Position, Span};
 use interner::StringInterner;
 
 macro_rules! spanned_regex {
     ($i:ident, $re:expr) => {
+        #[cfg_attr(feature = "cargo-clippy", allow(regex_macro))] // false positive rust-clippy#2586
         ::lexer::unicode::restore_span($i, re_find_static!($i.fragment, $re))
     };
 }
@@ -14,7 +16,7 @@ mod unicode;
 mod whitespace;
 
 /// Parse a token from the front of the span
-pub fn token<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner)-> IResult<Span<'i>, Token<'lex>> {
+pub(crate) fn token<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner)-> IResult<Span<'i>, Token<'lex>> {
     alt!(i,
         call!(whitespace::whitespace, pool) |
         call!(literal::integer, pool) |
