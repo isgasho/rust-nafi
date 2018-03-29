@@ -56,7 +56,14 @@ pub struct Token<'a> {
 
 impl<'a> Token<'a> {
     fn dump<W: io::Write>(&self, depth: usize, w: &mut W) -> io::Result<()> {
-        write!(w, "{}{}({:?})@{}", " ".repeat(depth), self.kind, self.source, self.position)?;
+        write!(
+            w,
+            "{}{}({:?})@{}",
+            " ".repeat(depth),
+            self.kind,
+            self.source,
+            self.position
+        )?;
         if let Kind::LiteralString(ref pieces) = self.kind {
             for piece in &**pieces {
                 writeln!(w)?;
@@ -142,7 +149,9 @@ impl<'a> StringFragment<'a> {
         match self {
             &StringFragment::Literal(ref s) => write!(w, "{}Literal({:?})", indent, s),
             &StringFragment::Escaped(c) => write!(w, "{}Escaped({})", indent, c.escape_default()),
-            &StringFragment::InvalidEscape(pos, s) => write!(w, "{}InvalidEscape({:?})@{}", indent, s, pos),
+            &StringFragment::InvalidEscape(pos, s) => {
+                write!(w, "{}InvalidEscape({:?})@{}", indent, s, pos)
+            },
             &StringFragment::Interpolated(ref tokens) => {
                 write!(w, "{}Interpolation", indent)?;
                 for token in tokens {
@@ -150,7 +159,7 @@ impl<'a> StringFragment<'a> {
                     token.dump(depth + 1, w)?;
                 }
                 Ok(())
-            }
+            },
             &StringFragment::_NonExhaustive => write!(w, "{}Unknown", indent),
         }
     }
