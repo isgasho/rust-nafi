@@ -18,7 +18,7 @@ before_install:
 matrix:
   include:
   - rust: nightly-2018-03-28
-    env: RUSTFLAGS="-D warnings"
+    env: RUSTFLAGS="-D warnings" RUST_BACKTRACE=1
     install:
     - rustup component add rustfmt-preview || true
     - cargo install clippy --verbose --version 0.0.190 || true
