@@ -1,13 +1,11 @@
-use nom::{IResult, Slice, InputLength};
-use nom::digit1;
-
-use {Kind, Position, Span, Token};
+use nom::{digit1, IResult, Slice, InputLength};
+use tokens::{Kind, Token, StringFragment, StringFragments};
 use interner::StringInterner;
-use lexer::token;
-use tokens::{StringFragment, StringFragments};
+
+use {Position, Span, lexer::token};
 
 /// `Kind::LiteralString`
-pub fn string<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner)-> IResult<Span<'i>, Token<'lex>> {
+pub(crate) fn string<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner)-> IResult<Span<'i>, Token<'lex>> {
     let (mut rest, pos) = tag!(i, "\"")?;
     let mut fragments = StringFragments::default();
 
@@ -67,8 +65,6 @@ pub fn string<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner)-> IResult<Span<
                         }
                     },
                     _ => {
-                        // FIXME(Geal/nom#696): Unused `use` in macro
-                        #[allow(unused)]
                         let (i, o) = match take_until_either1!(rest, "\\\"") {
                             Ok((i, o)) => (i, o),
                             Err(_) => (rest.slice(rest.input_len()..), rest),
@@ -94,7 +90,7 @@ pub fn string<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner)-> IResult<Span<
 }
 
 /// `Kind::LiteralInteger`
-pub fn integer<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner)-> IResult<Span<'i>, Token<'lex>> {
+pub(crate) fn integer<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner)-> IResult<Span<'i>, Token<'lex>> {
     do_parse!(i,
         pos: position!() >>
         o: call!(digit1) >>

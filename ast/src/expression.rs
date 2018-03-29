@@ -1,5 +1,6 @@
-use bigint;
-use tokens::{Token, Position, StringFragments};
+use bigint::BigInt;
+
+use tokens::{Position, StringFragments, Token};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[allow(missing_docs)]
@@ -32,9 +33,7 @@ pub struct ParenthesizedExpression<'a> {
 
 impl<'a> ParenthesizedExpression<'a> {
     /// The start position of this expression.
-    pub fn position(&self) -> Position {
-        self.left_paren.position
-    }
+    pub fn position(&self) -> Position { self.left_paren.position }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -47,15 +46,13 @@ pub struct OperatorExpression<'a> {
 
 impl<'a> OperatorExpression<'a> {
     /// The start position of this expression.
-    pub fn position(&self) -> Position {
-        self.lhs.position()
-    }
+    pub fn position(&self) -> Position { self.lhs.position() }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[allow(missing_docs)]
 pub enum LiteralExpression<'a> {
-    Integer(Token<'a>, bigint::BigInt),
+    Integer(Token<'a>, BigInt),
     String(Token<'a>, StringFragments<'a>),
 }
 
@@ -63,8 +60,9 @@ impl<'a> LiteralExpression<'a> {
     /// The start position of this expression.
     pub fn position(&self) -> Position {
         match *self {
-            LiteralExpression::Integer(ref token, _) |
-            LiteralExpression::String(ref token, _) => token.position,
+            LiteralExpression::Integer(ref token, _) | LiteralExpression::String(ref token, _) => {
+                token.position
+            },
         }
     }
 }

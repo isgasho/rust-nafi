@@ -2,17 +2,17 @@ use nom::IResult;
 
 use Span;
 
-pub fn white_space(i: Span) -> IResult<Span, Span> {
+pub(crate) fn white_space(i: Span) -> IResult<Span, Span> {
     spanned_regex!(i, concat!(
         "^[", include_str!("../../resources/white_space.regex"), "]",
     ))
 }
 
-pub fn symbol(i: Span) -> IResult<Span, Span> {
+pub(crate) fn symbol(i: Span) -> IResult<Span, Span> {
     spanned_regex!(i, r"^[\pP\pS]")
 }
 
-pub fn identifier(i: Span) -> IResult<Span, Span> {
+pub(crate) fn identifier(i: Span) -> IResult<Span, Span> {
     spanned_regex!(i, concat!(
         "^[", include_str!("../../resources/xid_start.regex"), "]",
         "[", include_str!("../../resources/xid_continue.regex"), "]*",

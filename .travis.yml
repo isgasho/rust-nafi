@@ -1,4 +1,5 @@
 language: rust
+cache: cargo
 
 rust:
 - nightly
@@ -8,15 +9,40 @@ branches:
   - staging
   - trying
   - master
-
-script:
-- cargo build --all
-- cargo test  --all
-- cargo doc   --all --no-deps
+  - /^v\d+\.\d+(?:\.\d+)?(?:-.*)?$/ # releases
 
 before_install:
 - openssl aes-256-cbc -K $encrypted_366ad4dc9b51_key -iv $encrypted_366ad4dc9b51_iv
   -in ./.travis/id_rsa.enc -out ~/.ssh/id_rsa -d
 - chmod 600 ~/.ssh/id_rsa
 
-after_success: cat .travis/doc_upload.sh | sh
+script:
+- cargo build --all --verbose
+- cargo test  --all --verbose
+- cargo doc   --all --no-deps
+
+env:
+matrix:
+  include:
+  
+  # Warnings/Docs
+  - rust: nightly-2018-03-28
+    env: RUSTFLAGS="-D warnings" CARGO_GHP_VERSION="0.3.2"
+    install:
+    - cargo install cargo-ghp-upload --verbose --version $CARGO_GHP_VERSION || true
+    script:
+    - cargo check --all-targets --tests
+    - cargo doc --all --no-deps
+    after_success:
+    - cargo ghp-upload -vvvr
+  
+  # Clippy/Format
+  - rust: nightly-2018-03-28
+  # # waiting on rust-lang-nursery/rust-clippy#2587 rust-lang-nursery/rust-clippy#2585
+    env: CLIPPY_VERSION="0.0.190"
+    install:
+    - rustup component add rustfmt-preview || true
+    - cargo install clippy --verbose --version $CLIPPY_VERSION || true
+    script:
+    - cargo clippy --all -- -D clippy
+    - cargo fmt -- --write-mode=diff
