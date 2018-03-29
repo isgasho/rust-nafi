@@ -1,4 +1,5 @@
-use bigint;
+use bigint::BigInt;
+
 use tokens::{Position, StringFragments, Token};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -51,7 +52,7 @@ impl<'a> OperatorExpression<'a> {
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[allow(missing_docs)]
 pub enum LiteralExpression<'a> {
-    Integer(Token<'a>, bigint::BigInt),
+    Integer(Token<'a>, BigInt),
     String(Token<'a>, StringFragments<'a>),
 }
 

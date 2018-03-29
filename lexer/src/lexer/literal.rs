@@ -1,11 +1,8 @@
-use nom::{IResult, Slice, InputLength};
-use nom::digit1;
-
-use tokens::{Kind, Token};
-use {Position, Span};
+use nom::{digit1, IResult, Slice, InputLength};
+use tokens::{Kind, Token, StringFragment, StringFragments};
 use interner::StringInterner;
-use lexer::token;
-use tokens::{StringFragment, StringFragments};
+
+use {Position, Span, lexer::token};
 
 /// `Kind::LiteralString`
 pub(crate) fn string<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner)-> IResult<Span<'i>, Token<'lex>> {
@@ -68,8 +65,6 @@ pub(crate) fn string<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner)-> IResul
                         }
                     },
                     _ => {
-                        // FIXME(Geal/nom#696): Unused `use` in macro
-                        #[allow(unused)]
                         let (i, o) = match take_until_either1!(rest, "\\\"") {
                             Ok((i, o)) => (i, o),
                             Err(_) => (rest.slice(rest.input_len()..), rest),

@@ -1,9 +1,8 @@
 use nom::{IResult, Slice, InputLength};
-
 use tokens::{Kind, Token};
-use {Position, Span};
 use interner::StringInterner;
-use lexer::unicode::white_space;
+
+use {Position, Span, lexer::unicode::white_space};
 
 /// `Kind::Whitespace`
 pub(crate) fn whitespace<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner) -> IResult<Span<'i>, Token<'lex>> {

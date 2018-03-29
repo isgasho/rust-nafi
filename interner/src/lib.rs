@@ -26,11 +26,7 @@
 #[macro_use]
 extern crate serde_derive;
 
-use std::cell::RefCell;
-use std::collections::HashSet;
-use std::collections::hash_map::RandomState;
-use std::hash::BuildHasher;
-use std::mem;
+use std::{mem, cell::RefCell, collections::{HashSet, hash_map::RandomState}, hash::BuildHasher};
 
 // The `StringInterner` loans out string references with the same lifetime as its own.
 // This guarantees that for as long as the interner is alive, so will the loan.

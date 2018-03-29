@@ -1,8 +1,8 @@
 use nom::IResult;
-
 use tokens::{Kind, Token};
-use {Position, Span};
 use interner::StringInterner;
+
+use {Position, Span};
 
 macro_rules! spanned_regex {
     ($i:ident, $re:expr) => {

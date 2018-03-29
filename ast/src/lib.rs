@@ -8,5 +8,4 @@ extern crate nafi_tokens as tokens;
 extern crate num_bigint as bigint;
 
 mod expression;
-
 pub use expression::*;
