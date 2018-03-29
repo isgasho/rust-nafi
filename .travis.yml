@@ -2,6 +2,7 @@ language: rust
 cache: cargo
 
 rust:
+- beta
 - nightly
 
 branches:
@@ -9,29 +10,40 @@ branches:
   - staging
   - trying
   - master
+  - /^v\d+\.\d+(?:\.\d+)?(?:-.*)?$/ # releases
 
 before_install:
 - openssl aes-256-cbc -K $encrypted_366ad4dc9b51_key -iv $encrypted_366ad4dc9b51_iv
   -in ./.travis/id_rsa.enc -out ~/.ssh/id_rsa -d
 - chmod 600 ~/.ssh/id_rsa
 
+script:
+- cargo build --all --verbose
+- cargo test  --all --verbose
+- cargo doc   --all --no-deps
+
+env:
 matrix:
   include:
-  - rust: nightly-2018-03-28
-    env: RUSTFLAGS="-D warnings" RUST_BACKTRACE=1
+  
+  # Warnings/Format
+  - rust: 1.26.0-beta.13
+    env: RUSTFLAGS="-D warnings" CARGO_GHP_VERSION="0.3.2"
     install:
     - rustup component add rustfmt-preview || true
-    - cargo install clippy --verbose --version 0.0.190 || true
-    - cargo install cargo-ghp-upload --verbose --version 0.3.2 || true
+    - cargo install cargo-ghp-upload --verbose --version $CARGO_GHP_VERSION || true
     script:
     - cargo check --all-targets --tests
     - cargo fmt -- --write-mode=diff
-    - cargo clippy -- -D clippy
     - cargo doc --all --no-deps
     after_success:
-    - cargo ghp-upload -vvv
-  - rust: nightly
-    script:
-    - cargo build --all
-    - cargo test  --all
-    - cargo doc   --all --no-deps
+    - cargo ghp-upload -vvvr
+  
+  # Clippy
+  # # rust-lang-nursery/rust-clippy#2587 rust-lang-nursery/rust-clippy#2585
+  # rust: nightly-2018-04-01
+  # env: CLIPPY_VERSION="0.0.191"
+  # install:
+  # - cargo install clippy --verbose --version $CLIPPY_VERSION || true
+  # script:
+  # - cargo clippy --all-targets --tests -- -D clippy
