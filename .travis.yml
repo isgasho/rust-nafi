@@ -24,7 +24,7 @@ matrix:
     - cargo install clippy --verbose --version 0.0.190 || true
     - cargo install cargo-ghp-upload --verbose --version 0.3.2 || true
     script:
-    - cargo check --all-target --tests
+    - cargo check --all-targets --tests
     - cargo fmt -- --write-mode=diff
     - cargo clippy -- -D clippy
     - cargo doc --all --no-deps
