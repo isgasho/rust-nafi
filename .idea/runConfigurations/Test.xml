@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Test" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-    <option name="channel" value="NIGHTLY" />
+    <option name="channel" value="DEFAULT" />
     <option name="command" value="test --all" />
     <option name="nocapture" value="true" />
     <option name="backtrace" value="SHORT" />
