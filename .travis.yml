@@ -39,10 +39,10 @@ matrix:
   # Clippy/Format
   - rust: nightly-2018-03-28
   # # waiting on rust-lang-nursery/rust-clippy#2587 rust-lang-nursery/rust-clippy#2585
-    env: CLIPPY_VERSION="0.0.191"
+    env: CLIPPY_VERSION="0.0.190"
     install:
     - rustup component add rustfmt-preview || true
     - cargo install clippy --verbose --version $CLIPPY_VERSION || true
     script:
-    - cargo clippy --all-targets --tests -- -D clippy
+    - cargo clippy --all -- -D clippy
     - cargo fmt -- --write-mode=diff
