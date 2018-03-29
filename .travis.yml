@@ -30,8 +30,8 @@ matrix:
     - cargo doc --all --no-deps
     after_success:
     - cargo ghp-upload -vvv
-
-script:
-- cargo build --all
-- cargo test  --all
-- cargo doc   --all --no-deps
+  - rust: nightly
+    script:
+    - cargo build --all
+    - cargo test  --all
+    - cargo doc   --all --no-deps
