@@ -26,7 +26,7 @@
 #[macro_use]
 extern crate serde_derive;
 
-use std::{mem, cell::RefCell, collections::{HashSet, hash_map::RandomState}, hash::BuildHasher};
+use std::{mem, collections::{HashSet, hash_map::RandomState}, hash::BuildHasher, sync::RwLock};
 
 // The `StringInterner` loans out string references with the same lifetime as its own.
 // This guarantees that for as long as the interner is alive, so will the loan.
@@ -35,18 +35,18 @@ use std::{mem, cell::RefCell, collections::{HashSet, hash_map::RandomState}, has
 // They will not be freed until we are, as we are an append-only collection of `String`s.
 
 /// A string interner based on a `HashSet`. See the crate-level docs for more.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Debug)]
 #[derive(Serialize, Deserialize)]
 pub struct StringInterner<H: BuildHasher = RandomState> {
     #[serde(bound(deserialize = "H: Default"))] // HashSet: Serialize
-    arena: RefCell<HashSet<Box<str>, H>>,
+    arena: RwLock<HashSet<Box<str>, H>>,
 }
 
 // Cannot be derived with the BuildHasher generic
 impl Default for StringInterner {
     fn default() -> Self {
         StringInterner {
-            arena: RefCell::default(),
+            arena: RwLock::default(),
         }
     }
 }
@@ -71,15 +71,17 @@ impl<H: BuildHasher> StringInterner<H> {
     /// Otherwise, just pass in a string slice.
     ///
     /// See `get` for more about the interned `&str`.
-    #[inline]
     pub fn get_or_insert<'a, S>(&'a self, s: S) -> &'a str
     where
         S: AsRef<str> + Into<Box<str>>,
     {
-        let mut arena = self.arena.borrow_mut();
-        if arena.contains(s.as_ref()) {
-            unsafe { mem::transmute(coerce::<&str>(arena.get(s.as_ref()).expect("Just entered"))) }
+        if let Some(s) = self.get(s.as_ref()) {
+            return s;
         } else {
+            let mut arena = self.arena.write().unwrap();
+            if let Some(s) = arena.get(s.as_ref()) {
+                return unsafe { mem::transmute(coerce::<&str>(s)) };
+            } // cannot else because `arena` would still be borrowed
             let boxed_s: Box<str> = s.into();
             // Get the reference to loan out _after_ boxing up our data
             let s_ref: &'a str = unsafe { mem::transmute(coerce::<&str>(&boxed_s)) };
@@ -94,10 +96,10 @@ impl<H: BuildHasher> StringInterner<H> {
     /// will live at least as long as and no longer than this interner does. All strings
     /// in the interner are never mutated, so the heap-allocated string slice is never
     /// going to move, which makes loaning these references out sound.
-    #[inline]
     pub fn get<'a>(&'a self, s: &str) -> Option<&'a str> {
         self.arena
-            .borrow()
+            .read()
+            .unwrap()
             .get(s)
             .map(|s| unsafe { mem::transmute(coerce::<&str>(s)) })
     }
@@ -111,7 +113,7 @@ impl StringInterner<RandomState> {
     /// so it will not allocate until it is first inserted into.
     pub fn new() -> Self {
         StringInterner {
-            arena: RefCell::new(HashSet::new()),
+            arena: RwLock::new(HashSet::new()),
         }
     }
 
@@ -121,7 +123,7 @@ impl StringInterner<RandomState> {
     /// If `capacity` is 0, the interner will not initially allocate.
     pub fn with_capacity(capacity: usize) -> Self {
         StringInterner {
-            arena: RefCell::new(HashSet::with_capacity(capacity)),
+            arena: RwLock::new(HashSet::with_capacity(capacity)),
         }
     }
 }
@@ -133,7 +135,7 @@ impl<H: BuildHasher> StringInterner<H> {
     /// The string interner is also created with the default capacity.
     pub fn with_hasher(hasher: H) -> Self {
         StringInterner {
-            arena: RefCell::new(HashSet::with_hasher(hasher)),
+            arena: RwLock::new(HashSet::with_hasher(hasher)),
         }
     }
 
@@ -143,7 +145,7 @@ impl<H: BuildHasher> StringInterner<H> {
     /// If `capacity` is 0, the interner will not initially allocate.
     pub fn with_capacity_and_hasher(capacity: usize, hasher: H) -> Self {
         StringInterner {
-            arena: RefCell::new(HashSet::with_capacity_and_hasher(capacity, hasher)),
+            arena: RwLock::new(HashSet::with_capacity_and_hasher(capacity, hasher)),
         }
     }
 }
@@ -159,7 +161,7 @@ mod tests {
 
         // Intern some strings
         let a1 = interner.get_or_insert(Box::<str>::from("a"));
-        let b1 = interner.get_or_insert(Box::<str>::from("b"));
+        let b1 = interner.get_or_insert(String::from("b"));
         let c1 = interner.get_or_insert("c");
 
         // Get the interned strings
