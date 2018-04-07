@@ -6,8 +6,6 @@
 
 #[macro_use]
 extern crate serde_derive;
-#[macro_use]
-extern crate derive_deref;
 
 extern crate nafi_location as location;
 extern crate nafi_tokens as tokens;

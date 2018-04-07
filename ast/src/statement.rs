@@ -23,8 +23,11 @@ impl<'a> Statement<'a> {
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize, Deserialize)]
-#[derive(Deref, DerefMut)]
-pub struct Declaration<'a>(#[serde(borrow)] pub Assignment<'a>);
+pub struct Declaration<'a> {
+    pub mutable: bool,
+    pub assignment: Assignment<'a>,
+    pub span: Span,
+}
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize, Deserialize)]
