@@ -1,6 +1,6 @@
 use location::Span;
 
-use {Expression, Identifier};
+use {Declaration, Expression, Identifier};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize, Deserialize)]
@@ -11,22 +11,13 @@ pub enum Statement<'a> {
 }
 
 impl<'a> Statement<'a> {
-    /// The start position of this expression.
     pub fn span(&self) -> Span {
         match *self {
-            Statement::Declaration(ref decl) => decl.span,
+            Statement::Declaration(ref decl) => decl.span(),
             Statement::Assignment(ref assign) => assign.span,
             Statement::Expression(ref expr) => expr.span(),
         }
     }
-}
-
-#[derive(Clone, Debug, Eq, PartialEq)]
-#[derive(Serialize, Deserialize)]
-pub struct Declaration<'a> {
-    pub mutable: bool,
-    pub assignment: Assignment<'a>,
-    pub span: Span,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]

@@ -15,7 +15,6 @@ pub enum Expression<'a> {
 }
 
 impl<'a> Expression<'a> {
-    /// The span of this expression.
     pub fn span(&self) -> Span {
         match *self {
             Expression::Identifier(ref expr) => expr.span,
@@ -50,18 +49,14 @@ pub struct BinaryOperator<'a> {
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize, Deserialize)]
 pub struct IntegerLiteral {
-    /// The value of this integer literal.
     pub value: BigInt,
-    /// The span of this expression.
     pub span: Span,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize, Deserialize)]
 pub struct StringLiteral<'a> {
-    /// The fragments of this string literal.
     #[serde(borrow)]
     pub fragments: StringFragments<'a>,
-    /// The span of this expression.
     pub span: Span,
 }
