@@ -1,6 +1,5 @@
 use bigint::BigInt;
 use location::Span;
-use tokens::StringFragments;
 
 use {Identifier, Operator};
 
@@ -56,7 +55,6 @@ pub struct IntegerLiteral {
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize, Deserialize)]
 pub struct StringLiteral<'a> {
-    #[serde(borrow)]
-    pub fragments: StringFragments<'a>,
+    pub contents: &'a str,
     pub span: Span,
 }

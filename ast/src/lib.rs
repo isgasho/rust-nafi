@@ -8,7 +8,6 @@
 extern crate serde_derive;
 
 extern crate nafi_location as location;
-extern crate nafi_tokens as tokens;
 extern crate num_bigint as bigint;
 
 pub mod expression;
