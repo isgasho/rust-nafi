@@ -132,13 +132,13 @@ impl<'a> From<&'a str> for StringFragment<'a> {
 impl<'a> StringFragment<'a> {
     fn dump<W: io::Write>(&self, depth: usize, w: &mut W) -> io::Result<()> {
         let indent = " ".repeat(depth);
-        match *self {
+        match self {
             StringFragment::Literal(s) => write!(w, "{}Literal({:?})", indent, s),
             StringFragment::Escaped(c) => write!(w, "{}Escaped({})", indent, c.escape_default()),
             StringFragment::InvalidEscape(pos, s) => {
                 write!(w, "{}InvalidEscape({:?})@{}", indent, s, pos)
             },
-            StringFragment::Interpolated(ref tokens) => {
+            StringFragment::Interpolated(tokens) => {
                 write!(w, "{}Interpolation", indent)?;
                 for token in tokens {
                     writeln!(w)?;
