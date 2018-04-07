@@ -1,68 +1,60 @@
 use bigint::BigInt;
+use location::Span;
 
-use tokens::{Position, StringFragments, Token};
+use {Identifier, Operator};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-#[allow(missing_docs)]
+#[derive(Serialize, Deserialize)]
 pub enum Expression<'a> {
-    Identifier(Token<'a>),
-    Parenthesized(Box<ParenthesizedExpression<'a>>),
-    Operator(Box<OperatorExpression<'a>>),
-    Literal(Box<LiteralExpression<'a>>),
+    Identifier(#[serde(borrow)] Box<Identifier<'a>>),
+    Parenthesized(#[serde(borrow)] Box<Parenthesized<'a>>),
+    BinaryOperator(#[serde(borrow)] Box<BinaryOperator<'a>>),
+    IntegerLiteral(Box<IntegerLiteral>),
+    StringLiteral(#[serde(borrow)] Box<StringLiteral<'a>>),
 }
 
 impl<'a> Expression<'a> {
-    /// The start position of this expression.
-    pub fn position(&self) -> Position {
+    pub fn span(&self) -> Span {
         match *self {
-            Expression::Identifier(ref token) => token.position,
-            Expression::Parenthesized(ref expr) => expr.position(),
-            Expression::Operator(ref expr) => expr.position(),
-            Expression::Literal(ref expr) => expr.position(),
+            Expression::Identifier(ref expr) => expr.span,
+            Expression::Parenthesized(ref expr) => expr.span,
+            Expression::BinaryOperator(ref expr) => expr.span,
+            Expression::IntegerLiteral(ref expr) => expr.span,
+            Expression::StringLiteral(ref expr) => expr.span,
         }
     }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-#[allow(missing_docs)]
-pub struct ParenthesizedExpression<'a> {
-    left_paren: Token<'a>,
-    inner: Expression<'a>,
-    right_paren: Token<'a>,
-}
-
-impl<'a> ParenthesizedExpression<'a> {
-    /// The start position of this expression.
-    pub fn position(&self) -> Position { self.left_paren.position }
+#[derive(Serialize, Deserialize)]
+pub struct Parenthesized<'a> {
+    #[serde(borrow)]
+    pub inner: Expression<'a>,
+    pub span: Span,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-#[allow(missing_docs)]
-pub struct OperatorExpression<'a> {
-    lhs: Expression<'a>,
-    operator: Vec<Token<'a>>,
-    rhs: Expression<'a>,
-}
-
-impl<'a> OperatorExpression<'a> {
-    /// The start position of this expression.
-    pub fn position(&self) -> Position { self.lhs.position() }
+#[derive(Serialize, Deserialize)]
+pub struct BinaryOperator<'a> {
+    #[serde(borrow)]
+    pub lhs: Expression<'a>,
+    #[serde(borrow)]
+    pub op: Operator<'a>,
+    #[serde(borrow)]
+    pub rhs: Expression<'a>,
+    pub span: Span,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-#[allow(missing_docs)]
-pub enum LiteralExpression<'a> {
-    Integer(Token<'a>, BigInt),
-    String(Token<'a>, StringFragments<'a>),
+#[derive(Serialize, Deserialize)]
+pub struct IntegerLiteral {
+    pub value: BigInt,
+    pub span: Span,
 }
 
-impl<'a> LiteralExpression<'a> {
-    /// The start position of this expression.
-    pub fn position(&self) -> Position {
-        match *self {
-            LiteralExpression::Integer(ref token, _) | LiteralExpression::String(ref token, _) => {
-                token.position
-            },
-        }
-    }
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Serialize, Deserialize)]
+pub struct StringLiteral<'a> {
+    pub contents: &'a str,
+    pub span: Span,
 }

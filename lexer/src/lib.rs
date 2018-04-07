@@ -13,6 +13,7 @@ extern crate log;
 #[macro_use]
 extern crate lazy_static;
 extern crate nafi_interner as interner;
+extern crate nafi_location as location;
 extern crate nafi_tokens as tokens;
 #[macro_use(position)]
 extern crate nom_locate;
@@ -24,12 +25,12 @@ use tokens::Token;
 #[cfg_attr(rustfmt, rustfmt_skip)] // nom macros
 mod lexer;
 
-type Span<'a> = nom_locate::LocatedSpan<&'a str>;
+type Cursor<'a> = nom_locate::LocatedSpan<&'a str>;
 #[allow(non_snake_case)]
-fn Position(pos: Span) -> tokens::Position {
-    tokens::Position {
-        line: pos.line as usize,
-        column: pos.get_utf8_column(),
+fn Position(pos: Cursor) -> location::Position {
+    location::Position {
+        line: pos.line,
+        column: pos.get_utf8_column() as u32,
     }
 }
 
@@ -37,7 +38,7 @@ fn Position(pos: Span) -> tokens::Position {
 #[derive(Debug)]
 pub struct Lexer<'i, 'lex> {
     str_pool: &'lex StringInterner,
-    source: Span<'i>,
+    source: Cursor<'i>,
 }
 
 impl<'i, 'lex> Lexer<'i, 'lex> {
@@ -45,11 +46,11 @@ impl<'i, 'lex> Lexer<'i, 'lex> {
     pub fn new(source: &'i str, pool: &'lex StringInterner) -> Self {
         Lexer {
             str_pool: pool,
-            source: Span::new(source),
+            source: Cursor::new(source),
         }
     }
 
-    fn try_next(&mut self) -> Result<Token<'lex>, nom::Err<Span<'i>>> {
+    fn try_next(&mut self) -> Result<Token<'lex>, nom::Err<Cursor<'i>>> {
         lexer::token(self.source, self.str_pool).map(|(i, o)| {
             self.source = i;
             o

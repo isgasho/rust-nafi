@@ -5,14 +5,14 @@
 #![warn(unreachable_pub)]
 
 #[macro_use]
-extern crate derive_deref;
-#[macro_use]
 extern crate derive_more;
 #[macro_use]
 extern crate serde_derive;
 #[macro_use]
 extern crate smart_default;
+extern crate nafi_location;
 
+use nafi_location::Span;
 use std::{fmt, io};
 
 /// Dump tokens to an output stream
@@ -24,30 +24,13 @@ pub fn dump<W: io::Write>(tokens: &[Token], mut to: W) -> io::Result<()> {
     Ok(())
 }
 
-// TODO: Move to a more general position?
-/// Position in source code
-#[derive(Copy, Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
-#[derive(Serialize, Deserialize)]
-#[derive(From, Into, Constructor)]
-#[allow(missing_docs)]
-pub struct Position {
-    pub line: usize,
-    pub column: usize,
-}
-
-impl fmt::Display for Position {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}:{}", self.line, self.column)
-    }
-}
-
 /// A token of source code
 #[derive(Clone, Debug, Default, Eq, PartialEq, Hash)]
 #[derive(Serialize, Deserialize)]
 #[derive(Constructor)]
 pub struct Token<'a> {
     /// The position in the original source
-    pub position: Position,
+    pub span: Span,
     /// The text from the original source
     pub source: &'a str,
     /// The kind of token
@@ -62,7 +45,7 @@ impl<'a> Token<'a> {
             " ".repeat(depth),
             self.kind,
             self.source,
-            self.position
+            self.span
         )?;
         if let Kind::LiteralString(ref pieces) = self.kind {
             for piece in &**pieces {
@@ -77,7 +60,6 @@ impl<'a> Token<'a> {
 /// The kind of token
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 #[derive(Serialize, Deserialize)]
-#[serde(bound(deserialize = "'de : 'a"))]
 #[derive(SmartDefault)]
 pub enum Kind<'a> {
     /// An identifier, matching Unicode UAX31-R1 unmodified (includes keywords)
@@ -87,9 +69,7 @@ pub enum Kind<'a> {
     /// A literal integer
     LiteralInteger,
     /// A literal string
-    LiteralString(StringFragments<'a>),
-    /// Whitespace, matching Unicode White_Space
-    Whitespace,
+    LiteralString(#[serde(borrow)] StringFragments<'a>),
     /// Any characters not matched by one of the above cases
     #[doc(hidden)]
     #[default]
@@ -105,7 +85,6 @@ impl<'a> fmt::Display for Kind<'a> {
                 Kind::Identifier => "Identifier",
                 Kind::Symbol => "Symbol",
                 Kind::LiteralInteger | Kind::LiteralString(_) => "Literal",
-                Kind::Whitespace => "Whitespace",
                 Kind::Unknown => "Unknown",
             }
         )
@@ -115,9 +94,16 @@ impl<'a> fmt::Display for Kind<'a> {
 /// A tokenized view of the parts of a string literal
 #[derive(Clone, Debug, Default, Eq, PartialEq, Hash)]
 #[derive(Serialize, Deserialize)]
-#[serde(bound(deserialize = "'de : 'a"))]
-#[derive(Deref, DerefMut)]
-pub struct StringFragments<'a>(Vec<StringFragment<'a>>);
+pub struct StringFragments<'a>(#[serde(borrow)] Vec<StringFragment<'a>>);
+
+impl<'a> ::std::ops::Deref for StringFragments<'a> {
+    type Target = Vec<StringFragment<'a>>;
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+
+impl<'a> ::std::ops::DerefMut for StringFragments<'a> {
+    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
+}
 
 impl<'a> From<&'a str> for StringFragments<'a> {
     fn from(s: &'a str) -> Self { StringFragments(vec![s.into()]) }
@@ -132,7 +118,7 @@ pub enum StringFragment<'a> {
     /// An escaped character e.g. `\n` or `\u{2744}`
     Escaped(char),
     /// An invalid escape sequence e.g. `\u{bogus}` or `\❄`
-    InvalidEscape(Position, &'a str),
+    InvalidEscape(Span, &'a str),
     /// An interpolated sequence e.g. `\{name}`
     Interpolated(Vec<Token<'a>>),
     #[doc(hidden)]

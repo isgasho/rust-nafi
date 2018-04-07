@@ -15,6 +15,7 @@
       <sourceFolder url="file://$MODULE_DIR$/interner/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/interner/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/repl/lexer/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/location/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
