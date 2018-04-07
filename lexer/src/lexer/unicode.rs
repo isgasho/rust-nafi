@@ -1,18 +1,18 @@
 use nom::IResult;
 
-use Span;
+use Cursor;
 
-pub(crate) fn white_space(i: Span) -> IResult<Span, Span> {
+pub(crate) fn white_space(i: Cursor) -> IResult<Cursor, Cursor> {
     spanned_regex!(i, concat!(
         "^[", include_str!("../../resources/white_space.regex"), "]",
     ))
 }
 
-pub(crate) fn symbol(i: Span) -> IResult<Span, Span> {
+pub(crate) fn symbol(i: Cursor) -> IResult<Cursor, Cursor> {
     spanned_regex!(i, r"^[\pP\pS]")
 }
 
-pub(crate) fn identifier(i: Span) -> IResult<Span, Span> {
+pub(crate) fn identifier(i: Cursor) -> IResult<Cursor, Cursor> {
     spanned_regex!(i, concat!(
         "^[", include_str!("../../resources/xid_start.regex"), "]",
         "[", include_str!("../../resources/xid_continue.regex"), "]*",
@@ -20,9 +20,9 @@ pub(crate) fn identifier(i: Span) -> IResult<Span, Span> {
 }
 
 pub(crate) fn restore_span<'i>(
-    span: Span<'i>,
+    span: Cursor<'i>,
     result: IResult<&str, &str>,
-) -> IResult<Span<'i>, Span<'i>> {
+) -> IResult<Cursor<'i>, Cursor<'i>> {
     use nom::Slice;
     result
         .map(|(_, o)| (span.slice(o.len()..), span.slice(..o.len())))

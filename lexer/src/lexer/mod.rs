@@ -1,8 +1,9 @@
 use nom::IResult;
 use tokens::{Kind, Token};
 use interner::StringInterner;
+use location::Span;
 
-use {Position, Span};
+use {Position, Cursor};
 
 macro_rules! spanned_regex {
     ($i:ident, $re:expr) => {
@@ -15,10 +16,10 @@ mod literal;
 mod unicode;
 mod whitespace;
 
-/// Parse a token from the front of the span
-pub(crate) fn token<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner)-> IResult<Span<'i>, Token<'lex>> {
+/// Parse a token from the front of the cursor
+pub(crate) fn token<'i, 'lex>(i: Cursor<'i>, pool: &'lex StringInterner)-> IResult<Cursor<'i>, Token<'lex>> {
+    let (i,()) = whitespace::skip_whitespace(i)?;
     alt!(i,
-        call!(whitespace::whitespace, pool) |
         call!(literal::integer, pool) |
         call!(literal::string, pool) |
         call!(symbol, pool) |
@@ -28,12 +29,13 @@ pub(crate) fn token<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner)-> IResult
 }
 
 /// `Kind::Symbol`
-fn symbol<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner)-> IResult<Span<'i>, Token<'lex>> {
+fn symbol<'i, 'lex>(i: Cursor<'i>, pool: &'lex StringInterner)-> IResult<Cursor<'i>, Token<'lex>> {
     do_parse!(i,
-        pos: position!() >>
+        start: position!() >>
         symbol: call!(unicode::symbol) >>
+        stop: position!() >>
         (Token::new(
-            Position(pos),
+            Span { start:Position(start), stop:Position(stop) },
             pool.get_or_insert(symbol.fragment),
             Kind::Symbol,
         ))
@@ -41,12 +43,13 @@ fn symbol<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner)-> IResult<Span<'i>,
 }
 
 /// `Kind::Identifier`
-fn identifier<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner) -> IResult<Span<'i>, Token<'lex>> {
+fn identifier<'i, 'lex>(i: Cursor<'i>, pool: &'lex StringInterner) -> IResult<Cursor<'i>, Token<'lex>> {
     do_parse!(i,
-        pos: position!() >>
+        start: position!() >>
         ident: call!(unicode::identifier) >>
+        stop: position!() >>
         (Token::new(
-            Position(pos),
+            Span { start:Position(start), stop:Position(stop) },
             pool.get_or_insert(ident.fragment),
             Kind::Identifier,
         ))
@@ -54,12 +57,13 @@ fn identifier<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner) -> IResult<Span
 }
 
 /// `Kind::Unknown`
-fn unknown<'i, 'lex>(i: Span<'i>, pool: &'lex StringInterner) -> IResult<Span<'i>, Token<'lex>> {
+fn unknown<'i, 'lex>(i: Cursor<'i>, pool: &'lex StringInterner) -> IResult<Cursor<'i>, Token<'lex>> {
     do_parse!(i,
-        pos: position!() >>
+        start: position!() >>
         ch: take!(1) >>
+        stop: position!() >>
         (Token::new(
-            Position(pos),
+            Span { start:Position(start), stop:Position(stop) },
             pool.get_or_insert(ch.fragment),
             Kind::Unknown,
         ))
