@@ -1,9 +1,10 @@
 //! Tokens when parsing in CODE mode
 
 use location::Span;
+use std::fmt;
 
 /// A token of Nafi source code
-#[derive(Clone, Debug, Default, Eq, PartialEq, Hash)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 #[derive(Serialize, Deserialize)]
 #[derive(Constructor)]
 pub struct Token<'a> {
@@ -15,10 +16,15 @@ pub struct Token<'a> {
     pub kind: Kind,
 }
 
+impl<'a> fmt::Display for Token<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+         write!(f, "{}({:?})@{}", self.kind, self.source, self.span)
+    }
+}
+
 /// The kind of source token this is
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
 #[derive(Serialize, Deserialize)]
-#[derive(SmartDefault)]
 pub enum Kind {
     /// An identifier, matching Unicode UAX31-R1 unmodified (includes keywords)
     Identifier,
@@ -32,10 +38,24 @@ pub enum Kind {
     Whitespace,
     /// A comment in the source.
     Comment(CommentStyle),
-    /// Any characters not matched by one of the above cases
-    #[doc(hidden)]
-    #[default]
-    Unknown,
+}
+
+impl fmt::Display for Kind {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", match self {
+            Kind::Identifier => "Identifier",
+            Kind::Symbol => "Symbol",
+            Kind::LiteralInteger => "LiteralInteger",
+            Kind::LiteralStringStart => "LiteralStringStart",
+            Kind::Whitespace => "Whitespace",
+            Kind::Comment(_) => "Comment",
+        })?;
+        if let Kind::Comment(style) = self {
+            write!(f, "({})", style)
+        } else {
+            Ok(())
+        }
+    }
 }
 
 /// A style of comment
@@ -50,4 +70,15 @@ pub enum CommentStyle {
     Block,
     /// A comment starting with `/**` and ending with `*/`, nesting block comments
     BlockDoc,
+}
+
+impl fmt::Display for CommentStyle {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", match self {
+            CommentStyle::Line => "Line",
+            CommentStyle::LineDoc => "LineDoc",
+            CommentStyle::Block => "Block",
+            CommentStyle::BlockDoc => "BlockDoc",
+        })
+    }
 }

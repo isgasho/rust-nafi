@@ -49,7 +49,7 @@ named! { pub end (Cursor) -> Token,
         (Token::new(
             Span(start, stop),
             end.fragment.0,
-            Kind::End,
+            Kind::StringEnd,
         ))
     )
 }

@@ -8,8 +8,6 @@
 extern crate derive_more;
 #[macro_use]
 extern crate serde_derive;
-#[macro_use]
-extern crate smart_default;
 extern crate nafi_location as location;
 
 pub mod code;

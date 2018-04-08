@@ -80,7 +80,7 @@ impl<'a> From<&'a str> for Lexer<'a> {
 impl<'a> Lexer<'a> {
     /// Create a new lexer from the given source.
     pub fn new(source: &'a str) -> Self {
-        Lexer::new_on_line(source, 0)
+        Lexer::new_on_line(source, 1)
     }
 
     /// Create a new lexer that starts on the given line.
@@ -97,7 +97,7 @@ impl<'a> Lexer<'a> {
 
 impl<'a> Lexer<'a> {
     /// Produce the next token in CODE mode
-    fn next_code(&mut self) -> Option<tokens::code::Token<'a>> {
+    pub fn next_code(&mut self) -> Option<tokens::code::Token<'a>> {
         use nom::InputLength;
         if self.source.input_len() == 0 {
             return None;
@@ -119,7 +119,7 @@ impl<'a> Lexer<'a> {
     }
 
     /// Produce the next token in STRING mode
-    fn next_string(&mut self) -> Option<tokens::string::Token<'a>> {
+    pub fn next_string(&mut self) -> Option<tokens::string::Token<'a>> {
         use nom::InputLength;
         if self.source.input_len() == 0 {
             return None;
