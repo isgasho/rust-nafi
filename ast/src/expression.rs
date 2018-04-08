@@ -15,12 +15,12 @@ pub enum Expression<'a> {
 
 impl<'a> Expression<'a> {
     pub fn span(&self) -> Span {
-        match *self {
-            Expression::Identifier(ref expr) => expr.span,
-            Expression::Parenthesized(ref expr) => expr.span,
-            Expression::BinaryOperator(ref expr) => expr.span,
-            Expression::IntegerLiteral(ref expr) => expr.span,
-            Expression::StringLiteral(ref expr) => expr.span,
+        match self {
+            Expression::Identifier(expr) => expr.span,
+            Expression::Parenthesized(expr) => expr.span,
+            Expression::BinaryOperator(expr) => expr.span,
+            Expression::IntegerLiteral(expr) => expr.span,
+            Expression::StringLiteral(expr) => expr.span,
         }
     }
 }

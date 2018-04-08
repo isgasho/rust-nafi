@@ -10,8 +10,8 @@ pub enum Declaration<'a> {
 
 impl<'a> Declaration<'a> {
     pub fn span(&self) -> Span {
-        match *self {
-            Declaration::Binding(ref decl) => decl.span,
+        match self {
+            Declaration::Binding(decl) => decl.span,
         }
     }
 }
