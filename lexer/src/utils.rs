@@ -18,12 +18,13 @@ pub(crate) fn restore_span<'i>(
         .map_err(|e| {
             use nom::{Context, Err};
             match e {
-                Err::Error(Context::Code(i, kind)) =>
-                    Err::Error(Context::Code(span.slice(..i.len()), kind)),
-                Err::Failure(Context::Code(i, kind)) =>
-                    Err::Failure(Context::Code(span.slice(..i.len()), kind)),
-                Err::Incomplete(needed) =>
-                    Err::Incomplete(needed),
+                Err::Error(Context::Code(i, kind)) => {
+                    Err::Error(Context::Code(span.slice(..i.len()), kind))
+                },
+                Err::Failure(Context::Code(i, kind)) => {
+                    Err::Failure(Context::Code(span.slice(..i.len()), kind))
+                },
+                Err::Incomplete(needed) => Err::Incomplete(needed),
             }
         })
 }

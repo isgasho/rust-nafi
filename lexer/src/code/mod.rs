@@ -1,6 +1,6 @@
+use nom::digit1;
 use tokens::code::*;
 use {Cursor, Span};
-use nom::digit1;
 
 mod comment;
 

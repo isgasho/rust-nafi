@@ -38,12 +38,16 @@ pub enum Kind {
 
 impl fmt::Display for Kind {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", match self {
-            Kind::Text => "Text",
-            Kind::Escaped(_) => "Escaped",
-            Kind::InterpolationStart => "InterpolationStart",
-            Kind::StringEnd => "StringEnd",
-        })?;
+        write!(
+            f,
+            "{}",
+            match self {
+                Kind::Text => "Text",
+                Kind::Escaped(_) => "Escaped",
+                Kind::InterpolationStart => "InterpolationStart",
+                Kind::StringEnd => "StringEnd",
+            }
+        )?;
         if let Kind::Escaped(escape) = self {
             write!(f, "({})", escape)
         } else {
@@ -88,14 +92,18 @@ impl StringEscape {
 
 impl fmt::Display for StringEscape {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", match self {
-            StringEscape::CarriageReturn => "CR",
-            StringEscape::NewLine => "NL",
-            StringEscape::HorizontalTab => "TAB",
-            StringEscape::Backslash => "\\",
-            StringEscape::Quote => "\"",
-            StringEscape::Unicode => "Unicode",
-            StringEscape::Invalid => "INVALID",
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                StringEscape::CarriageReturn => "CR",
+                StringEscape::NewLine => "NL",
+                StringEscape::HorizontalTab => "TAB",
+                StringEscape::Backslash => "\\",
+                StringEscape::Quote => "\"",
+                StringEscape::Unicode => "Unicode",
+                StringEscape::Invalid => "INVALID",
+            }
+        )
     }
 }

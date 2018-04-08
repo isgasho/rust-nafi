@@ -18,7 +18,7 @@ pub struct Token<'a> {
 
 impl<'a> fmt::Display for Token<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-         write!(f, "{}({:?})@{}", self.kind, self.source, self.span)
+        write!(f, "{}({:?})@{}", self.kind, self.source, self.span)
     }
 }
 
@@ -42,14 +42,18 @@ pub enum Kind {
 
 impl fmt::Display for Kind {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", match self {
-            Kind::Identifier => "Identifier",
-            Kind::Symbol => "Symbol",
-            Kind::LiteralInteger => "LiteralInteger",
-            Kind::LiteralStringStart => "LiteralStringStart",
-            Kind::Whitespace => "Whitespace",
-            Kind::Comment(_) => "Comment",
-        })?;
+        write!(
+            f,
+            "{}",
+            match self {
+                Kind::Identifier => "Identifier",
+                Kind::Symbol => "Symbol",
+                Kind::LiteralInteger => "LiteralInteger",
+                Kind::LiteralStringStart => "LiteralStringStart",
+                Kind::Whitespace => "Whitespace",
+                Kind::Comment(_) => "Comment",
+            }
+        )?;
         if let Kind::Comment(style) = self {
             write!(f, "({})", style)
         } else {
@@ -74,11 +78,15 @@ pub enum CommentStyle {
 
 impl fmt::Display for CommentStyle {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", match self {
-            CommentStyle::Line => "Line",
-            CommentStyle::LineDoc => "LineDoc",
-            CommentStyle::Block => "Block",
-            CommentStyle::BlockDoc => "BlockDoc",
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                CommentStyle::Line => "Line",
+                CommentStyle::LineDoc => "LineDoc",
+                CommentStyle::Block => "Block",
+                CommentStyle::BlockDoc => "BlockDoc",
+            }
+        )
     }
 }

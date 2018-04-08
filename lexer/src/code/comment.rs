@@ -29,7 +29,7 @@ named! { pub line_doc (Cursor) -> Token,
 }
 
 fn block_impl(i: Cursor) -> IResult<Cursor, Cursor> {
-    use nom::{Slice, InputLength};
+    use nom::{InputLength, Slice};
     tag!(i, "/*")?;
 
     let mut idx: usize = 2;
@@ -83,9 +83,7 @@ mod test {
 
     #[test]
     fn block_a() {
-        let comment = unsafe {
-            Cursor("/* /* *** */ */ ", 0, 0)
-        };
+        let comment = unsafe { Cursor("/* /* *** */ */ ", 0, 0) };
         assert_eq!(
             super::block_impl(comment),
             Ok((comment.slice(15..), comment.slice(..15)))
@@ -94,9 +92,7 @@ mod test {
 
     #[test]
     fn block_b() {
-        let comment = unsafe {
-            Cursor("/* /* /** */ */ ", 0, 0)
-        };
+        let comment = unsafe { Cursor("/* /* /** */ */ ", 0, 0) };
         assert_eq!(
             super::block_impl(comment),
             Ok((comment.slice(16..), comment.slice(..16)))
@@ -105,9 +101,7 @@ mod test {
 
     #[test]
     fn block_c() {
-        let comment = unsafe {
-            Cursor("/* /* */* */ */ ", 0, 0)
-        };
+        let comment = unsafe { Cursor("/* /* */* */ */ ", 0, 0) };
         assert_eq!(
             super::block_impl(comment),
             Ok((comment.slice(12..), comment.slice(..12)))
@@ -116,9 +110,7 @@ mod test {
 
     #[test]
     fn block_d() {
-        let comment = unsafe {
-            Cursor("/* /* **/ */ */ ", 0, 0)
-        };
+        let comment = unsafe { Cursor("/* /* **/ */ */ ", 0, 0) };
         assert_eq!(
             super::block_impl(comment),
             Ok((comment.slice(12..), comment.slice(..12)))

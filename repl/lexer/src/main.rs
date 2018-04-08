@@ -20,7 +20,9 @@ fn repl() -> Result<()> {
         print!("? ");
         io::stdout().flush()?;
         io::stdin().read_line(&mut buffer).expect("IO Failure");
-        if buffer.trim().is_empty() { break; }
+        if buffer.trim().is_empty() {
+            break;
+        }
         drive(nafi_lexer::Lexer::from(&*buffer))?;
         println!();
     }
@@ -43,45 +45,62 @@ fn drive(mut lexer: nafi_lexer::Lexer) -> Result<()> {
                 if let Some(tok) = lexer.next_code() {
                     println!("{}{}", " ".repeat(depth.len() - 1), tok);
                     match tok {
-                        Token { kind: Kind::Symbol, source: "}", .. } => {
+                        Token {
+                            kind: Kind::Symbol,
+                            source: "}",
+                            ..
+                        } => {
                             let d = depth.pop().unwrap();
-                            if d == 0 && depth.len() > 0 {
+                            if d == 0 && !depth.is_empty() {
                                 mode = Mode::String;
                             } else {
                                 depth.push(d.saturating_sub(1));
                             }
-                        }
-                        Token { kind: Kind::Symbol, source: "{", .. } => {
+                        },
+                        Token {
+                            kind: Kind::Symbol,
+                            source: "{",
+                            ..
+                        } => {
                             let d = depth.pop().unwrap();
                             depth.push(d + 1);
-                        }
-                        Token { kind: Kind::LiteralStringStart, .. } => {
+                        },
+                        Token {
+                            kind: Kind::LiteralStringStart,
+                            ..
+                        } => {
                             depth.push(0);
                             mode = Mode::String;
-                        }
-                        _ => {}
+                        },
+                        _ => {},
                     }
                 } else {
                     break;
                 }
-            }
+            },
             Mode::String => {
                 use nafi_tokens::string::*;
                 if let Some(tok) = lexer.next_string() {
                     println!("{}{}", " ".repeat(depth.len() - 1), tok);
                     match tok {
-                        Token { kind: Kind::InterpolationStart, .. } => {
+                        Token {
+                            kind: Kind::InterpolationStart,
+                            ..
+                        } => {
                             depth.push(0);
                             mode = Mode::Code;
-                        }
-                        Token { kind: Kind::StringEnd, .. } => {
+                        },
+                        Token {
+                            kind: Kind::StringEnd,
+                            ..
+                        } => {
                             depth.pop().unwrap();
                             mode = Mode::Code;
-                        }
-                        _ => {}
+                        },
+                        _ => {},
                     }
                 }
-            }
+            },
         }
     }
 
