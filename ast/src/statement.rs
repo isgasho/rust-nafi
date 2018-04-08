@@ -12,10 +12,10 @@ pub enum Statement<'a> {
 
 impl<'a> Statement<'a> {
     pub fn span(&self) -> Span {
-        match *self {
-            Statement::Declaration(ref decl) => decl.span(),
-            Statement::Assignment(ref assign) => assign.span,
-            Statement::Expression(ref expr) => expr.span(),
+        match self {
+            Statement::Declaration(decl) => decl.span(),
+            Statement::Assignment(assign) => assign.span,
+            Statement::Expression(expr) => expr.span(),
         }
     }
 }
