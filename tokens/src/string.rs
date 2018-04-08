@@ -55,3 +55,17 @@ pub enum StringEscape {
     #[default]
     Invalid,
 }
+
+impl StringEscape {
+    /// Get the `StringEscape` for a certain escaped string
+    pub fn of(s: &str) -> StringEscape {
+        match s {
+            "r" => StringEscape::CarriageReturn,
+            "n" => StringEscape::NewLine,
+            "t" => StringEscape::HorizontalTab,
+            "\\" => StringEscape::Backslash,
+            "\"" => StringEscape::Quote,
+            _ => StringEscape::Invalid,
+        }
+    }
+}

@@ -12,12 +12,5 @@ extern crate serde_derive;
 extern crate smart_default;
 extern crate nafi_location as location;
 
-/// A source of tokens (e.g. a lexer)
-trait Lexer {
-    type Error;
-    fn next_code(source: &str) -> Result<code::Token, Self::Error>;
-    fn next_string(source: &str) -> Result<string::Token, Self::Error>;
-}
-
 pub mod code;
 pub mod string;

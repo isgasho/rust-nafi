@@ -42,9 +42,9 @@ pub enum Kind {
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
 #[derive(Serialize, Deserialize)]
 pub enum CommentStyle {
-    /// A comment starting with `//` and ending with a newline
+    /// A comment starting with `//` and ending with a newline (excluded)
     Line,
-    /// A comment starting with `///` and ending with a newline
+    /// A comment starting with `///` and ending with a newline (excluded)
     LineDoc,
     /// A comment starting with `/*` and ending with `*/`, nestable
     Block,
