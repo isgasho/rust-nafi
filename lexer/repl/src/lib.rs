@@ -1,49 +1,38 @@
-//! Read-Eval-Print-Loop for the Nafi Lexer
-
-#![forbid(missing_debug_implementations, unconditional_recursion, future_incompatible)]
-#![deny(bad_style, unsafe_code, missing_docs)]
-#![warn(edition_2018, rust_2018_idioms)]
-
-#[macro_use]
-extern crate quicli;
-
-extern crate nafi_lexer;
-extern crate nafi_tokens;
-
-use quicli::prelude::*;
-use std::io::{self, prelude::*};
-
-fn repl() -> Result<()> {
-    let mut buffer = String::with_capacity(80);
-    loop {
-        buffer.clear();
-        print!("? ");
-        io::stdout().flush()?;
-        io::stdin().read_line(&mut buffer).expect("IO Failure");
-        if buffer.trim().is_empty() {
-            break;
-        }
-        drive(nafi_lexer::Lexer::from(&*buffer))?;
-        println!();
-    }
-    Ok(())
-}
+extern crate nafi_lexer as lexer;
+extern crate nafi_tokens as tokens;
+use std::fmt;
 
 enum Mode {
     Code,
     String,
 }
 
-fn drive(mut lexer: nafi_lexer::Lexer) -> Result<()> {
+pub enum Token<'a> {
+    Code(usize, tokens::code::Token<'a>),
+    String(usize, tokens::string::Token<'a>),
+}
+
+impl<'a> fmt::Display for Token<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Token::Code(depth, tok) => write!(f, "{}{}", " ".repeat(depth), tok),
+            Token::String(depth, tok) => write!(f, "{}{}", " ".repeat(depth), tok),
+        }
+    }
+}
+
+pub fn lex(source: &str) -> Vec<Token> {
+    let mut lexer = lexer::Lexer::from(source);
+    let mut out = vec![];
     let mut mode = Mode::Code;
-    let mut depth: Vec<usize> = vec![0];
+    let mut depth = vec![0u32];
 
     loop {
         match mode {
             Mode::Code => {
-                use nafi_tokens::code::*;
+                use tokens::code::*;
                 if let Some(tok) = lexer.next_code() {
-                    println!("{}{}", " ".repeat(depth.len() - 1), tok);
+                    out.push(::Token::Code(depth.len() - 1, tok));
                     match tok {
                         Token {
                             kind: Kind::Symbol,
@@ -79,9 +68,9 @@ fn drive(mut lexer: nafi_lexer::Lexer) -> Result<()> {
                 }
             },
             Mode::String => {
-                use nafi_tokens::string::*;
+                use tokens::string::*;
                 if let Some(tok) = lexer.next_string() {
-                    println!("{}{}", " ".repeat(depth.len() - 1), tok);
+                    out.push(::Token::String(depth.len() - 1, tok));
                     match tok {
                         Token {
                             kind: Kind::InterpolationStart,
@@ -104,9 +93,5 @@ fn drive(mut lexer: nafi_lexer::Lexer) -> Result<()> {
         }
     }
 
-    Ok(())
+    out
 }
-
-main!({
-    repl()?;
-});

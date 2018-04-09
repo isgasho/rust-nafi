@@ -3,7 +3,7 @@
 members = [
     './ast/',
     './lexer/',
+    './lexer/repl/',
     './location/',
-    './repl/lexer/',
     './tokens/',
 ]

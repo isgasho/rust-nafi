@@ -4,7 +4,7 @@ use location::Span;
 use std::fmt;
 
 /// A token of Nafi source code
-#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
 #[derive(Serialize, Deserialize)]
 #[derive(Constructor)]
 pub struct Token<'a> {

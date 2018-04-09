@@ -7,15 +7,14 @@
       <sourceFolder url="file://$MODULE_DIR$/nnom/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/tokens/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/lexer/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/lexer/repl" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/plru-str-intern/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/str-intern/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/ast/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/lexer/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/interner/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/interner/tests" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/repl/lexer/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/location/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lexer/repl/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
