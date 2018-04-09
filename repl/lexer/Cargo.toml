@@ -6,6 +6,5 @@ publish = false
 [dependencies]
 nafi-lexer = { path = "../../lexer/" }
 nafi-tokens = { path = "../../tokens/" }
-nafi-interner = { path = "../../interner/" }
 
 quicli = "0.2"
