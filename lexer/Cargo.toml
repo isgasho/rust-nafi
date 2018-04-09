@@ -5,7 +5,6 @@ publish = false
 
 [dependencies]
 nafi-tokens = { path = "../tokens/" }
-nafi-interner = { path = "../interner/" }
 nafi-location = { path = "../location/" }
 
 lazy_static = "1.0"
