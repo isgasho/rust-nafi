@@ -1,0 +1,6 @@
+Identifier("a")
+Whitespace(" ")
+Symbol("+")
+Whitespace(" ")
+Identifier("b")
+Whitespace("\n")
