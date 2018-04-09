@@ -18,7 +18,7 @@ pub struct Token<'a> {
 
 impl<'a> fmt::Display for Token<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}({:?})@{}", self.kind, self.source, self.span)
+        write!(f, "{}({:?})", self.kind, self.source)
     }
 }
 
