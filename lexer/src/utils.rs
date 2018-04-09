@@ -1,6 +1,8 @@
 use Cursor;
 use nom::IResult;
 
+// Without this I get an extra } at the end of the code line !?
+#[cfg_attr(rustfmt, rustfmt_skip)]
 macro_rules! spanned_regex {
     ($i:ident, $re:expr) => {
         ::utils::restore_span($i, re_find_static!($i.fragment.0, $re))
