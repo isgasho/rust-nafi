@@ -20,7 +20,7 @@ const SIGN_LEFT: char = '<'; // - < ←
 // Credits johannhof (MIT License)
 
 pub fn format_changeset(f: &mut fmt::Formatter, changeset: &Changeset) -> fmt::Result {
-    let ref diffs = changeset.diffs;
+    let diffs = &changeset.diffs;
 
     writeln!(
         f,
@@ -120,7 +120,7 @@ pub fn format_replacement(f: &mut fmt::Write, added: &str, removed: &str) -> fmt
             _ => (),
         }
     }
-    writeln!(f, "")?;
+    writeln!(f)?;
 
     // RIGHT side (==what's new)
     paint!(f, Green, "{}", SIGN_RIGHT)?;
@@ -146,7 +146,7 @@ pub fn format_replacement(f: &mut fmt::Write, added: &str, removed: &str) -> fmt
         }
     }
 
-    writeln!(f, "")
+    writeln!(f)
 }
 
 #[test]

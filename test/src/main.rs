@@ -19,6 +19,7 @@ struct Opts {
     // TODO
 }
 
+#[cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))]
 fn test(_opts: Opts) -> Result<()> {
     println!("lexertests");
     println!("{}", "=".repeat(80));
