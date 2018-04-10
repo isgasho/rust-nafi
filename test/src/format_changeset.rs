@@ -1,10 +1,10 @@
 //! Stolen wholesale from rust-pretty-assertions
 //! https://github.com/colin-kiegel/rust-pretty-assertions/blob/965f11b5b56a03a9c7d2d4844b5afdfc8a956f03/src/format_changeset.rs#L1
 
-use difference::{Difference, Changeset};
-use std::fmt;
-use ansi_term::Colour::{Red, Green, Fixed};
+use ansi_term::Colour::{Fixed, Green, Red};
 use ansi_term::Style;
+use difference::{Changeset, Difference};
+use std::fmt;
 
 macro_rules! paint {
     ($f:ident, $colour:expr, $fmt:expr, $($args:tt)*) => (
@@ -37,7 +37,7 @@ pub fn format_changeset(f: &mut fmt::Formatter, changeset: &Changeset) -> fmt::R
                 for line in same.split('\n') {
                     writeln!(f, " {}", line)?;
                 }
-            }
+            },
             Difference::Add(ref added) => {
                 match diffs.get(i - 1) {
                     Some(&Difference::Rem(ref removed)) => {
@@ -46,28 +46,28 @@ pub fn format_changeset(f: &mut fmt::Formatter, changeset: &Changeset) -> fmt::R
                         // Let's highlight the character-differences in this replaced
                         // chunk. Note that this chunk can span over multiple lines.
                         format_replacement(f, added, removed)?;
-                    }
+                    },
                     _ => {
                         for line in added.split('\n') {
                             paint!(f, Green, "{}{}\n", SIGN_RIGHT, line)?;
                         }
-                    }
+                    },
                 };
-            }
+            },
             Difference::Rem(ref removed) => {
                 match diffs.get(i + 1) {
                     Some(&Difference::Add(_)) => {
                         // The removal is followed by an addition.
                         //
                         // ... we'll handle both in the next iteration.
-                    }
+                    },
                     _ => {
                         for line in removed.split('\n') {
                             paint!(f, Red, "{}{}\n", SIGN_LEFT, line)?;
                         }
-                    }
+                    },
                 }
-            }
+            },
         }
     }
     Ok(())
@@ -108,7 +108,7 @@ pub fn format_replacement(f: &mut fmt::Write, added: &str, removed: &str) -> fmt
                     writeln!(f)?;
                     paint!(f, Red, "{}", SIGN_LEFT)?;
                 });
-            }
+            },
             Difference::Rem(ref word_diff) => {
                 join!(chunk in (word_diff.split('\n')) {
                     paint!(f, Red.on(Fixed(52)).bold(), "{}", chunk)?;
@@ -116,7 +116,7 @@ pub fn format_replacement(f: &mut fmt::Write, added: &str, removed: &str) -> fmt
                     writeln!(f)?;
                     paint!(f, Red.bold(), "{}", SIGN_LEFT)?;
                 });
-            }
+            },
             _ => (),
         }
     }
@@ -133,7 +133,7 @@ pub fn format_replacement(f: &mut fmt::Write, added: &str, removed: &str) -> fmt
                     writeln!(f)?;
                     paint!(f, Green, "{}", SIGN_RIGHT)?;
                 });
-            }
+            },
             Difference::Add(ref word_diff) => {
                 join!(chunk in (word_diff.split('\n')) {
                     paint!(f, Green.on(Fixed(22)).bold(), "{}", chunk)?;
@@ -141,7 +141,7 @@ pub fn format_replacement(f: &mut fmt::Write, added: &str, removed: &str) -> fmt
                     writeln!(f)?;
                     paint!(f, Green.bold(), "{}", SIGN_RIGHT)?;
                 });
-            }
+            },
             _ => (),
         }
     }
@@ -154,22 +154,20 @@ fn test_format_replacement() {
     let added = "    84,\
                  \n    248,";
     let removed = "    0,\
-                 \n    0,\
-                 \n    128,";
+                   \n    0,\
+                   \n    128,";
 
     let mut buf = String::new();
     let _ = format_replacement(&mut buf, added, removed);
 
     println!(
         "## removed ##\
-            \n{}\
-            \n## added ##\
-            \n{}\
-            \n## diff ##\
-            \n{}",
-        removed,
-        added,
-        buf
+         \n{}\
+         \n## added ##\
+         \n{}\
+         \n## diff ##\
+         \n{}",
+        removed, added, buf
     );
 
     assert_eq!(

@@ -1,9 +1,10 @@
 use lexer;
 
-use std::fmt;
 use difference::Changeset;
 use quicli::prelude::*;
-use walkdir::WalkDir;
+use std::fmt;
+use std::path::PathBuf;
+use walkdir::{DirEntry, WalkDir};
 
 const TESTCASE_DIR: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/testcases");
 
@@ -14,9 +15,13 @@ struct Failed {
 
 impl fmt::Display for Failed {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "There were {} failures in lexertests:\n", self.failures.len())?;
+        writeln!(
+            f,
+            "There were {} failures in lexertests:",
+            self.failures.len()
+        )?;
         for failure in &self.failures {
-            writeln!(f, "{}", failure)?;
+            write!(f, "\n{}", failure)?;
         }
         Ok(())
     }
@@ -24,61 +29,79 @@ impl fmt::Display for Failed {
 
 #[derive(Debug)]
 enum TestFailure {
-    NoTarget(String),
-    Mismatch(String, String, String),
+    NoTarget(PathBuf),
+    Mismatch(PathBuf, String, String),
 }
 
 impl fmt::Display for TestFailure {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            TestFailure::NoTarget(test) => write!(f,
-                "{} did not exist, so I created it",
-                test
-            ),
-            TestFailure::Mismatch(test, expected, actual) => {
-                writeln!(f, "{} had a mismatch with its expected output:", test)?;
+            TestFailure::NoTarget(path) => {
+                write!(f, "{} did not exist, so I created it", path.display())
+            },
+            TestFailure::Mismatch(path, expected, actual) => {
+                writeln!(
+                    f,
+                    "{} had a mismatch with its expected output:",
+                    path.display()
+                )?;
                 ::format_changeset::format_changeset(f, &Changeset::new(expected, actual, "\n"))
-            }
+            },
         }
     }
 }
 
 pub(crate) fn test() -> Result<()> {
-    let mut failures = vec![];
+    let testcases: Vec<_> = WalkDir::new(TESTCASE_DIR)
+        // Taking the contents first allows me to filter to nafi files without cancelling recursion
+        .contents_first(true)
+        .into_iter()
+        .filter_entry(|e: &DirEntry|
+            e.path().extension().map(|ext| ext == "nafi").unwrap_or(false)
+        )
+        .filter_map(|r| r.ok())
+        .map(|e: DirEntry| {
+            assert!(e.file_type().is_file());
+            let path_nafi = e.path();
+            assert_eq!(path_nafi.extension().unwrap(), "nafi");
+            let mut path_tokens = path_nafi.to_path_buf();
+            path_tokens.set_extension("nafi.tokens");
+            let path = path_nafi.strip_prefix(TESTCASE_DIR).unwrap().to_path_buf();
 
-    for entry in WalkDir::new(TESTCASE_DIR) {
-        let entry = entry?;
-        if !entry.file_type().is_file() {
-            continue;
-        }
+            let source = read_file(&path_nafi)
+                .unwrap_or_else(
+                    |e| panic!("Failed to read file {} with err {}", path.display(), e)
+                )
+                .replace("\r\n", "\n");
+            let tokens = read_file(&path_tokens).map(
+                |text| text.replace("\r\n", "\n")
+            );
+            (path, source, tokens)
+        })
+        .collect();
 
-        let nafi_path = entry.path();
-        if nafi_path.extension().map(|ext| ext != "nafi").unwrap_or(true) {
-            continue;
-        }
-
-        let mut tokens_path = nafi_path.to_path_buf();
-        tokens_path.set_extension("nafi.tokens");
-
-        let source = read_file(&nafi_path)?.replace("\r\n", "\n");
-        let expected = read_file(&tokens_path).map(|text| text.replace("\r\n", "\n"));
-        let actual = lexer::lex(&source).iter().map(ToString::to_string).map(|s| s + "\n").collect();
-
-        match expected {
-            Ok(expected) => if actual != expected {
-                failures.push(TestFailure::Mismatch(
-                    nafi_path.strip_prefix(TESTCASE_DIR)?.to_string_lossy().into_owned(),
-                    expected, actual
-                ))
+    let failures: Vec<_> = testcases
+        .into_par_iter()
+        .filter_map(|(mut path, source, tokens)| {
+            let actual = lexer::lex(&source)
+                .iter()
+                .map(ToString::to_string)
+                .map(|s| s + "\n")
+                .collect();
+            match tokens {
+                Ok(expected) => if actual != expected {
+                    Some(TestFailure::Mismatch(path, expected, actual))
+                } else {
+                    None
+                },
+                Err(_) => {
+                    path.set_extension("nafi.tokens");
+                    write_to_file(&path, &actual).unwrap();
+                    Some(TestFailure::NoTarget(path))
+                },
             }
-            Err(_) => {
-                write_to_file(&tokens_path, &actual)?;
-                failures.push(TestFailure::NoTarget(
-                    tokens_path.strip_prefix(TESTCASE_DIR)?.to_string_lossy().into_owned(),
-                ))
-            }
-        }
-    }
+        })
+        .collect();
 
     if failures.is_empty() {
         Ok(())
