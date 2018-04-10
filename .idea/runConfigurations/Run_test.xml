@@ -1,10 +1,10 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run lexer REPL" type="CargoCommandRunConfiguration" factoryName="Cargo Command" folderName="lexer" singleton="true">
+  <configuration default="false" name="Run test" type="CargoCommandRunConfiguration" factoryName="Cargo Command" folderName="test">
     <option name="channel" value="DEFAULT" />
     <option name="command" value="run" />
     <option name="nocapture" value="true" />
     <option name="backtrace" value="SHORT" />
-    <option name="workingDirectory" value="file://$PROJECT_DIR$/lexer/repl" />
+    <option name="workingDirectory" value="file://$PROJECT_DIR$/test" />
     <envs />
     <method />
   </configuration>

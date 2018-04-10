@@ -17,9 +17,9 @@ before_install:
 - chmod 600 ~/.ssh/id_rsa
 
 script:
-- cargo build --all --verbose
-- cargo test  --all --verbose
-- cargo doc   --all --no-deps
+- cargo build --all
+- cargo test  --all
+- cargo run   --package nafi-test
 
 env:
 matrix:
@@ -41,7 +41,7 @@ matrix:
     env: CLIPPY_VERSION="0.0.193"
     install:
     - rustup component add rustfmt-preview || true
-    - cargo install clippy --verbose --version $CLIPPY_VERSION || true
+    - cargo install clippy --version $CLIPPY_VERSION || true
     script:
     - cargo clippy --all-targets --tests -- -D clippy
     - cargo fmt -- --write-mode=diff

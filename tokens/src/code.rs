@@ -4,7 +4,7 @@ use location::Span;
 use std::fmt;
 
 /// A token of Nafi source code
-#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
 #[derive(Serialize, Deserialize)]
 #[derive(Constructor)]
 pub struct Token<'a> {
@@ -18,7 +18,7 @@ pub struct Token<'a> {
 
 impl<'a> fmt::Display for Token<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}({:?})@{}", self.kind, self.source, self.span)
+        write!(f, "{}({:?})", self.kind, self.source)
     }
 }
 
