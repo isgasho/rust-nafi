@@ -27,7 +27,7 @@ matrix:
   
   # Warnings/Docs
   - rust: nightly-2018-04-07
-    env: RUSTFLAGS="-D warnings" CARGO_GHP_VERSION="0.3.2"
+    env: RUSTFLAGS="-D warnings" CARGO_GHP_VERSION="0.3.4"
     install:
     - cargo install cargo-ghp-upload --verbose --version $CARGO_GHP_VERSION || true
     script:
