@@ -21,6 +21,12 @@ I am deeply humbled that you would consider this project worthy of your time.
 See [CONTRIBUTING] for more information on contributing,
 but always, feel free to submit a PR that improves something about this project!
 
+This project is very much in a state of rapid prototyping and development currently.
+Once the end-goal design becomes a bit more concrete, more documentaiton will be written.
+One of the project's goals is to be a very well-documented and well-compartimentalized compiler.
+If you know Rust, understanding enough of the project to contribute _should_ be easy.
+If not, that's a bug in the documentation; open an issue and we'll work to improve it!
+
 [travis]: <https://travis-ci.org/nafi-lang/rust-nafi>
 [issues]: <https://github.com/nafi-lang/rust-nafi/issues>
 [mit]: <https://choosealicense.com/licenses/mit/>
