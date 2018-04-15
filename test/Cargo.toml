@@ -4,7 +4,10 @@ version = "0.0.0"
 publish = false
 
 [dependencies]
+nafi-lexer = { path = "../lexer/" }
 nafi-lexer-repl = { path = "../lexer/repl/" }
+
+unic-char-range = "0.7"
 
 failure = "0.1"
 ansi_term = "0.11"

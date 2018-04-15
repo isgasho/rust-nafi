@@ -1,4 +1,4 @@
-use lexer;
+use lexer_harness::lex;
 
 use difference::Changeset;
 use quicli::prelude::*;
@@ -83,7 +83,7 @@ pub(crate) fn test() -> Result<()> {
     let failures: Vec<_> = testcases
         .into_par_iter()
         .filter_map(|(mut path, source, tokens)| {
-            let actual = lexer::lex(&source)
+            let actual = lex(&source)
                 .iter()
                 .map(ToString::to_string)
                 .map(|s| s + "\n")
