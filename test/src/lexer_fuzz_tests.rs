@@ -1,37 +1,23 @@
 use lexer::Lexer;
 
-use quicli::prelude::*;
-
-#[derive(Debug, Default, Fail)]
-#[fail(display = "Lexer halted when given some characters: CODE mode {:?}; STRING mode {:?}",
-       string, code)]
-struct Failed {
-    code: Vec<char>,
-    string: Vec<char>,
-}
-
-impl Failed {
-    fn is_failure(&self) -> bool {
-        !self.code.is_empty() || !self.string.is_empty()
-    }
-}
+use std::char;
+use rayon::prelude::*;
+use Result;
 
 pub(crate) fn test() -> Result<()> {
-    let mut failed = Failed::default();
-
-    for ch in chars!(..) {
-        let s = ch.to_string();
-
-        if Lexer::new(&s).next_code().is_none() {
-            failed.code.push(ch);
-        }
-        if Lexer::new(&s).next_string().is_none() {
-            failed.string.push(ch);
-        }
-    }
-
-    if failed.is_failure() {
-        Err(failed)?
-    }
+    (0..(char::MAX as u32 + 1)).into_par_iter()
+        .filter_map(char::from_u32)
+        .filter_map(|ch| {
+            let s = &ch.to_string();
+            let code = Lexer::new(s).next_code().is_none();
+            let string = Lexer::new(s).next_string().is_none();
+            if code || string {
+                Some((ch, code, string))
+            } else {
+                None
+            }
+        })
+        .for_each(drop);
+    // Failure ==> panic
     Ok(())
 }

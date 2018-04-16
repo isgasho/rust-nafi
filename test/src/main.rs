@@ -1,18 +1,23 @@
-extern crate quicli;
 #[macro_use]
 extern crate failure;
+#[macro_use]
+extern crate structopt;
+extern crate env_logger;
+extern crate log;
+extern crate rayon;
 extern crate ansi_term;
 extern crate difference;
 extern crate walkdir;
-#[macro_use]
-extern crate unic_char_range as char_range;
 
 extern crate nafi_lexer as lexer;
 extern crate nafi_lexer_repl as lexer_harness;
 
-use quicli::prelude::*;
+type Result<T> = ::std::result::Result<T, failure::Error>;
+use structopt::StructOpt;
+use log::LevelFilter;
 
 mod format_changeset;
+mod fs;
 
 mod lexer_fuzz_tests;
 mod lexer_tests;
@@ -63,7 +68,7 @@ fn main() {
 
     fn run() -> Result<()> {
         let opts = Opts::from_args();
-        LoggerBuiler::new()
+        env_logger::Builder::new()
             .filter(Some(env!("CARGO_PKG_NAME")), LevelFilter::Warn)
             .filter(None, LevelFilter::Off)
             .try_init()?;

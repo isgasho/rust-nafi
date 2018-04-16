@@ -1,7 +1,9 @@
 use lexer_harness::lex;
 
 use difference::Changeset;
-use quicli::prelude::*;
+use rayon::prelude::*;
+use Result;
+use fs::*;
 use std::fmt;
 use std::path::PathBuf;
 use walkdir::{DirEntry, WalkDir};

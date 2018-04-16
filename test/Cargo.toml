@@ -7,9 +7,11 @@ publish = false
 nafi-lexer = { path = "../lexer/" }
 nafi-lexer-repl = { path = "../lexer/repl/" }
 
-unic-char-range = "0.7"
-
+rayon = "1.0"
 failure = "0.1"
+structopt = "0.2"
+log = "0.4"
+env_logger = "0.5"
 ansi_term = "0.11"
 difference = "2.0"
 quicli = "0.2"
