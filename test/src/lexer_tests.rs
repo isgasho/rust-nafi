@@ -62,6 +62,10 @@ pub(crate) fn test() -> Result<()> {
             e.path().extension().map(|ext| ext == "nafi").unwrap_or(false)
         )
         .filter_map(|r| r.ok())
+        .collect();
+
+    let failures: Vec<_> = testcases
+        .into_par_iter()
         .map(|e: DirEntry| {
             assert!(e.file_type().is_file());
             let path_nafi = e.path();
@@ -80,10 +84,6 @@ pub(crate) fn test() -> Result<()> {
             );
             (path, source, tokens)
         })
-        .collect();
-
-    let failures: Vec<_> = testcases
-        .into_par_iter()
         .filter_map(|(mut path, source, tokens)| {
             let actual = lex(&source)
                 .iter()
