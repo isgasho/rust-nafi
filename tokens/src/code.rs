@@ -38,6 +38,8 @@ pub enum Kind {
     Whitespace,
     /// A comment in the source.
     Comment(CommentStyle),
+    /// A character with no meaning assigned yet
+    Invalid,
 }
 
 impl fmt::Display for Kind {
@@ -52,6 +54,7 @@ impl fmt::Display for Kind {
                 Kind::LiteralStringStart => "LiteralStringStart",
                 Kind::Whitespace => "Whitespace",
                 Kind::Comment(_) => "Comment",
+                Kind::Invalid => "Invalid",
             }
         )?;
         if let Kind::Comment(style) = self {
