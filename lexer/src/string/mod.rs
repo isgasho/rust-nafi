@@ -18,7 +18,7 @@ named! { pub text (Cursor) -> Token,
 named! { pub escaped (Cursor) -> Token,
     do_parse!(
         start: position!() >>
-        escape: spanned_regex!(r"(?s)^\\.") >>
+        escape: spanned_regex!(r"(?s)^\\.?") >>
         stop: position!() >>
         (Token::new(
             Span(start, stop),
