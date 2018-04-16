@@ -1,11 +1,12 @@
 use lexer::Lexer;
 
-use std::char;
-use rayon::prelude::*;
 use Result;
+use rayon::prelude::*;
+use std::char;
 
 pub(crate) fn test() -> Result<()> {
-    (0..(char::MAX as u32 + 1)).into_par_iter()
+    (0..(char::MAX as u32 + 1))
+        .into_par_iter()
         .filter_map(char::from_u32)
         .filter_map(|ch| {
             let s = &ch.to_string();

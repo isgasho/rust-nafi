@@ -1,7 +1,7 @@
 unstable_features = true
 
 # Stable
-newline_style = "Native"
+newline_style = "Unix"
 merge_derives = false
 
 # Unstable

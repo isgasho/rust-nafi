@@ -2,19 +2,19 @@
 extern crate failure;
 #[macro_use]
 extern crate structopt;
+extern crate ansi_term;
+extern crate difference;
 extern crate env_logger;
 extern crate log;
 extern crate rayon;
-extern crate ansi_term;
-extern crate difference;
 extern crate walkdir;
 
 extern crate nafi_lexer as lexer;
 extern crate nafi_lexer_repl as lexer_harness;
 
 type Result<T> = ::std::result::Result<T, failure::Error>;
-use structopt::StructOpt;
 use log::LevelFilter;
+use structopt::StructOpt;
 
 mod format_changeset;
 mod fs;
@@ -77,10 +77,10 @@ fn main() {
     }
 
     match run() {
-        Ok(_) => {}
+        Ok(_) => {},
         Err(e) => {
             eprintln!("{}", e);
             std::process::exit(1);
-        }
+        },
     }
 }

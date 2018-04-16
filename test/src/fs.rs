@@ -1,10 +1,10 @@
-use std::path::{Path};
-use std::io::{Read, Write, BufReader, BufWriter};
 use std::fs::File;
+use std::io::{BufReader, BufWriter, Read, Write};
+use std::path::Path;
 
 use failure::ResultExt;
 
-use ::Result;
+use Result;
 
 pub use std::fs::create_dir_all as create_dir;
 
@@ -23,10 +23,13 @@ pub use std::fs::create_dir_all as create_dir;
 /// ```
 pub fn read_file<P: AsRef<Path>>(path: P) -> Result<String> {
     let path = path.as_ref();
-    ensure!(path.exists() && path.is_file(), "Path {:?} is not a file!", path);
+    ensure!(
+        path.exists() && path.is_file(),
+        "Path {:?} is not a file!",
+        path
+    );
 
-    let file = File::open(path)
-        .with_context(|_| format!("Could not open file {:?}", path))?;
+    let file = File::open(path).with_context(|_| format!("Could not open file {:?}", path))?;
     let mut file = BufReader::new(file);
 
     let mut result = String::new();
@@ -53,8 +56,8 @@ pub fn read_file<P: AsRef<Path>>(path: P) -> Result<String> {
 pub fn write_to_file<P: AsRef<Path>>(path: P, content: &str) -> Result<()> {
     let path = path.as_ref();
 
-    let file = File::create(path)
-        .with_context(|_| format!("Could not create/open file {:?}", path))?;
+    let file =
+        File::create(path).with_context(|_| format!("Could not create/open file {:?}", path))?;
     let mut file = BufWriter::new(file);
 
     file.write_all(content.as_bytes())
