@@ -82,3 +82,16 @@ named! { pub comment (Cursor) -> Token,
         call!(comment::line)
     )
 }
+
+named! { pub invalid (Cursor) -> Token,
+    do_parse!(
+        start: position!() >>
+        ch: take!(1) >>
+        stop: position!() >>
+        (Token::new(
+            Span(start, stop),
+            ch.fragment.0,
+            Kind::Invalid,
+        ))
+    )
+}

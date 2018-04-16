@@ -1,7 +1,9 @@
-use lexer;
+use lexer_harness::lex;
 
+use Result;
 use difference::Changeset;
-use quicli::prelude::*;
+use fs::*;
+use rayon::prelude::*;
 use std::fmt;
 use std::path::PathBuf;
 use walkdir::{DirEntry, WalkDir};
@@ -83,7 +85,7 @@ pub(crate) fn test() -> Result<()> {
     let failures: Vec<_> = testcases
         .into_par_iter()
         .filter_map(|(mut path, source, tokens)| {
-            let actual = lexer::lex(&source)
+            let actual = lex(&source)
                 .iter()
                 .map(ToString::to_string)
                 .map(|s| s + "\n")

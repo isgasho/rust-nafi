@@ -108,13 +108,13 @@ impl<'a> Lexer<'a> {
             call!(code::literal_string_start) |
             call!(code::literal_integer) |
             call!(code::symbol) |
-            call!(code::identifier)
+            call!(code::identifier) |
+            call!(code::invalid)
         ) {
             self.source = i;
             Some(o)
         } else {
-            error!("CODE mode Lexer terminated early with remaining input `{:?}`", self.source);
-            None
+            unreachable!("CODE mode Lexer terminated early with remaining input `{:?}`", self.source.fragment);
         }
     }
 
@@ -133,8 +133,7 @@ impl<'a> Lexer<'a> {
             self.source = i;
             Some(o)
         } else {
-            error!("STRING mode Lexer terminated early with remaining input `{:?}`", self.source);
-            None
+            unreachable!("STRING mode Lexer terminated early with remaining input `{:?}`", self.source.fragment)
         }
     }
 }
