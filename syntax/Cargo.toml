@@ -9,7 +9,7 @@ serde_derive = "1.0"
 slog = "2.2"
 bytecount = "0.3"
 memchr = "2.0"
-optional = "0.3"
+optional = "0.4"
 
 [dev-dependencies]
 sexpr = { path = "../sexpr/" }
