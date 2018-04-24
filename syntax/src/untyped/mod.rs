@@ -1,6 +1,7 @@
 use optional::Optioned;
 
 mod ser;
+#[macro_use]
 mod de;
 
 #[derive(Clone, Debug)]
@@ -123,11 +124,11 @@ macro_rules! Kind {
                     $(Kind::$nonterminal)|* => true,
                 }
             }
+        }
 
-            pub const VARIANTS: &'static [&'static str] = &[
-                $(stringify!($terminal),)*
-                $(stringify!($nonterminal),)*
-            ];
+        de_kind! {
+            terminal { $($terminal,)* }
+            nonterminal { $($nonterminal,)* }
         }
     };
 }
@@ -166,85 +167,8 @@ Kind! {
 mod tests {
     use super::*;
     use ron::ser::to_string_pretty;
-    use sexpr::{SExpr, SExprHead, SExprTail, Lit, ParseError};
-    use optional::{some, none};
+    use ron::de::from_str;
     use std::str::FromStr;
-
-    impl From<SExprHead> for Kind {
-        fn from(head: SExprHead) -> Self {
-            if let SExprHead::Symbol(ident) = head {
-                ident.as_ref().parse().unwrap()
-            } else {
-                panic!("invalid syntaxtree sexpr")
-            }
-        }
-    }
-
-    impl From<SExpr> for SyntaxTree {
-        fn from(expr: SExpr) -> Self {
-            match expr {
-                SExpr::Tail(_) => panic!("invalid syntaxtree sexpr"),
-                SExpr::Pair(_, head, tail) => {
-                    let kind: Kind = head.into();
-                    let source = if let SExprTail::Literal(Lit::Str(s)) = tail {
-                        s.value()
-                    } else {
-                        panic!("invalid syntaxtree sexpr")
-                    };
-                    SyntaxTree {
-                        nodes: vec![Node {
-                            kind,
-                            span: (0, source.len() as u32),
-                            parent: none(),
-                            child: none(),
-                            sibling: none(),
-                        }], source,
-                    }
-                }
-                SExpr::List(_, head, tail) => {
-                    let kind: Kind = head.into();
-                    let subtrees: Vec<SyntaxTree> = tail.into_iter().map(|sexpr| sexpr.into()).collect();
-                    let mut source = String::new();
-                    let mut nodes = vec![Node {
-                        kind,
-                        span: (0, 0),
-                        parent: none(),
-                        child: none(),
-                        sibling: none(),
-                    }];
-                    let mut previous_root = None::<u32>;
-                    for mut subtree in subtrees {
-                        let span_offset = source.len() as u32;
-                        let idx_offset = nodes.len() as u32;
-                        if let Some(sibling) = previous_root {
-                            nodes[sibling as usize].sibling = some(idx_offset);
-                        } else {
-                            nodes[0].child = some(idx_offset);
-                        }
-                        source.push_str(&subtree.source);
-                        for node in &mut subtree.nodes {
-                            node.child = node.child.map_t(|it| it + idx_offset);
-                            node.sibling = node.sibling.map_t(|it| it + idx_offset);
-                            node.parent = node.parent.map_t(|it| it + idx_offset);
-                            node.span = (node.span.0 + span_offset, node.span.1 + span_offset);
-                        }
-                        subtree.nodes[0].parent = some(0);
-                        nodes.extend(subtree.nodes);
-                        previous_root = Some(idx_offset);
-                    }
-                    nodes[0].span = (0, source.len() as u32);
-                    SyntaxTree { source, nodes }
-                }
-            }
-        }
-    }
-
-    impl FromStr for SyntaxTree {
-        type Err = ParseError;
-        fn from_str(s: &str) -> Result<Self, ParseError> {
-            Ok(s.parse::<SExpr>()?.into())
-        }
-    }
 
     #[test]
     fn if_else_expression() {
@@ -282,36 +206,9 @@ mod tests {
                 Symbol(";"),
             ])
         );
-        let tree = stringify!(
-            (SideEffect
-                (FunctionCall
-                    (Identifier "if")
-                    (Whitespace " ")
-                    (Symbol "(")
-                    (Identifier "true")
-                    (Symbol ")")
-                    (Whitespace " ")
-                    (Closure
-                        (Symbol "{")
-                        (Whitespace "\n    ")
-                        (SideEffect
-                            (FunctionCall
-                                (Identifier "print")
-                                (Symbol "(")
-                                (FunctionCallArgument
-                                    (StringLiteral
-                                        (Symbol "\"")
-                                        (StringText "true is true")
-                                        (Symbol "\"")))
-                                (Symbol ")"))
-                            (Symbol ";"))
-                    (Whitespace "\n")
-                    (Symbol "}")))
-                (Symbol ";"))
-        );
-        println!("{}", tree.parse::<SExpr>().unwrap().multi_line());
-        let tree: SyntaxTree = tree.parse().unwrap();
-        // println!("{:#?}", tree);
+        println!("{}", tree);
+        let tree: SyntaxTree = from_str(tree).unwrap();
+        println!("{:#?}", tree);
         println!("{}", to_string_pretty(&tree, Default::default()).unwrap());
     }
 }
