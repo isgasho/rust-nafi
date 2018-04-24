@@ -1,0 +1,20 @@
+[package]
+name = "nafi-syntax"
+version = "0.1.0"
+publish = false
+
+[dependencies]
+serde = "1.0"
+serde_derive = "1.0"
+slog = "2.2"
+bytecount = "0.3"
+memchr = "2.0"
+optional = "0.3"
+
+[dev-dependencies]
+sexpr = { path = "../sexpr/" }
+
+[build-dependencies]
+ron = "0.2"
+serde = "1.0"
+serde_derive = "1.0"
