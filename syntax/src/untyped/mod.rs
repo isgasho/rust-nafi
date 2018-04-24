@@ -224,7 +224,7 @@ mod tests {
                         source.push_str(&subtree.source);
                         for node in &mut subtree.nodes {
                             node.child = node.child.map_t(|it| it + idx_offset);
-                            node.sibling = node.child.map_t(|it| it + idx_offset);
+                            node.sibling = node.sibling.map_t(|it| it + idx_offset);
                             node.parent = node.parent.map_t(|it| it + idx_offset);
                             node.span = (node.span.0 + span_offset, node.span.1 + span_offset);
                         }
@@ -309,8 +309,9 @@ mod tests {
                     (Symbol "}")))
                 (Symbol ";"))
         );
+        println!("{}", tree.parse::<SExpr>().unwrap().multi_line());
         let tree: SyntaxTree = tree.parse().unwrap();
-        println!("{:#?}", tree);
+        // println!("{:#?}", tree);
         println!("{}", to_string_pretty(&tree, Default::default()).unwrap());
     }
 }
