@@ -124,7 +124,7 @@ macro_rules! Kind {
                 }
             }
 
-            pub const VARIANTS: &[&str] = &[
+            pub const VARIANTS: &'static [&'static str] = &[
                 $(stringify!($terminal),)*
                 $(stringify!($nonterminal),)*
             ];
