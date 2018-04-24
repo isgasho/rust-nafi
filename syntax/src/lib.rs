@@ -6,7 +6,10 @@ extern crate slog;
 extern crate bytecount;
 extern crate memchr;
 extern crate optional;
+
 #[cfg(test)]
 extern crate sexpr;
+#[cfg(test)]
+extern crate ron;
 
 mod untyped;
