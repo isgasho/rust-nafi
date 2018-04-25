@@ -22,6 +22,13 @@ impl SyntaxTree {
     }
 }
 
+impl Eq for SyntaxTree {}
+impl PartialEq for SyntaxTree {
+    fn eq(&self, other: &SyntaxTree) -> bool {
+        self.root().eq_at_and_below(&other.root())
+    }
+}
+
 #[derive(Copy, Clone, Debug)]
 pub struct Node {
     kind: Kind,
@@ -64,6 +71,19 @@ impl<'a> NodeRef<'a> {
 
     pub fn children(&self) -> NodeChildren<'a> {
         NodeChildren(self.child())
+    }
+
+    /// This is not an implementation of PartialEq because it shouldn't be public
+    fn eq_at_and_below(&self, other: &Self) -> bool {
+        let simple_eq =
+            self.kind() == other.kind() &&
+            self.span() == other.span() &&
+            self.source() == other.source();
+        if !simple_eq { return false; }
+
+        self.children().count() == other.children().count() &&
+            self.children().zip(other.children())
+                .all(|(lhs, rhs)|lhs.eq_at_and_below(&rhs))
     }
 }
 
@@ -166,13 +186,13 @@ Kind! {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ron::ser::to_string_pretty;
+    use ron::ser::to_string;
     use ron::de::from_str;
     use std::str::FromStr;
 
     #[test]
     fn if_else_expression() {
-        let tree = stringify!(
+        let tree = r#"
             SideEffect([
                 FunctionCall([
                     Identifier("if"),
@@ -205,10 +225,10 @@ mod tests {
                 ]),
                 Symbol(";"),
             ])
-        );
-        println!("{}", tree);
-        let tree: SyntaxTree = from_str(tree).unwrap();
-        println!("{:#?}", tree);
-        println!("{}", to_string_pretty(&tree, Default::default()).unwrap());
+        "#;
+        let tree1: SyntaxTree = from_str(tree).unwrap();
+        let serialized = to_string(&tree1).unwrap();
+        let tree2: SyntaxTree = from_str(&serialized).unwrap();
+        assert_eq!(tree1, tree2);
     }
 }

@@ -12,23 +12,22 @@ macro_rules! de_kind {
             use optional::{some, none};
 
             #[derive(Debug, Deserialize)]
-            pub enum TreeNode<'a> {
-                $($terminal(&'a str),)*
-                $($nonterminal(Vec<TreeNode<'a>>),)*
+            pub enum TreeNode {
+                $($terminal(String),)*
+                $($nonterminal(Vec<TreeNode>),)*
             }
 
-            impl<'a> From<TreeNode<'a>> for SyntaxTree {
-                fn from(tree: TreeNode<'a>) -> Self {
+            impl From<TreeNode> for SyntaxTree {
+                fn from(tree: TreeNode) -> Self {
                     match tree {
                         $(TreeNode::$terminal(source) => SyntaxTree {
-                            source: source.to_string(),
                             nodes: vec![Node {
                                 kind: Kind::$terminal,
                                 span: (0, source.len() as u32),
                                 parent: none(),
                                 child: none(),
                                 sibling: none(),
-                            }]
+                            }], source,
                         },)*
                         $(TreeNode::$nonterminal(children) => {
                             let mut source = String::new();
