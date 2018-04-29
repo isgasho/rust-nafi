@@ -78,8 +78,8 @@ named! { pub block_doc (Cursor) -> Token,
 mod test {
     #![allow(unsafe_code)]
 
-    use Cursor;
     use nom::Slice;
+    use Cursor;
 
     #[test]
     fn block_a() {

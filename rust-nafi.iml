@@ -18,6 +18,9 @@
       <sourceFolder url="file://$MODULE_DIR$/test/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/test/testcases" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/syntax/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/sexpr/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/sexpr/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>

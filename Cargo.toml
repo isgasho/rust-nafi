@@ -6,5 +6,7 @@ members = [
     './lexer/repl/',
     './location/',
     './test/',
+    './sexpr/',
+    './syntax/',
     './tokens/',
 ]

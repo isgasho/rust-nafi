@@ -1,5 +1,5 @@
-use Cursor;
 use nom::IResult;
+use Cursor;
 
 // Without this I get an extra } at the end of the code line !?
 #[cfg_attr(rustfmt, rustfmt_skip)]

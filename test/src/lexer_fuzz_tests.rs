@@ -1,8 +1,8 @@
 use lexer::Lexer;
 
-use Result;
 use rayon::prelude::*;
 use std::char;
+use Result;
 
 pub(crate) fn test() -> Result<()> {
     (0..(char::MAX as u32 + 1))
