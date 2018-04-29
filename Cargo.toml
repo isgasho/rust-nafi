@@ -9,4 +9,8 @@ members = [
     './sexpr/',
     './syntax/',
     './tokens/',
+    './wasm-api/',
 ]
+
+[patch.crates-io]
+memchr = { git = "https://github.com/CAD97/rust-memchr", branch = "patch-1" }

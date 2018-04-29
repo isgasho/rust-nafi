@@ -88,6 +88,8 @@ pub fn lex(source: &str) -> Vec<Token> {
                         },
                         _ => {},
                     }
+                } else {
+                    break;
                 }
             },
         }

@@ -21,6 +21,8 @@
       <sourceFolder url="file://$MODULE_DIR$/syntax/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/sexpr/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/sexpr/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/wasm-api/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/wasm-api/static" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>

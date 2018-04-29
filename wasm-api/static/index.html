@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nafi demo</title>
+    <style>
+        textarea {
+            width: calc(100% - 12px);
+            height: 10rem;
+            margin: 5px;
+        }
+
+        #output {
+            height: 40rem;
+        }
+    </style>
+</head>
+<body>
+
+<p>
+    <label for="input">Input</label>
+    <br>
+    <textarea id="input"></textarea>
+</p>
+<p>
+    <label for="output">Output</label>
+    <br>
+    <textarea id="output" readonly></textarea>
+</p>
+
+<!--suppress HtmlUnknownTarget -->
+<script src="nafi-wasm-api.js"></script>
+<script>
+    document.getElementById('input').onkeyup = () => {
+        // noinspection JSUnresolvedVariable
+        Rust.nafi_wasm_api
+            .then(({lex}) => {
+                const input = document.getElementById('input').value;
+                document.getElementById('output').value = lex(input);
+            })
+            .catch(err => console.error(err));
+    };
+</script>
+</body>
+</html>
