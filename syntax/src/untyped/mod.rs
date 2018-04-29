@@ -155,7 +155,6 @@ macro_rules! Kind {
 
 Kind! {
     terminal {
-        ERROR,
         Symbol,
         Identifier,
         IntegerLiteral,
@@ -168,6 +167,7 @@ Kind! {
         StringEscape,
     }
     nonterminal {
+        ERROR,
         BinaryOperation,
         PrefixOperation,
         SuffixOperation,
