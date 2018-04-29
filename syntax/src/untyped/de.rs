@@ -1,5 +1,5 @@
-use super::_impl_de::TreeNode;
 use super::SyntaxTree;
+use super::_impl_de::TreeNode;
 use serde::de::{Deserialize, Deserializer};
 
 macro_rules! de_kind {
@@ -71,7 +71,9 @@ macro_rules! de_kind {
 
 impl<'de> Deserialize<'de> for SyntaxTree {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where D: Deserializer<'de> {
+    where
+        D: Deserializer<'de>,
+    {
         let tree: TreeNode = Deserialize::deserialize(deserializer)?;
         Ok(tree.into())
     }

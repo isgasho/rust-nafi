@@ -8,8 +8,8 @@ extern crate memchr;
 extern crate optional;
 
 #[cfg(test)]
-extern crate sexpr;
-#[cfg(test)]
 extern crate ron;
+#[cfg(test)]
+extern crate sexpr;
 
 mod untyped;

@@ -1,12 +1,12 @@
 use lexer_harness::lex;
 
-use Result;
 use difference::Changeset;
 use fs::*;
 use rayon::prelude::*;
 use std::fmt;
 use std::path::PathBuf;
 use walkdir::{DirEntry, WalkDir};
+use Result;
 
 const TESTCASE_DIR: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/testcases");
 

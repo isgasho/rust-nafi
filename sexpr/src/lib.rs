@@ -6,14 +6,14 @@ extern crate quote;
 extern crate failure;
 extern crate optional;
 
+use optional::{none, some, Optioned};
 use std::fmt;
 use std::str::FromStr;
-use optional::{Optioned, some, none};
+pub use syn::synom::ParseError;
+use syn::synom::Synom;
+use syn::token::Paren;
 use syn::Ident;
 pub use syn::Lit;
-pub use syn::synom::ParseError;
-use syn::token::Paren;
-use syn::synom::Synom;
 
 #[derive(Copy, Clone, Debug)]
 pub enum SExprHead {
@@ -82,23 +82,15 @@ impl Synom for SExpr {
 
 impl FromStr for SExpr {
     type Err = ParseError;
-    fn from_str(s: &str) -> Result<Self, ParseError> {
-        Ok(syn::parse_str(s)?)
-    }
+    fn from_str(s: &str) -> Result<Self, ParseError> { Ok(syn::parse_str(s)?) }
 }
 
 impl SExpr {
-    pub fn single_line(&self) -> Display {
-        self.display(none())
-    }
+    pub fn single_line(&self) -> Display { self.display(none()) }
 
-    pub fn multi_line(&self) -> Display {
-        self.display(some(1))
-    }
+    pub fn multi_line(&self) -> Display { self.display(some(1)) }
 
-    fn display(&self, depth: Optioned<usize>) -> Display {
-        Display { depth, sexpr: self }
-    }
+    fn display(&self, depth: Optioned<usize>) -> Display { Display { depth, sexpr: self } }
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -124,9 +116,7 @@ impl<'s> Display<'s> {
 impl<'s> fmt::Display for Display<'s> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.sexpr {
-            SExpr::Pair(_paren, head, tail) => {
-                write!(f, "({} {})", head, tail)
-            }
+            SExpr::Pair(_paren, head, tail) => write!(f, "({} {})", head, tail),
             SExpr::List(_paren, head, tail) => {
                 write!(f, "({}", head)?;
                 for child in tail {
@@ -134,7 +124,7 @@ impl<'s> fmt::Display for Display<'s> {
                     write!(f, "{}", child.display(self.depth.map_t(|t| t + 1)))?;
                 }
                 write!(f, ")")
-            }
+            },
             SExpr::Tail(tail) => write!(f, "{}", tail),
         }
     }

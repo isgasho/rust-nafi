@@ -11,22 +11,18 @@ pub struct SyntaxTree {
 }
 
 impl SyntaxTree {
-    pub fn root(&self) -> NodeRef {
-        self.get(0).expect("Empty SyntaxTree")
-    }
+    pub fn root(&self) -> NodeRef { self.get(0).expect("Empty SyntaxTree") }
 
     pub fn get(&self, idx: u32) -> Option<NodeRef> {
-        self.nodes.get(idx as usize).map(|node| {
-            NodeRef { node, syntax: self }
-        })
+        self.nodes
+            .get(idx as usize)
+            .map(|node| NodeRef { node, syntax: self })
     }
 }
 
 impl Eq for SyntaxTree {}
 impl PartialEq for SyntaxTree {
-    fn eq(&self, other: &SyntaxTree) -> bool {
-        self.root().eq_at_and_below(&other.root())
-    }
+    fn eq(&self, other: &SyntaxTree) -> bool { self.root().eq_at_and_below(&other.root()) }
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -45,45 +41,34 @@ pub struct NodeRef<'a> {
 }
 
 impl<'a> NodeRef<'a> {
-    pub fn kind(&self) -> Kind {
-        self.node.kind
-    }
+    pub fn kind(&self) -> Kind { self.node.kind }
 
-    pub fn span(&self) -> (u32, u32) {
-        (self.node.span.0, self.node.span.1)
-    }
+    pub fn span(&self) -> (u32, u32) { (self.node.span.0, self.node.span.1) }
 
     pub fn source(&self) -> &'a str {
-        &self.syntax.source[self.span().0 as usize .. self.span().1 as usize]
+        &self.syntax.source[self.span().0 as usize..self.span().1 as usize]
     }
 
-    pub fn parent(&self) -> Option<NodeRef<'a>> {
-        self.syntax.get(self.node.parent.unpack())
-    }
+    pub fn parent(&self) -> Option<NodeRef<'a>> { self.syntax.get(self.node.parent.unpack()) }
 
-    pub fn child(&self) -> Option<NodeRef<'a>> {
-        self.syntax.get(self.node.child.unpack())
-    }
+    pub fn child(&self) -> Option<NodeRef<'a>> { self.syntax.get(self.node.child.unpack()) }
 
-    pub fn sibling(&self) -> Option<NodeRef<'a>> {
-        self.syntax.get(self.node.sibling.unpack())
-    }
+    pub fn sibling(&self) -> Option<NodeRef<'a>> { self.syntax.get(self.node.sibling.unpack()) }
 
-    pub fn children(&self) -> NodeChildren<'a> {
-        NodeChildren(self.child())
-    }
+    pub fn children(&self) -> NodeChildren<'a> { NodeChildren(self.child()) }
 
     /// This is not an implementation of PartialEq because it shouldn't be public
     fn eq_at_and_below(&self, other: &Self) -> bool {
-        let simple_eq =
-            self.kind() == other.kind() &&
-            self.span() == other.span() &&
-            self.source() == other.source();
-        if !simple_eq { return false; }
+        let simple_eq = self.kind() == other.kind() && self.span() == other.span()
+            && self.source() == other.source();
+        if !simple_eq {
+            return false;
+        }
 
-        self.children().count() == other.children().count() &&
-            self.children().zip(other.children())
-                .all(|(lhs, rhs)|lhs.eq_at_and_below(&rhs))
+        self.children().count() == other.children().count()
+            && self.children()
+                .zip(other.children())
+                .all(|(lhs, rhs)| lhs.eq_at_and_below(&rhs))
     }
 }
 
@@ -186,8 +171,8 @@ Kind! {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ron::ser::to_string;
     use ron::de::from_str;
+    use ron::ser::to_string;
     use std::str::FromStr;
 
     #[test]
