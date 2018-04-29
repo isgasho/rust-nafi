@@ -2,8 +2,6 @@
 extern crate syn;
 #[macro_use]
 extern crate quote;
-#[macro_use]
-extern crate failure;
 extern crate optional;
 
 use optional::{none, some, Optioned};
