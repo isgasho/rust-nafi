@@ -21,9 +21,9 @@ pub enum SExprHead {
 
 impl Synom for SExprHead {
     named!(parse -> Self, alt!(
-        syn!(Ident) => {|ident| SExprHead::Symbol(ident)}
+        syn!(Ident) => {SExprHead::Symbol}
         |
-        syn!(Token![_]) => {|line| SExprHead::Omit(line)}
+        syn!(Token![_]) => {SExprHead::Omit}
     ));
 }
 
@@ -44,9 +44,9 @@ pub enum SExprTail {
 
 impl Synom for SExprTail {
     named!(parse -> Self, alt!(
-        syn!(Ident) => {|ident| SExprTail::Symbol(ident)}
+        syn!(Ident) => {SExprTail::Symbol}
         |
-        syn!(Lit) => {|lit| SExprTail::Literal(lit)}
+        syn!(Lit) => {SExprTail::Literal}
     ));
 }
 
@@ -74,7 +74,7 @@ impl Synom for SExpr {
         parens!(tuple!(syn!(SExprHead), many0!(syn!(SExpr))))
             => {|(paren, (head, tail))| SExpr::List(paren, head, tail)}
         |
-        syn!(SExprTail) => {|tail| SExpr::Tail(tail)}
+        syn!(SExprTail) => {SExpr::Tail}
     ));
 }
 
