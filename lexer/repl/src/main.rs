@@ -4,15 +4,14 @@
 #![deny(bad_style, unsafe_code, missing_docs)]
 #![warn(edition_2018, rust_2018_idioms)]
 
-#[macro_use]
-extern crate quicli;
+extern crate failure;
 
 extern crate nafi_lexer_repl as lexer;
 
-use quicli::prelude::*;
+use failure::Error;
 use std::io::{self, prelude::*};
 
-fn repl() -> Result<()> {
+fn repl() -> Result<(), Error> {
     let mut buffer = String::with_capacity(80);
     loop {
         buffer.clear();
@@ -30,6 +29,4 @@ fn repl() -> Result<()> {
     Ok(())
 }
 
-main!({
-    repl()?;
-});
+fn main() { repl().unwrap(); }
