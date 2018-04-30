@@ -1,7 +1,9 @@
 #![feature(proc_macro)]
 
 #[macro_use]
+#[cfg(target_arch = "wasm32")]
 extern crate stdweb;
+#[cfg(target_arch = "wasm32")]
 extern crate nafi_lexer_repl;
 
 #[cfg(target_arch = "wasm32")]

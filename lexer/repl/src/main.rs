@@ -4,7 +4,6 @@
 #![deny(bad_style, unsafe_code, missing_docs)]
 #![warn(edition_2018, rust_2018_idioms)]
 
-#[macro_use]
 extern crate failure;
 
 extern crate nafi_lexer_repl as lexer;
