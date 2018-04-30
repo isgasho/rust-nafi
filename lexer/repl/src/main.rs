@@ -30,6 +30,4 @@ fn repl() -> Result<(), Error> {
     Ok(())
 }
 
-fn main() {
-    repl().unwrap();
-}
+fn main() { repl().unwrap(); }

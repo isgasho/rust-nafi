@@ -7,8 +7,8 @@ extern crate nafi_lexer_repl;
 #[cfg(target_arch = "wasm32")]
 mod hide {
     use super::*;
-    use stdweb::js_export;
     use std::fmt::Write;
+    use stdweb::js_export;
 
     #[js_export]
     pub fn lex(input: &str) -> String {
@@ -30,11 +30,7 @@ mod hide {
 pub use hide::*;
 
 #[cfg(target_arch = "wasm32")]
-fn main() {
-    hide::main()
-}
+fn main() { hide::main() }
 
 #[cfg(not(target_arch = "wasm32"))]
-fn main() {
-    println!("nafi-wasm-api is only useful on wasm32")
-}
+fn main() { println!("nafi-wasm-api is only useful on wasm32") }
