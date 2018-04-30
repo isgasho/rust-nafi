@@ -3,6 +3,6 @@ name = "nafi-wasm-api"
 version = "0.0.0"
 publish = false
 
-[dependencies]
+[target.'target_arch = "wasm"'.dependencies]
 stdweb = "0.4.4"
 nafi-lexer-repl = { path = "../lexer/repl/" }
