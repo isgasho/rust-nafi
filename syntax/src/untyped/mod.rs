@@ -50,11 +50,8 @@ impl<'a> NodeRef<'a> {
     }
 
     pub fn parent(&self) -> Option<NodeRef<'a>> { self.syntax.get(self.node.parent.unpack()) }
-
     pub fn child(&self) -> Option<NodeRef<'a>> { self.syntax.get(self.node.child.unpack()) }
-
     pub fn sibling(&self) -> Option<NodeRef<'a>> { self.syntax.get(self.node.sibling.unpack()) }
-
     pub fn children(&self) -> NodeChildren<'a> { NodeChildren(self.child()) }
 
     /// This is not an implementation of PartialEq because it shouldn't be public

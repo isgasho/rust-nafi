@@ -8,6 +8,9 @@ extern crate slog;
 extern crate bytecount;
 extern crate memchr;
 extern crate optional;
+#[macro_use]
+extern crate lazy_static;
+extern crate regex;
 
 #[cfg(test)]
 extern crate ron;
@@ -15,3 +18,5 @@ extern crate ron;
 extern crate sexpr;
 
 mod untyped;
+
+mod lexer;

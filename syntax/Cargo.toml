@@ -1,6 +1,6 @@
 [package]
 name = "nafi-syntax"
-version = "0.1.0"
+version = "0.0.0"
 publish = false
 
 [dependencies]
@@ -10,6 +10,9 @@ slog = "2.2"
 bytecount = "0.3"
 memchr = "2.0"
 optional = "0.4"
+
+regex = "0.2"
+lazy_static = "1.0"
 
 [dev-dependencies]
 sexpr = { path = "../sexpr/" }
