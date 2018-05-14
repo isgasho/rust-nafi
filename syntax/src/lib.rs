@@ -11,12 +11,15 @@ extern crate optional;
 #[macro_use]
 extern crate lazy_static;
 extern crate regex;
+extern crate num_bigint as bigint;
+#[macro_use]
+extern crate failure;
+extern crate nafi_misc;
 
 #[cfg(test)]
 extern crate ron;
-#[cfg(test)]
-extern crate sexpr;
 
 mod untyped;
 
 mod lexer;
+mod parser;

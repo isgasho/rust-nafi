@@ -23,6 +23,7 @@
       <sourceFolder url="file://$MODULE_DIR$/sexpr/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/wasm-api/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/wasm-api/static" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/misc/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>

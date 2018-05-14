@@ -12,4 +12,4 @@ serde_derive = "1.0"
 version = "0.2.0-git"
 features = ["serde"]
 git = "https://github.com/rust-num/num-bigint.git"
-rev = "7424bbe0ea6a68e84af91ea7e0dd4ecc833c1806"
+rev = "e22271cbc5d4255a6c9d0e3d5a1a9fb192f2d093"

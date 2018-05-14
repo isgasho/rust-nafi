@@ -14,14 +14,14 @@ macro_rules! Kind {
         $(#[$meta:meta])*
         $kind:ident,
     )*) => {
-        pub type Token<'a> = super::Token<'a, Kind>;
+        pub type Token = super::Token<Kind>;
 
         #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
         #[derive(Serialize, Deserialize)]
         #[repr(u8)]
         pub enum Kind {$(
-                $(#[$meta])*
-                $kind,
+            $(#[$meta])*
+            $kind,
         )*}
 
         impl Kind {
@@ -34,14 +34,14 @@ macro_rules! Kind {
 
         impl super::private_in_pub::Sealed for Kind {}
 
-        impl<'a> ::serde::ser::Serialize for Token<'a> {
+        impl ::serde::ser::Serialize for Token {
             fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
             where S: ::serde::ser::Serializer {
                 serializer.serialize_newtype_variant(
                     "Token",
-                    u32::from(self.kind as u8),
+                    self.kind as u32,
                     self.kind.as_str(),
-                    self.source,
+                    &self.length,
                 )
             }
         }
@@ -53,10 +53,16 @@ mod private_in_pub {
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash)]
-pub struct Token<'a, Kind: private_in_pub::Sealed> {
-    pub source: &'a str,
-    pub kind: Kind,
+pub struct Token<Kind: self::private_in_pub::Sealed> {
+    pub length: u32,
+    pub kind: Kind, // u8
 }
 
 pub mod code;
 pub mod string;
+
+#[test]
+fn token_size() {
+    use std::mem::size_of;
+    assert_eq!(size_of::<code::Token>(), size_of::<Option<code::Token>>())
+}

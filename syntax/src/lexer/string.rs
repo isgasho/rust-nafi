@@ -28,7 +28,7 @@ fn simple_escape(source: &str) -> Option<Token> {
         Some(c) => c,
         None => {
             return Some(Token {
-                source,
+                length: 1,
                 kind: Kind::InvalidEscape,
             })
         },
@@ -44,7 +44,7 @@ fn simple_escape(source: &str) -> Option<Token> {
         _ => Kind::InvalidEscape,
     };
     Some(Token {
-        source: &source[..1 + escape.len_utf8()],
+        length: 1 + escape.len_utf8() as u32,
         kind,
     })
 }
@@ -53,18 +53,18 @@ fn unicode_escape(source: &str) -> Option<Token> {
     if !source.starts_with("\\u{") {
         return None;
     }
-    let end_idx = match memchr(b'}', source.as_bytes()) {
+    let length = match memchr(b'}', source.as_bytes()) {
         Some(idx) => idx,
         None => {
             return Some(Token {
-                source,
+                length: 3,
                 kind: Kind::InvalidEscape,
             })
         },
     };
-    let payload = &source[3..end_idx];
+    let payload = &source[3..length];
     Some(Token {
-        source: &source[..=end_idx],
+        length: length as u32,
         kind: if payload.len() >= 4 && payload.len() <= 6
             && payload.bytes().all(|b| b.is_ascii_hexdigit())
         {
@@ -76,10 +76,10 @@ fn unicode_escape(source: &str) -> Option<Token> {
 }
 
 fn text(source: &str) -> Option<Token> {
-    let idx = memchr2(b'"', b'\\', source.as_bytes()).unwrap_or_else(|| source.len());
-    if idx > 0 {
+    let length = memchr2(b'"', b'\\', source.as_bytes()).unwrap_or_else(|| source.len());
+    if length > 0 {
         Some(Token {
-            source: &source[..idx],
+            length: length as u32,
             kind: Kind::Text,
         })
     } else {
@@ -90,7 +90,7 @@ fn text(source: &str) -> Option<Token> {
 fn string_end(source: &str) -> Option<Token> {
     if source.starts_with('"') {
         Some(Token {
-            source: &source[..1],
+            length: 1,
             kind: Kind::StringEnd,
         })
     } else {
