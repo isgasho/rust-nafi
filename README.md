@@ -1,6 +1,6 @@
 # NAFI interpreter
 
-[![Build Status](https://travis-ci.org/nafi-lang/rust-nafi.svg?branch=master)][travis]
+[![Build Status](https://travis-ci.com/nafi-lang/rust-nafi.svg?branch=master)][travis]
 [![GitHub issues](https://img.shields.io/github/issues/nafi-lang/rust-nafi.svg)][issues]
 [![license](https://img.shields.io/github/license/nafi-lang/rust-nafi.svg)][mit]
 [![Documentation](https://img.shields.io/badge/docs-master-blue.svg)][docs]
@@ -27,7 +27,7 @@ One of the project's goals is to be a very well-documented and well-compartiment
 If you know Rust, understanding enough of the project to contribute _should_ be easy.
 If not, that's a bug in the documentation; open an issue and we'll work to improve it!
 
-[travis]: <https://travis-ci.org/nafi-lang/rust-nafi>
+[travis]: <https://travis-ci.com/nafi-lang/rust-nafi>
 [issues]: <https://github.com/nafi-lang/rust-nafi/issues>
 [mit]: <https://choosealicense.com/licenses/mit/>
 [docs]: <https://nafi-lang.github.io/rust-nafi/>
