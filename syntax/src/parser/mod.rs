@@ -1,12 +1,12 @@
 //! Parser that turns nafi source into
 
-use std::u32;
-use optional::{Optioned, some, none};
-use slog::Logger;
 use nafi_misc::ReplaceMany;
+use optional::{none, some, Optioned};
+use slog::Logger;
+use std::u32;
 
-use untyped::{SyntaxTree, Kind as SyntaxKind, Node as SyntaxNode};
 use lexer::{self, code, string};
+use untyped::{Kind as SyntaxKind, Node as SyntaxNode, SyntaxTree};
 
 #[derive(Clone, Debug)]
 struct ParseContext<'a> {
@@ -24,15 +24,17 @@ pub enum ParseFailure {
     #[fail(display = "The nafi parser hit the end of the file unexpectedly; this is a bug")]
     UnexpectedEof,
     #[doc(hidden)]
-    #[fail(display = "OOPSIE WOOPSIE!! Uwu We made a fucky wucky!! A wittle fucko boingo! \
-                      The code monkeys at our headquarters are working VEWY HAWD to fix this!")]
+    #[fail(
+        display = "OOPSIE WOOPSIE!! Uwu We made a fucky wucky!! A wittle fucko boingo! \
+                   The code monkeys at our headquarters are working VEWY HAWD to fix this!"
+    )]
     __NonExhausive, // sorry, this should never be constructed
 }
 
 type Pos = Result<u32, ParseFailure>;
 
 macro_rules! set {
-    ($ctx:ident.$target:ident.$member:ident in $nodes:ident = $val:expr) => {
+    ($ctx:ident. $target:ident. $member:ident in $nodes:ident = $val:expr) => {
         if let Some(n) = $nodes.get_mut($ctx.$target.unpack() as usize) {
             n.$member = some(n.$member.unwrap_or($val));
         }
@@ -74,7 +76,11 @@ fn source<'a>(ctx: &ParseContext<'a>, tok: code::Token) -> &'a str {
     &ctx.source[..tok.length as usize]
 }
 
-fn error_until(mut ctx: ParseContext, nodes: &mut Vec<SyntaxNode>, terminators: &[code::Kind]) -> u32 {
+fn error_until(
+    mut ctx: ParseContext,
+    nodes: &mut Vec<SyntaxNode>,
+    terminators: &[code::Kind],
+) -> u32 {
     ctx.log = ctx.log.new(o!("rule" => "error-until"));
     let start_idx = nodes.len() as u32;
     let start_pos = ctx.pos;
@@ -98,8 +104,13 @@ fn error_until(mut ctx: ParseContext, nodes: &mut Vec<SyntaxNode>, terminators: 
     nodes.push(SyntaxNode {
         kind: SyntaxKind::ERROR,
         span: (start_pos, ctx.pos),
-        parent, previous,
-        child: if start_idx != idx { some(start_idx) } else { none() },
+        parent,
+        previous,
+        child: if start_idx != idx {
+            some(start_idx)
+        } else {
+            none()
+        },
         next: none(),
     });
     ctx.pos
@@ -123,7 +134,7 @@ pub fn parse(source: String, log: &Logger) -> Result<SyntaxTree, ParseFailure> {
             source: &source,
             log,
         },
-        &mut nodes
+        &mut nodes,
     );
     if consumed < source.len() as u32 {
         unimplemented!("Excess input");
@@ -133,8 +144,8 @@ pub fn parse(source: String, log: &Logger) -> Result<SyntaxTree, ParseFailure> {
 
 #[cfg(test)]
 mod tests {
-    extern crate slog_term;
     extern crate ron;
+    extern crate slog_term;
     use super::*;
     use nafi_misc::PrintWriter;
 
@@ -144,9 +155,9 @@ mod tests {
         use std::sync::Mutex;
         Logger::root(
             Mutex::new(
-                slog_term::CompactFormat::new(
-                    slog_term::PlainSyncDecorator::new(PrintWriter)
-                ).build().fuse()
+                slog_term::CompactFormat::new(slog_term::PlainSyncDecorator::new(PrintWriter))
+                    .build()
+                    .fuse(),
             ).fuse(),
             o!(),
         )

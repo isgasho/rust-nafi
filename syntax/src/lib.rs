@@ -10,8 +10,8 @@ extern crate memchr;
 extern crate optional;
 #[macro_use]
 extern crate lazy_static;
-extern crate regex;
 extern crate num_bigint as bigint;
+extern crate regex;
 #[macro_use]
 extern crate failure;
 extern crate nafi_misc;

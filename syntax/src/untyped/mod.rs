@@ -30,9 +30,7 @@ pub struct Span<'a> {
 }
 
 impl<'a> Span<'a> {
-    fn source(&self) -> &'a str {
-        &self.source[self.span.0 as usize ..= self.span.1 as usize]
-    }
+    fn source(&self) -> &'a str { &self.source[self.span.0 as usize..=self.span.1 as usize] }
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -126,7 +124,7 @@ macro_rules! Kind {
 
 Kind! {
     ERROR,
-    
+
     // terminal
     Symbol,
     Identifier,
@@ -138,7 +136,7 @@ Kind! {
     BlockComment,
     StringText,
     StringEscape,
-    
+
     // nonterminal
     Operator,
     BinaryOperation,

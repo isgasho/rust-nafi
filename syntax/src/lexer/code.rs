@@ -1,5 +1,5 @@
-use std::u32;
 use memchr::memchr2;
+use std::u32;
 
 Kind! {
     /// A name that refers to some binding, meeting UAX31-R1 unmodified

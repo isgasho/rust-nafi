@@ -7,9 +7,7 @@ impl std::io::Write for PrintWriter {
         print!("{}", String::from_utf8_lossy(buf));
         Ok(buf.len())
     }
-    fn flush(&mut self) -> std::io::Result<()> {
-        std::io::stdout().flush()
-    }
+    fn flush(&mut self) -> std::io::Result<()> { std::io::stdout().flush() }
 }
 
 /// IO sink that uses the `eprint` macro, for test stdout capture.
@@ -19,9 +17,7 @@ impl std::io::Write for EPrintWriter {
         eprint!("{}", String::from_utf8_lossy(buf));
         Ok(buf.len())
     }
-    fn flush(&mut self) -> std::io::Result<()> {
-        std::io::stdout().flush()
-    }
+    fn flush(&mut self) -> std::io::Result<()> { std::io::stdout().flush() }
 }
 
 /// Replace many nonoverlapping substrings with replacements at once.
@@ -31,7 +27,7 @@ pub trait ReplaceMany {
 }
 impl ReplaceMany for str {
     fn replace_many(&self, replacements: &[(&str, &str)]) -> String {
-        use aho_corasick::{Automaton, AcAutomaton};
+        use aho_corasick::{AcAutomaton, Automaton};
         let aut = AcAutomaton::new(replacements.iter().map(|it| it.0));
         let mut s = String::with_capacity(self.len());
         let mut last_hit_end = 0;
