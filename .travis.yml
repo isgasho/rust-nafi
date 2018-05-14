@@ -9,12 +9,6 @@ branches:
   - staging
   - trying
   - master
-  - /^v\d+\.\d+(?:\.\d+)?(?:-.*)?$/ # releases
-
-before_install:
-- openssl aes-256-cbc -K $encrypted_366ad4dc9b51_key -iv $encrypted_366ad4dc9b51_iv
-  -in ./.travis/id_rsa.enc -out ~/.ssh/id_rsa -d
-- chmod 600 ~/.ssh/id_rsa
 
 script:
 - cargo build --all
@@ -25,16 +19,9 @@ env:
 matrix:
   include:
   
-  # warnings + pinned minimum version + gh-pages doc upload
+  # warnings + pinned minimum version
   - rust: 1.26.0
-    env: RUSTFLAGS="-D warnings" CARGO_GHP_VERSION="0.3.4"
-    install:
-    - cargo install cargo-ghp-upload --verbose --version $CARGO_GHP_VERSION || true
-    script:
-    - cargo check --all-targets --tests
-    - cargo doc --all --no-deps
-    after_success:
-    - cargo ghp-upload -vvvr
+    env: RUSTFLAGS="-D warnings"
   
   # clippy + rustfmt check
   - rust: nightly-2018-05-13
@@ -45,3 +32,12 @@ matrix:
     script:
     - cargo clippy --all-targets --tests -- -D clippy
     - cargo fmt -- --write-mode=diff
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  local-dir: "target/doc"
+  github-token:
+    secure: "puRicvcZxHNzYJEj+iAlI0/2cDMG+ID4MdL2BRyLN5NcNvGKrFOgUBBU34REH5/MoWnO8G8YZbznDdMeo+WL3bjYhKzq/tJ5E4JxfVvyhzOmWnBM1vL89ZtMv62wdvHJAsI0DK+HNtDX+1bQSUi6UnO1COjaP0a+78+f1WQ6bfIWIWJ9ArKd4GnEbTR8MGpB/COfy8S3XqEy6+/8JAhT8uJqkf8Kk5/EKeJlgT+KjCragX8iP9GxQbSmGAFNXnY40tplI18N1N7Fi/H9OePuY0HFuOSO6E7BOWW/9HOeep1Rmmbx8B14mA5b+hVtqg3symv6oI46uxGuIPo4fybj2BP954Ia+jG1A5ZcQITfmacCZQfvUz4zcmoZ6yOXYmK4S5mpicfkwcoFPiUtKTTdMzRNeyyc/X8Jf6Kkl7cFqSRXOeEh3OwPqkcvrtWnTnPl6Qhgg9+WyTIPifqJQBQBjLFZxwdOcXogtCQSi7zSMvuIvmlW6FHChNfBlnkRMco7p4Gt8wnq+vgc9KbFupHFVXoKtj7vEUaR9TvjmAAOYbXkbG2wjO2tWxTidMEZ7b1Patc9qFWZL3cCODhl4WgyiOo7rf4Jto3P+4srZ1he1bdITuT/IaaADhZIb0Hu9pIOI9D/Z/vs8tvTqHBKCfHATk6fNzDL4W3srC0V/BnBL44="
+  on:
+    branch: master
