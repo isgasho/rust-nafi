@@ -14,6 +14,7 @@ script:
 - cargo build --all
 - cargo test  --all
 - cargo run   --package nafi-test
+- cargo doc   --all --no-deps
 
 env:
 matrix:
