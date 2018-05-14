@@ -1,4 +1,4 @@
-#![feature(proc_macro)]
+#![cfg_attr(target_arch = "wasm32", feature(proc_macro))]
 
 #[macro_use]
 #[cfg(target_arch = "wasm32")]

@@ -2,7 +2,7 @@ language: rust
 cache: cargo
 
 rust:
-- nightly
+- stable
 
 branches:
   only:
@@ -25,8 +25,8 @@ env:
 matrix:
   include:
   
-  # Warnings/Docs
-  - rust: nightly-2018-04-28
+  # warnings + pinned minimum version + gh-pages doc upload
+  - rust: 1.26.0
     env: RUSTFLAGS="-D warnings" CARGO_GHP_VERSION="0.3.4"
     install:
     - cargo install cargo-ghp-upload --verbose --version $CARGO_GHP_VERSION || true
@@ -36,9 +36,9 @@ matrix:
     after_success:
     - cargo ghp-upload -vvvr
   
-  # Clippy/Format
-  - rust: nightly-2018-04-28
-    env: CLIPPY_VERSION="1742229ebb7843a65c05ee495d8de5366fcc5567"
+  # clippy + rustfmt check
+  - rust: nightly-2018-05-13
+    env: CLIPPY_VERSION="491fb01af56e08ff7312e2f44fdd1b3547367354"
     install:
     - rustup component add rustfmt-preview || true
     - cargo install clippy --git https://github.com/rust-lang-nursery/rust-clippy.git --rev $CLIPPY_VERSION || true
