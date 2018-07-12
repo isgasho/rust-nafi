@@ -23,6 +23,6 @@ git = "https://github.com/rust-num/num-bigint.git"
 rev = "351ea5f2b1aee20619629f849ac4b838e15a893f"
 
 [dev-dependencies]
-ron = "0.2"
+ron = "0.3"
 slog = { version = "2.2", features = ["max_level_trace"] }
 slog-term = "2.4"
