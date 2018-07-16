@@ -1,8 +1,15 @@
 language: rust
 cache: cargo
+conditions: v1
+
+stages:
+- name: test
+- name: warnings
+- name: deploy
+  if: branch=master AND type=push
 
 rust:
-- stable
+- beta
 
 branches:
   only:
@@ -13,32 +20,26 @@ branches:
 script:
 - cargo build --all
 - cargo test  --all
-- cargo run   --package nafi-test
-- cargo doc   --all --no-deps
 
-env:
 matrix:
   include:
   
-  # warnings + pinned minimum version
-  - rust: 1.26.0
-    env: RUSTFLAGS="-D warnings"
-  
-  # clippy + rustfmt check
-  - rust: nightly-2018-05-13
-    env: CLIPPY_VERSION="491fb01af56e08ff7312e2f44fdd1b3547367354"
+  # clippy and rustfmt
+  - stage: warnings
+    rust: nightly-2018-07-15
     install:
-    - rustup component add rustfmt-preview || true
-    - cargo install clippy --git https://github.com/rust-lang-nursery/rust-clippy.git --rev $CLIPPY_VERSION || true
+    - rustup component add rustfmt-preview
+    - rustup component add clippy-preview
     script:
-    - cargo clippy --all-targets --tests -- -D clippy
-    - cargo fmt -- --write-mode=diff
+    - cargo clippy --all-targets --tests -- -D clippy -D warnings
+    - cargo fmt -- --check
 
-deploy:
-  provider: pages
-  skip-cleanup: true
-  local-dir: "target/doc"
-  github-token: $GH_TOKEN
-  on:
-    branch: master
-    rust: stable
+  # master docs on GitHub Pages
+  - stage: deploy
+    if: tag=false
+    script: cargo doc --all --no-deps
+    deploy:
+      provider: pages
+      skip-cleanup: true
+      local-dir: "target/doc"
+      github-token: $GH_TOKEN

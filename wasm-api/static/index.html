@@ -31,15 +31,15 @@
 <!--suppress HtmlUnknownTarget -->
 <script src="nafi-wasm-api.js"></script>
 <script>
-    document.getElementById('input').onkeyup = () => {
-        // noinspection JSUnresolvedVariable
-        Rust.nafi_wasm_api
-            .then(({lex}) => {
-                const input = document.getElementById('input').value;
-                document.getElementById('output').value = lex(input);
-            })
-            .catch(err => console.error(err));
-    };
+(async () => {
+    // noinspection JSUnresolvedVariable
+    const {parse} = await Rust.nafi_wasm_api;
+    const input = document.getElementById('input');
+    const output = document.getElementById('output');
+    const do_parse = () => output.value = parse(input.value);
+    input.onkeyup = do_parse;
+    do_parse();
+})();
 </script>
 </body>
 </html>

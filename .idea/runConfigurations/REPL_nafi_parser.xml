@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Fmt" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+  <configuration default="false" name="REPL nafi-parser" type="CargoCommandRunConfiguration" factoryName="Cargo Command" folderName="REPL">
     <option name="channel" value="DEFAULT" />
-    <option name="command" value="fmt --all" />
+    <option name="command" value="run --package nafi-parser-repl" />
     <option name="nocapture" value="true" />
     <option name="backtrace" value="SHORT" />
     <option name="workingDirectory" value="file://$PROJECT_DIR$" />

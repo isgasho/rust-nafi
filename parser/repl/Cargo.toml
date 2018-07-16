@@ -1,9 +1,8 @@
 [package]
-name = "nafi-wasm-api"
+name = "nafi-parser-repl"
 version = "0.0.0"
 authors = ["Christopher Durham <cad97@cad97.com>"]
 
 [dependencies]
-stdweb = "0.4"
-nafi-parser = { path = "../parser/" }
-ron = "0.3"
+nafi-parser = { path = "./../" }
+ron = "0.3.0"
