@@ -18,10 +18,6 @@ branches:
   - trying
   - master
 
-script:
-- cargo build --all
-- cargo test  --all
-
 matrix:
   include:
   
