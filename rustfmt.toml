@@ -1,9 +1,2 @@
-unstable_features = true
-
-# Stable
 newline_style = "Unix"
 merge_derives = false
-
-# Unstable
-fn_single_line = true
-match_block_trailing_comma = true

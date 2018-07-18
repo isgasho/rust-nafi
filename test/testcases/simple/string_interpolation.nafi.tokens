@@ -1,7 +1,0 @@
-LiteralStringStart("\"")
- Text("a = ")
- InterpolationStart("\\{")
-  Identifier("a")
-  Symbol("}")
- StringEnd("\"")
-Whitespace("\n")

@@ -1,38 +1,37 @@
 #![cfg_attr(target_arch = "wasm32", feature(proc_macro))]
 
-#[macro_use]
+extern crate nafi_parser;
+extern crate ron;
 #[cfg(target_arch = "wasm32")]
+#[cfg_attr(target_arch = "wasm32", macro_use)]
 extern crate stdweb;
-#[cfg(target_arch = "wasm32")]
-extern crate nafi_lexer_repl;
 
 #[cfg(target_arch = "wasm32")]
-mod hide {
-    use super::*;
-    use std::fmt::Write;
+pub use hidden::*;
+#[cfg(target_arch = "wasm32")]
+mod hidden {
+    use ron::ser::to_string_pretty;
     use stdweb::js_export;
 
     #[js_export]
-    pub fn lex(input: &str) -> String {
-        let tokens = nafi_lexer_repl::lex(input);
-        let mut out = String::new();
-        for tok in tokens {
-            writeln!(out, "{}", tok).unwrap();
+    fn parse(s: &str) -> String {
+        match nafi_parser::parse(s) {
+            Ok(parse) => match to_string_pretty(&parse, Default::default()) {
+                Ok(serialized) => serialized,
+                Err(err) => format!("{}", err),
+            },
+            Err(err) => format!("{}", err),
         }
-        out
-    }
-
-    pub fn main() {
-        stdweb::initialize();
-        stdweb::event_loop();
     }
 }
 
 #[cfg(target_arch = "wasm32")]
-pub use hide::*;
-
-#[cfg(target_arch = "wasm32")]
-fn main() { hide::main() }
+fn main() {
+    stdweb::initialize();
+    stdweb::event_loop();
+}
 
 #[cfg(not(target_arch = "wasm32"))]
-fn main() { println!("nafi-wasm-api is only useful on wasm32") }
+fn main() {
+    println!(">.>");
+}

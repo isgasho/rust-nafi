@@ -1,0 +1,13 @@
+[package]
+name = "nafi-parser"
+version = "0.0.0"
+authors = ["Christopher Durham <cad97@cad97.com>"]
+
+[dependencies]
+pest = "2"
+pest_derive = "2"
+serde = "1"
+serde_derive = "1"
+memchr = "2"
+bytecount = "0.3"
+single = "0.3"
