@@ -122,7 +122,7 @@ impl<'a> FunctionCall<'a> {
                     assert_eq!(it.as_rule(), Rule::FunctionCallArguments);
                     (Some(it), None)
                 }
-            },
+            }
             (arguments, closure) => (arguments, closure),
         };
         FunctionCall {
