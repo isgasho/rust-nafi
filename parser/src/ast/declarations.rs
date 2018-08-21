@@ -8,6 +8,7 @@ use {pest::iterators::Pair, serde_derive::Serialize, single::Single};
 #[derive(Serialize)]
 pub enum Declaration<'a> {
     Function(Function<'a>),
+    Let(Let<'a>),
 }
 
 impl<'a> Declaration<'a> {
@@ -16,6 +17,7 @@ impl<'a> Declaration<'a> {
         let inner = parse.into_inner().single().unwrap();
         match inner.as_rule() {
             Rule::FunctionDeclaration => Declaration::Function(Function::from_pest(inner)),
+            Rule::LetDeclaration => Declaration::Let(Let::from_pest(inner)),
             rule => unreachable!("Unexpected Declaration[{:?}]", rule),
         }
     }
@@ -41,7 +43,7 @@ impl<'a> Function<'a> {
         let arguments = inner.next().unwrap();
         let (return_, body) = {
             let mut body = inner.next().unwrap();
-            let return_ = if body.as_rule() == Rule::FunctionDeclarationReturn {
+            let return_ = if body.as_rule() == Rule::TypeAscription {
                 let temp = body;
                 body = inner.next().unwrap();
                 Some(temp)
@@ -97,6 +99,46 @@ impl<'a> FunctionArgument<'a> {
             span: Span::from_pest(span),
             name: name.map(Identifier::from_pest),
             type_: Type::from_pest(type_),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Serialize)]
+pub struct Let<'a> {
+    pub span: Span<'a>,
+    pub name: Identifier<'a>,
+    #[serde(rename = "type")]
+    pub type_: Option<Type<'a>>,
+    pub value: Expression<'a>,
+}
+
+impl<'a> Let<'a> {
+    pub(crate) fn from_pest(parse: Pair<'a, Rule>) -> Self {
+        assert_eq!(parse.as_rule(), Rule::LetDeclaration);
+        let span = parse.as_span();
+        let mut inner = parse.into_inner();
+        let name = inner.next().unwrap();
+        let (type_, value) = {
+            let mut value = inner.next().unwrap();
+            let type_ = if value.as_rule() == Rule::TypeAscription {
+                let temp = value;
+                value = inner.next().unwrap();
+                Some(temp)
+            } else {
+                None
+            };
+            (type_, value)
+        };
+        Let {
+            span: Span::from_pest(span),
+            name: Identifier::from_pest(name),
+            type_: type_
+                .map(Pair::into_inner)
+                .map(Single::single)
+                .map(Result::unwrap)
+                .map(Type::from_pest),
+            value: Expression::from_pest(value),
         }
     }
 }

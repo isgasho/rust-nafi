@@ -2,26 +2,32 @@ File = { SOI ~ EOI }
 
 TestEntry = _{ SOI ~ Expression ~ EOI }
 
+// ~~ common ~~ //
+
+TypeAscription = { ":" ~ Type }
+
 // ~~ declarations ~~ //
 
 Declaration =
     { FunctionDeclaration
+    | LetDeclaration
     }
 
 FunctionDeclaration =
     { "function" ~ Identifier
     ~ "(" ~ FunctionDeclarationArguments ~ ")"
-    ~ FunctionDeclarationReturn? ~ "=" ~ FunctionExpression
+    ~ TypeAscription? ~ "=" ~ FunctionExpression
     }
 
 FunctionDeclarationArguments = { (FunctionDeclarationArgument ~ ("," ~ FunctionDeclarationArgument)* ~ ","?)? }
 FunctionDeclarationArgument  = { (Identifier ~ ":")? ~ Type }
-FunctionDeclarationReturn    = { ":" ~ Type }
+
+LetDeclaration = { "let" ~ Identifier ~ TypeAscription? ~ "=" ~ Expression }
 
 // ~~ statements ~~ //
 
 Statement =
-    { Expression ~ ";"
+    { Expression
     | Declaration
     }
 
