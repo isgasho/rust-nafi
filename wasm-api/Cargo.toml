@@ -1,9 +1,12 @@
+cargo-features = ["edition"]
+
 [package]
 name = "nafi-wasm-api"
 version = "0.0.0"
 authors = ["Christopher Durham <cad97@cad97.com>"]
+edition = "2018"
 
 [dependencies]
 stdweb = "0.4"
 nafi-parser = { path = "../parser/" }
-ron = "0.3"
+ron = "0.4"

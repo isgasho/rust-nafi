@@ -1,17 +1,12 @@
+#![allow(stable_features)]
 #![cfg_attr(target_arch = "wasm32", feature(proc_macro))]
 
-extern crate nafi_parser;
-extern crate ron;
 #[cfg(target_arch = "wasm32")]
-#[cfg_attr(target_arch = "wasm32", macro_use)]
-extern crate stdweb;
-
-#[cfg(target_arch = "wasm32")]
-pub use hidden::*;
+pub use self::hidden::*;
 #[cfg(target_arch = "wasm32")]
 mod hidden {
     use ron::ser::to_string_pretty;
-    use stdweb::js_export;
+    use stdweb::{js_export, __js_raw_asm};
 
     #[js_export]
     fn parse(s: &str) -> String {
