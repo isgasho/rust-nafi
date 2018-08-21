@@ -27,8 +27,8 @@ LetDeclaration = { "let" ~ Identifier ~ TypeAscription? ~ "=" ~ Expression }
 // ~~ statements ~~ //
 
 Statement =
-    { Expression
-    | Declaration
+    { Declaration
+    | Expression
     }
 
 StatementBlock = { Statement* ~ Expression? }
