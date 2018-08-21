@@ -1,6 +1,5 @@
-use ast::Span;
-use pest::iterators::Pair;
-use syntax::Rule;
+use crate::{ast::Span, syntax::Rule};
+use {pest::iterators::Pair, serde_derive::Serialize};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize)]

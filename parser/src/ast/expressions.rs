@@ -1,12 +1,13 @@
-use ast::{
-    statements::StatementBlock,
-    terminals::{Identifier, IntegerLiteral},
-    types::Type,
-    Span,
+use crate::{
+    ast::{
+        statements::StatementBlock,
+        terminals::{Identifier, IntegerLiteral},
+        types::Type,
+        Span,
+    },
+    syntax::Rule,
 };
-use pest::iterators::Pair;
-use single::Single;
-use syntax::Rule;
+use {pest::iterators::Pair, serde_derive::Serialize, single::Single};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize)]

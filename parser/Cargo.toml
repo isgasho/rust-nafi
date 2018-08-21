@@ -1,7 +1,10 @@
+cargo-features = ["edition"]
+
 [package]
 name = "nafi-parser"
 version = "0.0.0"
 authors = ["Christopher Durham <cad97@cad97.com>"]
+edition = "2018"
 
 [dependencies]
 pest = "2"

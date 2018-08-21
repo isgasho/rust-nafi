@@ -1,8 +1,8 @@
-use ast::expressions::Function as FunctionExpression;
-use ast::{terminals::Identifier, types::Type, Span};
-use pest::iterators::Pair;
-use single::Single;
-use syntax::Rule;
+use crate::{
+    ast::{expressions::{Function as FunctionExpression, Expression}, terminals::Identifier, types::Type, Span},
+    syntax::Rule,
+};
+use {pest::iterators::Pair, serde_derive::Serialize, single::Single};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize)]
@@ -27,6 +27,7 @@ pub struct Function<'a> {
     pub span: Span<'a>,
     pub name: Identifier<'a>,
     pub arguments: Vec<FunctionArgument<'a>>,
+    #[serde(rename = "return")]
     pub return_: Option<Type<'a>>,
     pub body: FunctionExpression<'a>,
 }

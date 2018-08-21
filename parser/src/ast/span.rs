@@ -1,8 +1,13 @@
-use bytecount::{count, num_chars};
-use memchr::memrchr;
-use serde::ser::{Serialize, Serializer};
-use std::ops::{Bound, RangeBounds};
-use std::{fmt, slice, str, u32};
+use {
+    bytecount::{count, num_chars},
+    memchr::memrchr,
+    serde::ser::{Serialize, Serializer},
+    std::{
+        fmt,
+        ops::{Bound, RangeBounds},
+        slice, str, u32,
+    },
+};
 
 /// A span of source code.
 #[derive(Copy, Clone, Eq, PartialEq, Hash)]
@@ -16,7 +21,7 @@ pub struct Span<'a> {
 }
 
 impl<'a> fmt::Debug for Span<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Span")
             .field("source", &self.source())
             .field("start_byte", &self.start_byte)

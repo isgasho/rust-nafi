@@ -1,7 +1,8 @@
-use ast::{declarations::Declaration, expressions::Expression, Span};
-use pest::iterators::Pair;
-use single::Single;
-use syntax::Rule;
+use crate::{
+    ast::{declarations::Declaration, expressions::Expression, Span},
+    syntax::Rule,
+};
+use {pest::iterators::Pair, serde_derive::Serialize, single::Single};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize)]

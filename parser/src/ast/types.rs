@@ -1,7 +1,5 @@
-use ast::terminals::Identifier;
-use pest::iterators::Pair;
-use single::Single;
-use syntax::Rule;
+use crate::{ast::terminals::Identifier, syntax::Rule};
+use {pest::iterators::Pair, serde_derive::Serialize, single::Single};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize)]
