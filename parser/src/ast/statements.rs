@@ -1,5 +1,5 @@
 use crate::{
-    ast::{declarations::Declaration, expressions::Expression, Span},
+    ast::{declarations::Declaration, expressions::Expression, from_pest, FromPest, Span},
     syntax::Rule,
 };
 use {pest::iterators::Pair, serde_derive::Serialize, single::Single};
@@ -11,13 +11,14 @@ pub enum Statement<'a> {
     Declaration(Declaration<'a>),
 }
 
-impl<'a> Statement<'a> {
-    pub(crate) fn from_pest(parse: Pair<'a, Rule>) -> Self {
+impl<'a> FromPest<'a> for Statement<'a> {
+    const RULE: Rule = Rule::Statement;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
         assert_eq!(parse.as_rule(), Rule::Statement);
         let inner = parse.into_inner().single().unwrap();
         match inner.as_rule() {
-            Rule::Expression => Statement::Expression(Expression::from_pest(inner)),
-            Rule::Declaration => Statement::Declaration(Declaration::from_pest(inner)),
+            Rule::Expression => Statement::Expression(from_pest(inner)),
+            Rule::Declaration => Statement::Declaration(from_pest(inner)),
             rule => unimplemented!("Unexpected Statement[{:?}]", rule),
         }
     }
@@ -31,8 +32,9 @@ pub struct StatementBlock<'a> {
     pub tail: Option<Expression<'a>>,
 }
 
-impl<'a> StatementBlock<'a> {
-    pub(crate) fn from_pest(parse: Pair<'a, Rule>) -> Self {
+impl<'a> FromPest<'a> for StatementBlock<'a> {
+    const RULE: Rule = Rule::StatementBlock;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
         assert_eq!(parse.as_rule(), Rule::StatementBlock);
         let span = parse.as_span();
         let inner = parse.into_inner();
@@ -43,8 +45,8 @@ impl<'a> StatementBlock<'a> {
         };
         for parse in inner {
             match parse.as_rule() {
-                Rule::Statement => block.statements.push(Statement::from_pest(parse)),
-                Rule::Expression => block.tail = Some(Expression::from_pest(parse)),
+                Rule::Statement => block.statements.push(from_pest(parse)),
+                Rule::Expression => block.tail = Some(from_pest(parse)),
                 _ => unreachable!("Unexpected StatementBlock[{:?}]", parse.as_rule()),
             }
         }

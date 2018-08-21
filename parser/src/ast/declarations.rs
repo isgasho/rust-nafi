@@ -1,5 +1,11 @@
 use crate::{
-    ast::{expressions::{Function as FunctionExpression, Expression}, terminals::Identifier, types::Type, Span},
+    ast::{
+        expressions::{Expression, Function as FunctionExpression},
+        from_pest,
+        terminals::Identifier,
+        types::Type,
+        FromPest, Span,
+    },
     syntax::Rule,
 };
 use {pest::iterators::Pair, serde_derive::Serialize, single::Single};
@@ -11,13 +17,14 @@ pub enum Declaration<'a> {
     Let(Let<'a>),
 }
 
-impl<'a> Declaration<'a> {
-    pub(crate) fn from_pest(parse: Pair<'a, Rule>) -> Self {
+impl<'a> FromPest<'a> for Declaration<'a> {
+    const RULE: Rule = Rule::Declaration;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
         assert_eq!(parse.as_rule(), Rule::Declaration);
         let inner = parse.into_inner().single().unwrap();
         match inner.as_rule() {
-            Rule::FunctionDeclaration => Declaration::Function(Function::from_pest(inner)),
-            Rule::LetDeclaration => Declaration::Let(Let::from_pest(inner)),
+            Rule::FunctionDeclaration => Declaration::Function(from_pest(inner)),
+            Rule::LetDeclaration => Declaration::Let(from_pest(inner)),
             rule => unreachable!("Unexpected Declaration[{:?}]", rule),
         }
     }
@@ -34,8 +41,9 @@ pub struct Function<'a> {
     pub body: FunctionExpression<'a>,
 }
 
-impl<'a> Function<'a> {
-    pub(crate) fn from_pest(parse: Pair<'a, Rule>) -> Self {
+impl<'a> FromPest<'a> for Function<'a> {
+    const RULE: Rule = Rule::FunctionDeclaration;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
         assert_eq!(parse.as_rule(), Rule::FunctionDeclaration);
         let span = parse.as_span();
         let mut inner = parse.into_inner();
@@ -55,17 +63,14 @@ impl<'a> Function<'a> {
         };
         Function {
             span: Span::from_pest(span),
-            name: Identifier::from_pest(name),
-            arguments: arguments
-                .into_inner()
-                .map(FunctionArgument::from_pest)
-                .collect(),
+            name: from_pest(name),
+            arguments: arguments.into_inner().map(from_pest).collect(),
             return_: return_
                 .map(Pair::into_inner)
                 .map(Single::single)
                 .map(Result::unwrap)
-                .map(Type::from_pest),
-            body: FunctionExpression::from_pest(body),
+                .map(from_pest),
+            body: from_pest(body),
         }
     }
 }
@@ -79,8 +84,9 @@ pub struct FunctionArgument<'a> {
     pub type_: Type<'a>,
 }
 
-impl<'a> FunctionArgument<'a> {
-    pub(crate) fn from_pest(parse: Pair<'a, Rule>) -> Self {
+impl<'a> FromPest<'a> for FunctionArgument<'a> {
+    const RULE: Rule = Rule::FunctionDeclarationArgument;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
         assert_eq!(parse.as_rule(), Rule::FunctionDeclarationArgument);
         let span = parse.as_span();
         let mut inner = parse.into_inner();
@@ -97,8 +103,8 @@ impl<'a> FunctionArgument<'a> {
         };
         FunctionArgument {
             span: Span::from_pest(span),
-            name: name.map(Identifier::from_pest),
-            type_: Type::from_pest(type_),
+            name: name.map(from_pest),
+            type_: from_pest(type_),
         }
     }
 }
@@ -113,8 +119,9 @@ pub struct Let<'a> {
     pub value: Expression<'a>,
 }
 
-impl<'a> Let<'a> {
-    pub(crate) fn from_pest(parse: Pair<'a, Rule>) -> Self {
+impl<'a> FromPest<'a> for Let<'a> {
+    const RULE: Rule = Rule::LetDeclaration;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
         assert_eq!(parse.as_rule(), Rule::LetDeclaration);
         let span = parse.as_span();
         let mut inner = parse.into_inner();
@@ -132,13 +139,13 @@ impl<'a> Let<'a> {
         };
         Let {
             span: Span::from_pest(span),
-            name: Identifier::from_pest(name),
+            name: from_pest(name),
             type_: type_
                 .map(Pair::into_inner)
                 .map(Single::single)
                 .map(Result::unwrap)
-                .map(Type::from_pest),
-            value: Expression::from_pest(value),
+                .map(from_pest),
+            value: from_pest(value),
         }
     }
 }

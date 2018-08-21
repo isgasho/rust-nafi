@@ -10,5 +10,5 @@ pub fn parse(s: &str) -> Result<ast::expressions::Expression<'_>, Box<dyn std::e
         assert_eq!(pairs.next().unwrap().as_rule(), Rule::EOI);
         pair
     };
-    Ok(ast::expressions::Expression::from_pest(parse))
+    Ok(ast::from_pest(parse))
 }

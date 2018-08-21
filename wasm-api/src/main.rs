@@ -6,7 +6,7 @@ pub use self::hidden::*;
 #[cfg(target_arch = "wasm32")]
 mod hidden {
     use ron::ser::to_string_pretty;
-    use stdweb::{js_export, __js_raw_asm};
+    use stdweb::{__js_raw_asm, js_export};
 
     #[js_export]
     fn parse(s: &str) -> String {
