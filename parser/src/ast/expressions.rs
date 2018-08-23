@@ -1,12 +1,14 @@
-use ast::{
-    statements::StatementBlock,
-    terminals::{Identifier, IntegerLiteral},
-    types::Type,
-    Span,
+use crate::{
+    ast::{
+        from_pest,
+        statements::StatementBlock,
+        terminals::{Identifier, IntegerLiteral},
+        types::Type,
+        FromPest, PestDeconstruct, Span,
+    },
+    syntax::Rule,
 };
-use pest::iterators::Pair;
-use single::Single;
-use syntax::Rule;
+use {pest::iterators::Pair, serde_derive::Serialize, single::Single};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize)]
@@ -15,25 +17,18 @@ pub enum Expression<'a> {
     IntegerLiteral(IntegerLiteral<'a>),
     Function(Function<'a>),
     FunctionCall(FunctionCall<'a>),
-    Empty(Span<'a>),
 }
 
-impl<'a> Expression<'a> {
-    pub(crate) fn from_pest(parse: Pair<'a, Rule>) -> Self {
-        assert_eq!(parse.as_rule(), Rule::Expression);
-        let outer_span = parse.as_span();
-        match parse.into_inner().single() {
-            Err(::single::Error::NoElements) => Expression::Empty(Span::from_pest(outer_span)),
-            Err(::single::Error::MultipleElements) => unreachable!(),
-            Ok(parse) => match parse.as_rule() {
-                Rule::Identifier => Expression::Identifier(Identifier::from_pest(parse)),
-                Rule::IntegerLiteral => {
-                    Expression::IntegerLiteral(IntegerLiteral::from_pest(parse))
-                }
-                Rule::FunctionExpression => Expression::Function(Function::from_pest(parse)),
-                Rule::FunctionCall => Expression::FunctionCall(FunctionCall::from_pest(parse)),
-                rule => unreachable!("Unexpected Expression[{:?}]", rule),
-            },
+impl<'a> FromPest<'a> for Expression<'a> {
+    const RULE: Rule = Rule::Expression;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
+        let inner = parse.into_inner().single().unwrap();
+        match inner.as_rule() {
+            Rule::Identifier => Expression::Identifier(from_pest(inner)),
+            Rule::IntegerLiteral => Expression::IntegerLiteral(from_pest(inner)),
+            Rule::FunctionExpression => Expression::Function(from_pest(inner)),
+            Rule::FunctionCall => Expression::FunctionCall(from_pest(inner)),
+            rule => unreachable!("Unexpected Expression[{:?}]", rule),
         }
     }
 }
@@ -46,31 +41,15 @@ pub struct Function<'a> {
     pub body: Box<StatementBlock<'a>>,
 }
 
-impl<'a> Function<'a> {
-    pub(crate) fn from_pest(parse: Pair<'a, Rule>) -> Self {
-        assert_eq!(parse.as_rule(), Rule::FunctionExpression);
+impl<'a> FromPest<'a> for Function<'a> {
+    const RULE: Rule = Rule::FunctionExpression;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
         let span = parse.as_span();
-        let mut inner = parse.into_inner();
-        let (arguments, body) = {
-            let mut body = inner.next().unwrap();
-            let arguments = if body.as_rule() == Rule::FunctionExpressionArguments {
-                let temp = body;
-                body = inner.next().unwrap();
-                Some(temp)
-            } else {
-                None
-            };
-            assert_eq!(body.as_rule(), Rule::StatementBlock);
-            (arguments, body)
-        };
+        let mut inner = parse.deconstruct();
         Function {
             span: Span::from_pest(span),
-            arguments: arguments
-                .into_iter()
-                .flat_map(Pair::into_inner)
-                .map(FunctionArgument::from_pest)
-                .collect(),
-            body: Box::new(StatementBlock::from_pest(body)),
+            arguments: inner.next_or_default(),
+            body: Box::new(inner.next()),
         }
     }
 }
@@ -84,17 +63,22 @@ pub struct FunctionArgument<'a> {
     pub type_: Option<Type<'a>>,
 }
 
-impl<'a> FunctionArgument<'a> {
-    pub(crate) fn from_pest(parse: Pair<'a, Rule>) -> Self {
-        assert_eq!(parse.as_rule(), Rule::FunctionExpressionArgument);
+impl<'a> FromPest<'a> for Vec<FunctionArgument<'a>> {
+    const RULE: Rule = Rule::FunctionExpressionArguments;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
+        parse.deconstruct().next_many()
+    }
+}
+
+impl<'a> FromPest<'a> for FunctionArgument<'a> {
+    const RULE: Rule = Rule::FunctionExpressionArgument;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
         let span = parse.as_span();
-        let mut inner = parse.into_inner();
-        let name = Identifier::from_pest(inner.next().unwrap());
-        let type_ = inner.next().map(Type::from_pest);
+        let mut inner = parse.deconstruct();
         FunctionArgument {
             span: Span::from_pest(span),
-            name,
-            type_,
+            name: inner.next(),
+            type_: inner.next_opt(),
         }
     }
 }
@@ -108,32 +92,23 @@ pub struct FunctionCall<'a> {
     pub closure: Option<Function<'a>>,
 }
 
-impl<'a> FunctionCall<'a> {
-    pub(crate) fn from_pest(parse: Pair<'a, Rule>) -> Self {
-        assert_eq!(parse.as_rule(), Rule::FunctionCall);
+impl<'a> FromPest<'a> for Vec<FunctionCallArgument<'a>> {
+    const RULE: Rule = Rule::FunctionCallArguments;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
+        parse.deconstruct().next_many()
+    }
+}
+
+impl<'a> FromPest<'a> for FunctionCall<'a> {
+    const RULE: Rule = Rule::FunctionCall;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
         let span = parse.as_span();
-        let mut inner = parse.into_inner().fuse();
-        let function = inner.next().unwrap();
-        let (arguments, closure) = match (inner.next(), inner.next()) {
-            (Some(it), None) => {
-                if it.as_rule() == Rule::FunctionExpression {
-                    (None, Some(it))
-                } else {
-                    assert_eq!(it.as_rule(), Rule::FunctionCallArguments);
-                    (Some(it), None)
-                }
-            }
-            (arguments, closure) => (arguments, closure),
-        };
+        let mut inner = parse.deconstruct();
         FunctionCall {
             span: Span::from_pest(span),
-            function: Identifier::from_pest(function),
-            arguments: arguments
-                .into_iter()
-                .flat_map(Pair::into_inner)
-                .map(FunctionCallArgument::from_pest)
-                .collect(),
-            closure: closure.map(Function::from_pest),
+            function: inner.next(),
+            arguments: inner.next_or_default(),
+            closure: inner.next_opt(),
         }
     }
 }
@@ -146,27 +121,15 @@ pub struct FunctionCallArgument<'a> {
     pub value: Expression<'a>,
 }
 
-impl<'a> FunctionCallArgument<'a> {
-    pub(crate) fn from_pest(parse: Pair<'a, Rule>) -> Self {
-        assert_eq!(parse.as_rule(), Rule::FunctionCallArgument);
+impl<'a> FromPest<'a> for FunctionCallArgument<'a> {
+    const RULE: Rule = Rule::FunctionCallArgument;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
         let span = parse.as_span();
-        let mut inner = parse.into_inner();
-        let (label, value) = {
-            let mut value = inner.next().unwrap();
-            let label = if value.as_rule() == Rule::Identifier {
-                let temp = value;
-                value = inner.next().unwrap();
-                Some(temp)
-            } else {
-                None
-            };
-            assert_eq!(value.as_rule(), Rule::Expression);
-            (label, value)
-        };
+        let mut inner = parse.deconstruct();
         FunctionCallArgument {
             span: Span::from_pest(span),
-            label: label.map(Identifier::from_pest),
-            value: Expression::from_pest(value),
+            label: inner.next_opt(),
+            value: inner.next(),
         }
     }
 }

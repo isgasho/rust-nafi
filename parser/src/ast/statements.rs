@@ -1,7 +1,11 @@
-use ast::{declarations::Declaration, expressions::Expression, Span};
-use pest::iterators::Pair;
-use single::Single;
-use syntax::Rule;
+use crate::{
+    ast::{
+        declarations::Declaration, expressions::Expression, from_pest, FromPest, PestDeconstruct,
+        Span,
+    },
+    syntax::Rule,
+};
+use {pest::iterators::Pair, serde_derive::Serialize, single::Single};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize)]
@@ -10,13 +14,13 @@ pub enum Statement<'a> {
     Declaration(Declaration<'a>),
 }
 
-impl<'a> Statement<'a> {
-    pub(crate) fn from_pest(parse: Pair<'a, Rule>) -> Self {
-        assert_eq!(parse.as_rule(), Rule::Statement);
+impl<'a> FromPest<'a> for Statement<'a> {
+    const RULE: Rule = Rule::Statement;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
         let inner = parse.into_inner().single().unwrap();
         match inner.as_rule() {
-            Rule::Expression => Statement::Expression(Expression::from_pest(inner)),
-            Rule::Declaration => Statement::Declaration(Declaration::from_pest(inner)),
+            Rule::Expression => Statement::Expression(from_pest(inner)),
+            Rule::Declaration => Statement::Declaration(from_pest(inner)),
             rule => unimplemented!("Unexpected Statement[{:?}]", rule),
         }
     }
@@ -30,23 +34,15 @@ pub struct StatementBlock<'a> {
     pub tail: Option<Expression<'a>>,
 }
 
-impl<'a> StatementBlock<'a> {
-    pub(crate) fn from_pest(parse: Pair<'a, Rule>) -> Self {
-        assert_eq!(parse.as_rule(), Rule::StatementBlock);
+impl<'a> FromPest<'a> for StatementBlock<'a> {
+    const RULE: Rule = Rule::StatementBlock;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
         let span = parse.as_span();
-        let inner = parse.into_inner();
-        let mut block = StatementBlock {
+        let mut inner = parse.deconstruct();
+        StatementBlock {
             span: Span::from_pest(span),
-            statements: vec![],
-            tail: None,
-        };
-        for parse in inner {
-            match parse.as_rule() {
-                Rule::Statement => block.statements.push(Statement::from_pest(parse)),
-                Rule::Expression => block.tail = Some(Expression::from_pest(parse)),
-                _ => unreachable!("Unexpected StatementBlock[{:?}]", parse.as_rule()),
-            }
+            statements: inner.next_many(),
+            tail: inner.next_opt(),
         }
-        block
     }
 }

@@ -1,21 +1,29 @@
-use ast::expressions::Function as FunctionExpression;
-use ast::{terminals::Identifier, types::Type, Span};
-use pest::iterators::Pair;
-use single::Single;
-use syntax::Rule;
+use crate::{
+    ast::{
+        expressions::{Expression, Function as FunctionExpression},
+        from_pest,
+        terminals::Identifier,
+        types::Type,
+        FromPest, PestDeconstruct, Span,
+    },
+    syntax::Rule,
+};
+use {pest::iterators::Pair, serde_derive::Serialize, single::Single};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize)]
 pub enum Declaration<'a> {
     Function(Function<'a>),
+    Let(Let<'a>),
 }
 
-impl<'a> Declaration<'a> {
-    pub(crate) fn from_pest(parse: Pair<'a, Rule>) -> Self {
-        assert_eq!(parse.as_rule(), Rule::Declaration);
+impl<'a> FromPest<'a> for Declaration<'a> {
+    const RULE: Rule = Rule::Declaration;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
         let inner = parse.into_inner().single().unwrap();
         match inner.as_rule() {
-            Rule::FunctionDeclaration => Declaration::Function(Function::from_pest(inner)),
+            Rule::FunctionDeclaration => Declaration::Function(from_pest(inner)),
+            Rule::LetDeclaration => Declaration::Let(from_pest(inner)),
             rule => unreachable!("Unexpected Declaration[{:?}]", rule),
         }
     }
@@ -27,42 +35,22 @@ pub struct Function<'a> {
     pub span: Span<'a>,
     pub name: Identifier<'a>,
     pub arguments: Vec<FunctionArgument<'a>>,
+    #[serde(rename = "return")]
     pub return_: Option<Type<'a>>,
     pub body: FunctionExpression<'a>,
 }
 
-impl<'a> Function<'a> {
-    pub(crate) fn from_pest(parse: Pair<'a, Rule>) -> Self {
-        assert_eq!(parse.as_rule(), Rule::FunctionDeclaration);
+impl<'a> FromPest<'a> for Function<'a> {
+    const RULE: Rule = Rule::FunctionDeclaration;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
         let span = parse.as_span();
-        let mut inner = parse.into_inner();
-        let name = inner.next().unwrap();
-        let arguments = inner.next().unwrap();
-        let (return_, body) = {
-            let mut body = inner.next().unwrap();
-            let return_ = if body.as_rule() == Rule::FunctionDeclarationReturn {
-                let temp = body;
-                body = inner.next().unwrap();
-                Some(temp)
-            } else {
-                None
-            };
-            assert_eq!(body.as_rule(), Rule::FunctionExpression);
-            (return_, body)
-        };
+        let mut inner = parse.deconstruct();
         Function {
             span: Span::from_pest(span),
-            name: Identifier::from_pest(name),
-            arguments: arguments
-                .into_inner()
-                .map(FunctionArgument::from_pest)
-                .collect(),
-            return_: return_
-                .map(Pair::into_inner)
-                .map(Single::single)
-                .map(Result::unwrap)
-                .map(Type::from_pest),
-            body: FunctionExpression::from_pest(body),
+            name: inner.next(),
+            arguments: inner.next(),
+            return_: inner.next_opt(),
+            body: inner.next(),
         }
     }
 }
@@ -76,26 +64,46 @@ pub struct FunctionArgument<'a> {
     pub type_: Type<'a>,
 }
 
-impl<'a> FunctionArgument<'a> {
-    pub(crate) fn from_pest(parse: Pair<'a, Rule>) -> Self {
-        assert_eq!(parse.as_rule(), Rule::FunctionDeclarationArgument);
+impl<'a> FromPest<'a> for Vec<FunctionArgument<'a>> {
+    const RULE: Rule = Rule::FunctionDeclarationArguments;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
+        parse.deconstruct().next_many()
+    }
+}
+
+impl<'a> FromPest<'a> for FunctionArgument<'a> {
+    const RULE: Rule = Rule::FunctionDeclarationArgument;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
         let span = parse.as_span();
-        let mut inner = parse.into_inner();
-        let (name, type_) = {
-            let mut type_ = inner.next().unwrap();
-            let name = if type_.as_rule() == Rule::Identifier {
-                let temp = type_;
-                type_ = inner.next().unwrap();
-                Some(temp)
-            } else {
-                None
-            };
-            (name, type_)
-        };
+        let mut inner = parse.deconstruct();
         FunctionArgument {
             span: Span::from_pest(span),
-            name: name.map(Identifier::from_pest),
-            type_: Type::from_pest(type_),
+            name: inner.next_opt(),
+            type_: inner.next(),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Serialize)]
+pub struct Let<'a> {
+    pub span: Span<'a>,
+    pub name: Identifier<'a>,
+    #[serde(rename = "type")]
+    pub type_: Option<Type<'a>>,
+    pub value: Expression<'a>,
+}
+
+impl<'a> FromPest<'a> for Let<'a> {
+    const RULE: Rule = Rule::LetDeclaration;
+    fn from_pest(parse: Pair<'a, Rule>) -> Self {
+        let span = parse.as_span();
+        let mut inner = parse.deconstruct();
+        Let {
+            span: Span::from_pest(span),
+            name: inner.next(),
+            type_: inner.next_opt(),
+            value: inner.next(),
         }
     }
 }
