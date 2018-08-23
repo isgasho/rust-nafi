@@ -17,23 +17,18 @@ pub enum Expression<'a> {
     IntegerLiteral(IntegerLiteral<'a>),
     Function(Function<'a>),
     FunctionCall(FunctionCall<'a>),
-    Empty(Span<'a>),
 }
 
 impl<'a> FromPest<'a> for Expression<'a> {
     const RULE: Rule = Rule::Expression;
     fn from_pest(parse: Pair<'a, Rule>) -> Self {
-        let outer_span = parse.as_span();
-        match parse.into_inner().single() {
-            Err(::single::Error::NoElements) => Expression::Empty(Span::from_pest(outer_span)),
-            Err(::single::Error::MultipleElements) => unreachable!("Unexpected Expression[_, ..]"),
-            Ok(parse) => match parse.as_rule() {
-                Rule::Identifier => Expression::Identifier(from_pest(parse)),
-                Rule::IntegerLiteral => Expression::IntegerLiteral(from_pest(parse)),
-                Rule::FunctionExpression => Expression::Function(from_pest(parse)),
-                Rule::FunctionCall => Expression::FunctionCall(from_pest(parse)),
-                rule => unreachable!("Unexpected Expression[{:?}]", rule),
-            },
+        let inner = parse.into_inner().single().unwrap();
+        match inner.as_rule() {
+            Rule::Identifier => Expression::Identifier(from_pest(inner)),
+            Rule::IntegerLiteral => Expression::IntegerLiteral(from_pest(inner)),
+            Rule::FunctionExpression => Expression::Function(from_pest(inner)),
+            Rule::FunctionCall => Expression::FunctionCall(from_pest(inner)),
+            rule => unreachable!("Unexpected Expression[{:?}]", rule),
         }
     }
 }
