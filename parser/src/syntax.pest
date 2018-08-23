@@ -1,6 +1,6 @@
 File = { SOI ~ EOI }
 
-TestEntry = _{ SOI ~ Expression ~ EOI }
+TestEntry = _{ SOI ~ StatementBlock ~ EOI }
 
 // ~~ common ~~ //
 

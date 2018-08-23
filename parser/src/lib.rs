@@ -1,14 +1,10 @@
 pub mod ast;
 mod syntax;
 
-pub fn parse(s: &str) -> Result<ast::expressions::Expression<'_>, Box<dyn std::error::Error>> {
-    use crate::syntax::{NafiParser, Rule};
+pub fn parse(s: &str) -> Result<ast::statements::StatementBlock, Box<dyn std::error::Error>> {
+    use crate::{syntax::{NafiParser, Rule}, ast::from_pest};
     use pest::Parser;
-    let parse = {
-        let mut pairs = NafiParser::parse(Rule::TestEntry, s)?;
-        let pair = pairs.next().unwrap();
-        assert_eq!(pairs.next().unwrap().as_rule(), Rule::EOI);
-        pair
-    };
-    Ok(ast::from_pest(parse))
+
+    let parse = NafiParser::parse(Rule::TestEntry, s)?.next().unwrap();
+    Ok(from_pest(parse))
 }
