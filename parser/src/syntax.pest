@@ -4,7 +4,7 @@ TestEntry = _{ SOI ~ Expression ~ EOI }
 
 // ~~ common ~~ //
 
-TypeAscription = { ":" ~ Type }
+TypeAscription = _{ ":" ~ Type }
 
 // ~~ declarations ~~ //
 
@@ -20,7 +20,7 @@ FunctionDeclaration =
     }
 
 FunctionDeclarationArguments = { (FunctionDeclarationArgument ~ ("," ~ FunctionDeclarationArgument)* ~ ","?)? }
-FunctionDeclarationArgument  = { (Identifier ~ ":")? ~ Type }
+FunctionDeclarationArgument  = { (Identifier ~ TypeAscription) | Type }
 
 LetDeclaration = { "let" ~ Identifier ~ TypeAscription? ~ "=" ~ Expression }
 

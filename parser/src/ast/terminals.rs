@@ -13,9 +13,9 @@ pub struct Identifier<'a> {
 impl<'a> FromPest<'a> for Identifier<'a> {
     const RULE: Rule = Rule::Identifier;
     fn from_pest(parse: Pair<'a, Rule>) -> Self {
-        assert_eq!(parse.as_rule(), Rule::Identifier);
+        let span = parse.as_span();
         Identifier {
-            span: Span::from_pest(parse.as_span()),
+            span: Span::from_pest(span),
         }
     }
 }
@@ -29,9 +29,9 @@ pub struct IntegerLiteral<'a> {
 impl<'a> FromPest<'a> for IntegerLiteral<'a> {
     const RULE: Rule = Rule::IntegerLiteral;
     fn from_pest(parse: Pair<'a, Rule>) -> Self {
-        assert_eq!(parse.as_rule(), Rule::IntegerLiteral);
+        let span = parse.as_span();
         IntegerLiteral {
-            span: Span::from_pest(parse.as_span()),
+            span: Span::from_pest(span),
         }
     }
 }

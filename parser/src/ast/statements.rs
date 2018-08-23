@@ -1,5 +1,5 @@
 use crate::{
-    ast::{declarations::Declaration, expressions::Expression, from_pest, FromPest, Span},
+    ast::{declarations::Declaration, expressions::Expression, from_pest, FromPest, Span, PestDeconstruct},
     syntax::Rule,
 };
 use {pest::iterators::Pair, serde_derive::Serialize, single::Single};
@@ -14,7 +14,6 @@ pub enum Statement<'a> {
 impl<'a> FromPest<'a> for Statement<'a> {
     const RULE: Rule = Rule::Statement;
     fn from_pest(parse: Pair<'a, Rule>) -> Self {
-        assert_eq!(parse.as_rule(), Rule::Statement);
         let inner = parse.into_inner().single().unwrap();
         match inner.as_rule() {
             Rule::Expression => Statement::Expression(from_pest(inner)),
@@ -35,21 +34,12 @@ pub struct StatementBlock<'a> {
 impl<'a> FromPest<'a> for StatementBlock<'a> {
     const RULE: Rule = Rule::StatementBlock;
     fn from_pest(parse: Pair<'a, Rule>) -> Self {
-        assert_eq!(parse.as_rule(), Rule::StatementBlock);
         let span = parse.as_span();
-        let inner = parse.into_inner();
-        let mut block = StatementBlock {
+        let mut inner = parse.deconstruct();
+        StatementBlock {
             span: Span::from_pest(span),
-            statements: vec![],
-            tail: None,
-        };
-        for parse in inner {
-            match parse.as_rule() {
-                Rule::Statement => block.statements.push(from_pest(parse)),
-                Rule::Expression => block.tail = Some(from_pest(parse)),
-                _ => unreachable!("Unexpected StatementBlock[{:?}]", parse.as_rule()),
-            }
+            statements: inner.next_many(),
+            tail: inner.next_opt(),
         }
-        block
     }
 }
