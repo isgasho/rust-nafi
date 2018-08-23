@@ -9,9 +9,7 @@ mod span;
 pub use self::span::Span;
 
 use crate::syntax::Rule;
-use pest::{
-    iterators::{Pair, Pairs},
-};
+use pest::iterators::{Pair, Pairs};
 use std::iter::Peekable;
 
 pub(crate) fn from_pest<'a, T: FromPest<'a>>(parse: Pair<'a, Rule>) -> T {
@@ -39,7 +37,11 @@ pub(crate) struct PestDeconstructor<'i>(Peekable<Pairs<'i, Rule>>);
 
 impl<'i> Drop for PestDeconstructor<'i> {
     fn drop(&mut self) {
-        assert_eq!(self.0.next(), None, "PestDeconstructor was not fully exhausted")
+        assert_eq!(
+            self.0.next(),
+            None,
+            "PestDeconstructor was not fully exhausted"
+        )
     }
 }
 

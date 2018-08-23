@@ -4,7 +4,7 @@ use crate::{
         statements::StatementBlock,
         terminals::{Identifier, IntegerLiteral},
         types::Type,
-        FromPest, Span, PestDeconstruct
+        FromPest, PestDeconstruct, Span,
     },
     syntax::Rule,
 };

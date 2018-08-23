@@ -1,5 +1,8 @@
 use crate::{
-    ast::{declarations::Declaration, expressions::Expression, from_pest, FromPest, Span, PestDeconstruct},
+    ast::{
+        declarations::Declaration, expressions::Expression, from_pest, FromPest, PestDeconstruct,
+        Span,
+    },
     syntax::Rule,
 };
 use {pest::iterators::Pair, serde_derive::Serialize, single::Single};
