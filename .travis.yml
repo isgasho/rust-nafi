@@ -19,6 +19,7 @@ branches:
 
 matrix:
   include:
+  - stage: test
   
   # clippy and rustfmt
   - stage: warnings
