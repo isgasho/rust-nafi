@@ -1,0 +1,13 @@
+[package]
+name = "span_derive"
+version = "0.0.0"
+authors = ["cad97 <cad97@cad97.com>"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = "0.14"
+quote = "0.6"
+proc-macro2 = "0.4"
+single = "1"

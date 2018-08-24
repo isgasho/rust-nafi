@@ -1,0 +1,13 @@
+cargo-features = ["edition"]
+
+[package]
+name = "nafi-ast"
+version = "0.0.0"
+authors = ["cad97 <cad97@cad97.com>"]
+edition = "2018"
+
+[dependencies]
+span_derive = { path = "./span-derive/" }
+memchr = "2"
+bytecount = "0.3"
+serde = { version = "1", features = ["serde_derive"] }
