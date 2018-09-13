@@ -1,3 +1,5 @@
+#![feature(tool_lints)]
+
 pub mod ast;
 mod syntax;
 

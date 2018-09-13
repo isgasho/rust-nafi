@@ -76,7 +76,7 @@ impl<'a> Span<'a> {
     }
 
     /// Create a span from a `pest::Span`.
-    #[cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))]
+    #[allow(clippy::needless_pass_by_value)]
     pub(crate) fn from_pest(span: ::pest::Span<'a>) -> Self {
         unsafe { Self::from_slice(span.as_str(), span.start() as u32) }
     }
