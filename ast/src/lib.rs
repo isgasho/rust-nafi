@@ -33,8 +33,13 @@
 //!     }
 //!
 //! CommaSeparated(Rule) =
-//!    _{ List(Rule, ",")
+//!    _{ Separated(Rule, ",")
 //!     ~ ","?
+//!     }
+//!
+//! Keyword(Word) =
+//!   _${ Word
+//!     ~ !XID_CONTINUE
 //!     }
 //!
 //! TypeAscription =
