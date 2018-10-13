@@ -1,5 +1,4 @@
 language: rust
-sudo: required
 conditions: v1
 
 # https://levans.fr/rust_travis_cache.html
@@ -45,17 +44,22 @@ matrix:
 
     - name: coverage
       rust: nightly
+      sudo: required
       env:
-        - RUSTFLAGS=--cfg procmacro2_semver_exempt
+        - RUSTFLAGS="--cfg procmacro2_semver_exempt"
       addons:
         apt:
           packages:
             - libssl-dev
+            - pkg-config
+            - cmake
+            - zlib1g-dev
       install:
-        - cargo install cargo-tarpaulin
-      after_success: -|
-        cargo tarpaulin --out Xml
-        bash <(curl -s https://codecov.io/bash)
+        - cargo install cargo-update || true
+        - cargo install-update -i cargo-tarpaulin cargo-update
+      script:
+        - cargo +nightly tarpaulin --verbose --out Xml
+        - bash <(curl -s https://codecov.io/bash)
 
     - stage: deploy
       script: cargo doc --all --no-deps
