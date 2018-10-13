@@ -26,8 +26,20 @@
       <sourceFolder url="file://$MODULE_DIR$/misc/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/parser/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/parser/repl/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/wasm-api/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/wasm-api/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/wasm-api/benches" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/parser/repl/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/parser/repl/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/parser/repl/benches" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/parser/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/parser/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/parser/benches" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/parser/repl/target" />
+      <excludeFolder url="file://$MODULE_DIR$/parser/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
+      <excludeFolder url="file://$MODULE_DIR$/wasm-api/target" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
