@@ -1,6 +1,3 @@
-extern crate nafi_parser;
-extern crate ron;
-
 use ron::ser::to_string_pretty;
 use std::io::{self, prelude::*};
 
@@ -27,7 +24,7 @@ fn run() -> io::Result<()> {
                 _ => writeln!(stdout, "Unsupported command; try `;;help`")?,
             };
         } else {
-            match nafi_parser::parse(&input) {
+            match ::nafi_parser::parse(&input) {
                 Ok(parse) => writeln!(
                     stdout,
                     "{}",

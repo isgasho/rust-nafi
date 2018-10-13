@@ -5,7 +5,3 @@ members = [
     './parser/repl/',
     './wasm-api/',
 ]
-
-[patch.crates-io]
-pest        = { git = "https://github.com/pest-parser/pest.git" }
-pest_derive = { git = "https://github.com/pest-parser/pest.git" }

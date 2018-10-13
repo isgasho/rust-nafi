@@ -1,6 +1,3 @@
-#![allow(stable_features)]
-#![cfg_attr(target_arch = "wasm32", feature(proc_macro))]
-
 #[cfg(target_arch = "wasm32")]
 pub use self::hidden::*;
 #[cfg(target_arch = "wasm32")]

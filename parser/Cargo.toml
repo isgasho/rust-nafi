@@ -1,5 +1,3 @@
-cargo-features = ["edition"]
-
 [package]
 name = "nafi-parser"
 version = "0.0.0"
