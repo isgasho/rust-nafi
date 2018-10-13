@@ -1,5 +1,9 @@
 delete_merged_branches = true
 
+pr_status = [
+    "license/cla",
+]
+
 status = [
     "Travis CI - Branch",
 ]
