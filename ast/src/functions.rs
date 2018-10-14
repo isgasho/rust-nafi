@@ -119,6 +119,8 @@ pub struct FunctionCallArgument<'a> {
 #[pest(rule = "Rule::FunctionDeclaration")]
 pub struct FunctionDeclaration<'a> {
     span: Span<'a>,
+    #[pest(parse, rule = "Rule::Keyword__function")]
+    keyword_function: Span<'a>,
     name: Identifier<'a>,
     arguments: Vec<FunctionDeclarationArgument<'a>>,
     r#return: Option<Box<Path<'a>>>,
