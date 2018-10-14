@@ -1,9 +1,13 @@
 //! Functions are units of behavior. They take input, do some work, and produce output.
 
-use crate::paths::Path;
-use crate::terminals::Identifier;
-use crate::{Span, Spanned};
-use crate::containers::{Expression, Statement};
+use crate::{
+    containers::{Expression, Statement},
+    parser::Rule,
+    paths::Path,
+    terminals::Identifier,
+    Span, Spanned,
+};
+use pest_deconstruct::FromPest;
 use serde::Serialize;
 
 /// A function expression is a brace-delimited block of code representing a callable function.
@@ -22,7 +26,8 @@ use serde::Serialize;
 ///     }
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
-#[derive(Serialize, Spanned)]
+#[derive(Serialize, Spanned, FromPest)]
+#[pest(rule = "Rule::FunctionExpression")]
 pub struct FunctionExpression<'a> {
     span: Span<'a>,
     arguments: Vec<FunctionExpressionArgument<'a>>,
@@ -41,7 +46,8 @@ pub struct FunctionExpression<'a> {
 ///     }
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
-#[derive(Serialize, Spanned)]
+#[derive(Serialize, Spanned, FromPest)]
+#[pest(rule = "Rule::FunctionExpressionArgument")]
 pub struct FunctionExpressionArgument<'a> {
     span: Span<'a>,
     name: Identifier<'a>,
@@ -62,7 +68,8 @@ pub struct FunctionExpressionArgument<'a> {
 ///     }
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
-#[derive(Serialize, Spanned)]
+#[derive(Serialize, Spanned, FromPest)]
+#[pest(rule = "Rule::FunctionCall")]
 pub struct FunctionCall<'a> {
     span: Span<'a>,
     path: Identifier<'a>,
@@ -83,7 +90,8 @@ pub struct FunctionCall<'a> {
 ///     }
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
-#[derive(Serialize, Spanned)]
+#[derive(Serialize, Spanned, FromPest)]
+#[pest(rule = "Rule::FunctionCallArgument")]
 pub struct FunctionCallArgument<'a> {
     span: Span<'a>,
     name: Option<Identifier<'a>>,
@@ -107,7 +115,8 @@ pub struct FunctionCallArgument<'a> {
 ///     }
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
-#[derive(Serialize, Spanned)]
+#[derive(Serialize, Spanned, FromPest)]
+#[pest(rule = "Rule::FunctionDeclaration")]
 pub struct FunctionDeclaration<'a> {
     span: Span<'a>,
     name: Identifier<'a>,
@@ -129,7 +138,8 @@ pub struct FunctionDeclaration<'a> {
 ///     }
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
-#[derive(Serialize, Spanned)]
+#[derive(Serialize, Spanned, FromPest)]
+#[pest(rule = "Rule::FunctionDeclarationArgument")]
 pub struct FunctionDeclarationArgument<'a> {
     span: Span<'a>,
     name: Option<Identifier<'a>>,

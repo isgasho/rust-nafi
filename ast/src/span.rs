@@ -86,6 +86,16 @@ impl<'a> Span<'a> {
     }
 }
 
+impl<'a> From<::pest::Span<'a>> for Span<'a> {
+    fn from(span: ::pest::Span<'a>) -> Self {
+        if span.end() <= u32::MAX as usize {
+            unsafe { Span::from_slice(span.as_str(), span.start() as u32) }
+        } else {
+            panic!("too-large `Span` created")
+        }
+    }
+}
+
 /// Accessors
 impl<'a> Span<'a> {
     fn source(&self) -> &'a str {

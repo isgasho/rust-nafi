@@ -20,6 +20,18 @@
 //! written format, HIR is fully elaborated: all optional annotations are present, all paths are
 //! absolute and concrete, and all syntax sugar and implicit meaning has been made explicit.
 //!
+//! # Notes
+//!
+//! The public dependency on `pest` is an implementation detail, and trait implementations of `pest`
+//! traits are only public due to a limitation of Rust. They may be hidden or removed in the future.
+//!
+//! If a `pest` type appears in public API that is _not_ via a trait implementation, that is part of
+//! the API and will incur a breaking change to remove. (This is a bug if so; please report it.)
+//!
+//! The rough plan is that the `pest` parser will remain as a reference parser and a way to test the
+//! grammar specified on the AST types, but the official parser will migrate to a lossless IDE-ready
+//! syntax tree in the future, as tooling making the development of such a parser becomes available.
+//!
 //! # Grammar
 //!
 //! The following general productions are used throughout the rest of the specific grammars.
@@ -49,15 +61,25 @@
 //!
 //! __incomplete = // unmatchable, serves to mark incomplete choices
 //!    _{ !ANY
+//!     ~ ANY
 //!     }
 //! ```
 
 #![warn(missing_docs)]
 
+mod pest_deconstruct_shimming;
+
 pub mod containers;
 pub mod functions;
 pub mod paths;
 pub mod terminals;
+
+mod parser {
+    use pest_derive::Parser;
+    #[derive(Parser)]
+    #[grammar = "grammar.pest"]
+    pub struct Parser;
+}
 
 mod span;
 pub use self::span::{Span, Spanned};

@@ -1,7 +1,7 @@
 //! Paths are used to uniquely refer to one type or place in the program.
 
-use crate::terminals::Identifier;
-use crate::{Span, Spanned};
+use crate::{containers::Expression, parser::Rule, terminals::Identifier, Span, Spanned};
+use pest_deconstruct::FromPest;
 use serde::Serialize;
 
 /// A Path is a sequence of `::`-delimited segments referring to a type or data place.
@@ -15,7 +15,8 @@ use serde::Serialize;
 ///     }
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
-#[derive(Serialize, Spanned)]
+#[derive(Serialize, Spanned, FromPest)]
+#[pest(rule = "Rule::Path")]
 pub struct Path<'a> {
     span: Span<'a>,
     segments: Vec<PathSegment<'a>>,
@@ -36,9 +37,10 @@ pub struct Path<'a> {
 ///     }
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
-#[derive(Serialize, Spanned)]
+#[derive(Serialize, Spanned, FromPest)]
+#[pest(rule = "Rule::PathSegment")]
 pub struct PathSegment<'a> {
     span: Span<'a>,
     name: Identifier<'a>,
-    arguments: Vec</*Expression<'a>*/ ()>,
+    arguments: Vec<Expression<'a>>,
 }

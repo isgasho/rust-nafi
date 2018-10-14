@@ -30,6 +30,7 @@ TypeAscription =
 
 __incomplete = // unmatchable, serves to mark incomplete choices
    _{ !ANY
+    ~ ANY
     }
 
 // ~~~ src/containers.rs ~~~ //
@@ -51,6 +52,16 @@ Statement =
     }
 
 // ~~~ src/functions.rs ~~~ //
+
+FunctionExpression =
+    { "{"
+    ~ ( CommaSeparated__FunctionExpressionArgument?
+      ~ "->"
+      )?
+    ~ Statement*
+    ~ Expression?
+    ~ "}"
+    }
 
 FunctionExpressionArgument =
     { Identifier
@@ -114,11 +125,13 @@ IntegerLiteral = @{ ASCII_DIGIT+ }
 
 // ~~ monomorphization ~~ //
 
+CommaSeparated__FunctionExpressionArgument = _{ Separated__FunctionExpressionArgument__Comma ~ ","? }
+Separated__FunctionExpressionArgument__Comma = _{ FunctionExpressionArgument ~ ( "," ~ FunctionExpressionArgument )* }
 CommaSeparated__FunctionCallArgument = _{ Separated__FunctionCallArgument__Comma ~ ","? }
 Separated__FunctionCallArgument__Comma = _{ FunctionCallArgument ~ ( "," ~ FunctionCallArgument )* }
 Keyword__function = @{ "function" ~ !XID_CONTINUE }
 CommaSeparated__FunctionDeclarationArgument = _{ Separated__FunctionDeclarationArgument__Comma ~ ","? }
 Separated__FunctionDeclarationArgument__Comma = _{ FunctionDeclarationArgument ~ ( "," ~ FunctionDeclarationArgument )* }
-Separated__PathSegment__ColonColon = _{ PathSegment ~ { "::" ~ PathSegment )* }
+Separated__PathSegment__ColonColon = _{ PathSegment ~ ( "::" ~ PathSegment )* }
 CommaSeparated__Expression = _{ Separated__Expression__Comma ~ ","? }
 Separated__Expression__Comma = _{ Expression ~ ("," ~ Expression )* }
