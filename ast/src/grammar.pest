@@ -1,0 +1,163 @@
+// This grammar is hand-assembled from the fragments in nafi-ast
+// In the future, it should be generated from it
+// (Blocked on implementing parameterized rules)
+
+// ~~ src/lib.rs ~~ //
+
+// // Parameterized rules, manually monomorphized
+// 
+// Separated(Rule, Separator) =
+//    _{ Rule
+//     ~ ( Separator
+//       ~ Rule
+//       )*
+//     }
+// 
+// CommaSeparated(Rule) =
+//    _{ Separated(Rule, ",")
+//     ~ ","?
+//     }
+//
+// Keyword(Word) = // Unfortunately this one has to be monomorphized as $ not _$ -- pest-parser/pest#118
+//   _${ Word
+//     ~ !XID_CONTINUE
+//     }
+
+TypeAscription =
+   _{ ":"
+    ~ Path
+    }
+
+__incomplete = // unmatchable, serves to mark incomplete choices
+   _{ !ANY
+    ~ ANY
+    }
+
+WHITESPACE =
+   _{ WHITE_SPACE
+    }
+
+COMMENT =
+   _{ line_comment
+    | block_comment
+    }
+
+line_comment =
+   _{ "//"
+    ~ ( !NEWLINE
+      ~ ANY
+      )*
+    }
+
+block_comment =
+   _{ "/*"
+    ~ ( block_comment
+      | ( !"*/"
+        ~ ANY
+        )
+      )*
+    ~ "*/"
+    }
+
+// ~~~ src/containers.rs ~~~ //
+
+Expression =
+    { FunctionExpression
+    | FunctionCall
+    | Identifier
+    | IntegerLiteral
+    | __incomplete
+    }
+
+Statement =
+    { ( Expression
+      ~ ";"
+      )
+    | FunctionDeclaration
+    | __incomplete
+    }
+
+// ~~~ src/functions.rs ~~~ //
+
+FunctionExpression =
+    { "{"
+    ~ ( CommaSeparated__FunctionExpressionArgument?
+      ~ "->"
+      )?
+    ~ Statement*
+    ~ Expression?
+    ~ "}"
+    }
+
+FunctionExpressionArgument =
+    { Identifier
+    ~ TypeAscription?
+    }
+
+FunctionCall =
+    { Identifier
+    ~ "("
+    ~ CommaSeparated__FunctionCallArgument?
+    ~ ")"
+    ~ FunctionExpression?
+    }
+
+FunctionCallArgument =
+    { ( Identifier
+      ~ "="
+      )?
+    ~ Expression
+    }
+
+FunctionDeclaration =
+    { Keyword__function
+    ~ Identifier
+    ~ "("
+    ~ CommaSeparated__FunctionDeclarationArgument?
+    ~ ")"
+    ~ TypeAscription?
+    ~ "="
+    ~ FunctionExpression
+    }
+
+FunctionDeclarationArgument =
+    { ( Identifier
+      ~ TypeAscription
+      )
+    | Path
+    }
+
+// ~~ src/paths.rs ~~ //
+
+Path =
+    { "::"?
+    ~ Separated__PathSegment__ColonColon
+    }
+
+PathSegment =
+    { Identifier
+    ~ ( "["
+      ~ CommaSeparated__Expression
+      ~ "]"
+      )?
+    }
+
+// ~~ src/terminals.rs ~~ //
+
+// UAX31-R1 Default Identifier grammar
+Identifier = @{ XID_START ~ XID_CONTINUE* }
+
+IntegerLiteral = @{ ASCII_DIGIT+ }
+
+// ~~ monomorphization ~~ //
+
+CommaSeparated__FunctionExpressionArgument = _{ Separated__FunctionExpressionArgument__Comma ~ ","? }
+Separated__FunctionExpressionArgument__Comma = _{ FunctionExpressionArgument ~ ( "," ~ FunctionExpressionArgument )* }
+CommaSeparated__FunctionCallArgument = _{ Separated__FunctionCallArgument__Comma ~ ","? }
+Separated__FunctionCallArgument__Comma = _{ FunctionCallArgument ~ ( "," ~ FunctionCallArgument )* }
+Keyword__function = @{ "function" ~ !XID_CONTINUE }
+CommaSeparated__FunctionDeclarationArgument = _{ Separated__FunctionDeclarationArgument__Comma ~ ","? }
+Separated__FunctionDeclarationArgument__Comma = _{ FunctionDeclarationArgument ~ ( "," ~ FunctionDeclarationArgument )* }
+Separated__PathSegment__ColonColon = _{ PathSegment ~ ( "::" ~ PathSegment )* }
+CommaSeparated__Expression = _{ Separated__Expression__Comma ~ ","? }
+Separated__Expression__Comma = _{ Expression ~ ("," ~ Expression )* }

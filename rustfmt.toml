@@ -1,2 +1,3 @@
+edition = "2018"
 newline_style = "Unix"
 merge_derives = false

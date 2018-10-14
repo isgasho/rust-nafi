@@ -1,15 +1,19 @@
-use {
-    bytecount::{count, num_chars},
-    memchr::memrchr,
-    serde::ser::{Serialize, Serializer},
-    std::{
-        fmt,
-        ops::{Bound, RangeBounds},
-        slice, str, u32,
-    },
+use bytecount::{count, num_chars};
+use memchr::memrchr;
+use serde::ser::{Serialize, Serializer};
+use std::{
+    fmt,
+    ops::{Bound, RangeBounds},
+    slice, str, u32,
 };
 
+pub use span_derive::Spanned;
+
 /// A span of source code.
+///
+/// A span represents a region between two positions in the code.
+/// This implementation lazily calculates the row/column position,
+/// so if you need to access it frequently, consider caching it.
 #[derive(Copy, Clone, Eq, PartialEq, Hash)]
 pub struct Span<'a> {
     /// The starting byte of the complete source.
@@ -48,6 +52,11 @@ impl<'a> Span<'a> {
             Bound::Included(&idx) => idx + 1,
             Bound::Excluded(&idx) => idx,
         };
+
+        if end_byte as usize > source.len() {
+            panic!("Span slice extends past end of source");
+        }
+
         Span {
             source: unsafe { &*source.as_ptr() },
             start_byte,
@@ -59,26 +68,32 @@ impl<'a> Span<'a> {
     ///
     /// # Safety
     ///
-    /// The allocated string must be at least `offset` bytes before the slice.
+    /// The backing string must start at least `offset` bytes before the slice,
+    /// and said byte boundary must be a character boundary.
     ///
     /// In debug mode this check is approximated via a UTF-8 well-formedness check.
-    pub(crate) unsafe fn from_slice(slice: &'a str, offset: u32) -> Self {
+    pub unsafe fn from_slice(slice: &'a str, offset: u32) -> Self {
         let source = {
-            let ptr = slice.as_ptr().offset(offset as isize);
+            debug_assert_eq!(offset as isize as u32, offset);
+            let ptr = slice.as_ptr().offset(-(offset as isize));
             let bytes = slice::from_raw_parts(ptr, slice.len() + offset as usize);
             if cfg!(debug_assertions) {
-                str::from_utf8(bytes).expect("Invalid string")
+                str::from_utf8(bytes).expect("Invalid slice")
             } else {
                 str::from_utf8_unchecked(bytes)
             }
         };
         Self::from_source(source, offset..)
     }
+}
 
-    /// Create a span from a `pest::Span`.
-    #[cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))]
-    pub(crate) fn from_pest(span: ::pest::Span<'a>) -> Self {
-        unsafe { Self::from_slice(span.as_str(), span.start() as u32) }
+impl<'a> From<::pest::Span<'a>> for Span<'a> {
+    fn from(span: ::pest::Span<'a>) -> Self {
+        if span.end() <= u32::MAX as usize {
+            unsafe { Span::from_slice(span.as_str(), span.start() as u32) }
+        } else {
+            panic!("too-large `Span` created")
+        }
     }
 }
 
@@ -152,4 +167,10 @@ impl<'a> Serialize for Span<'a> {
     {
         (self.start_byte, self.end_byte).serialize(serializer)
     }
+}
+
+/// An object that represents some span of source.
+pub trait Spanned {
+    /// Get the span that this covers.
+    fn span(&self) -> Span<'_>;
 }
