@@ -54,13 +54,10 @@
 
 #![warn(missing_docs)]
 
-//pub mod declarations;
-//pub mod expressions;
-//pub mod statements;
+pub mod containers;
 pub mod functions;
-pub mod terminals;
-//pub mod types;
 pub mod paths;
+pub mod terminals;
 
 mod span;
 pub use self::span::{Span, Spanned};

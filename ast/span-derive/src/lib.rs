@@ -2,8 +2,6 @@
 //!
 //! For internal use by `nafi_ast` only. Generates edition-2018 code.
 
-#![feature(tool_lints)]
-
 extern crate proc_macro;
 extern crate proc_macro2;
 extern crate syn;

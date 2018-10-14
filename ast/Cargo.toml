@@ -9,3 +9,4 @@ span_derive = { path = "./span-derive/" }
 memchr = "2"
 bytecount = "0.3"
 serde = { version = "1", features = ["serde_derive"] }
+pest-deconstruct = "0.2"

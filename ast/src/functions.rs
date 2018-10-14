@@ -1,8 +1,9 @@
 //! Functions are units of behavior. They take input, do some work, and produce output.
 
-use crate::terminals::Identifier;
 use crate::paths::Path;
+use crate::terminals::Identifier;
 use crate::{Span, Spanned};
+use crate::containers::{Expression, Statement};
 use serde::Serialize;
 
 /// A function expression is a brace-delimited block of code representing a callable function.
@@ -25,8 +26,8 @@ use serde::Serialize;
 pub struct FunctionExpression<'a> {
     span: Span<'a>,
     arguments: Vec<FunctionExpressionArgument<'a>>,
-    statements: Vec</*Statement<'a>*/ ()>,
-    tail_expression: Option<Box</*Expression<'a>*/ ()>>,
+    statements: Vec<Statement<'a>>,
+    tail_expression: Option<Box<Expression<'a>>>,
 }
 
 /// Function Expression arguments are the bindings for inputs to the function.
@@ -66,7 +67,7 @@ pub struct FunctionCall<'a> {
     span: Span<'a>,
     path: Identifier<'a>,
     arguments: Vec<FunctionCallArgument<'a>>,
-    tail_closure: Option<Box<FunctionExpression<'a>>>
+    tail_closure: Option<Box<FunctionExpression<'a>>>,
 }
 
 /// Function Call Arguments bind a function argument to some value expression.
@@ -86,7 +87,7 @@ pub struct FunctionCall<'a> {
 pub struct FunctionCallArgument<'a> {
     span: Span<'a>,
     name: Option<Identifier<'a>>,
-    value: Box</*Expression<'a>*/ ()>
+    value: Box<Expression<'a>>,
 }
 
 /// A Function Declaration creates a new argument-overloadable function binding.

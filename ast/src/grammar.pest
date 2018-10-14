@@ -32,6 +32,24 @@ __incomplete = // unmatchable, serves to mark incomplete choices
    _{ !ANY
     }
 
+// ~~~ src/containers.rs ~~~ //
+
+Expression =
+    { FunctionExpression
+    | FunctionCall
+    | Identifier
+    | IntegerLiteral
+    | __incomplete
+    }
+
+Statement =
+    { ( Expression
+      ~ ";"
+      )
+    | FunctionDeclaration
+    | __incomplete
+    }
+
 // ~~~ src/functions.rs ~~~ //
 
 FunctionExpressionArgument =
