@@ -51,14 +51,11 @@ matrix:
         apt:
           packages:
             - libssl-dev
-            - pkg-config
-            - cmake
-            - zlib1g-dev
       install:
         - cargo install cargo-update || true
         - cargo install-update -i cargo-tarpaulin cargo-update
       script:
-        - cargo +nightly tarpaulin --verbose --out Xml
+        - cargo +nightly tarpaulin --out Xml
         - bash <(curl -s https://codecov.io/bash)
 
     - stage: deploy
