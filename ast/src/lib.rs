@@ -63,6 +63,32 @@
 //!    _{ !ANY
 //!     ~ ANY
 //!     }
+//!
+//! WHITESPACE =
+//!    _{ WHITE_SPACE
+//!     }
+//!
+//! COMMENT =
+//!    _{ line_comment
+//!     | block_comment
+//!     }
+//!
+//! line_comment =
+//!    _{ "//"
+//!     ~ ( !NEWLINE
+//!       ~ ANY
+//!       )*
+//!     }
+//!
+//! block_comment =
+//!    _{ "/*"
+//!     ~ ( block_comment
+//!       | ( !"*/"
+//!         ~ ANY
+//!         )
+//!       )*
+//!     ~ "*/"
+//!     }
 //! ```
 
 #![warn(missing_docs)]
@@ -74,7 +100,8 @@ pub mod functions;
 pub mod paths;
 pub mod terminals;
 
-mod parser {
+#[doc(hidden)]
+pub mod parser {
     use pest_derive::Parser;
     #[derive(Parser)]
     #[grammar = "grammar.pest"]

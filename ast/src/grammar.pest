@@ -33,6 +33,32 @@ __incomplete = // unmatchable, serves to mark incomplete choices
     ~ ANY
     }
 
+WHITESPACE =
+   _{ WHITE_SPACE
+    }
+
+COMMENT =
+   _{ line_comment
+    | block_comment
+    }
+
+line_comment =
+   _{ "//"
+    ~ ( !NEWLINE
+      ~ ANY
+      )*
+    }
+
+block_comment =
+   _{ "/*"
+    ~ ( block_comment
+      | ( !"*/"
+        ~ ANY
+        )
+      )*
+    ~ "*/"
+    }
+
 // ~~~ src/containers.rs ~~~ //
 
 Expression =

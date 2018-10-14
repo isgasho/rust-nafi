@@ -8,9 +8,5 @@ edition = "2018"
 
 [dependencies]
 pest = "2"
-pest_derive = "2"
-serde = "1"
-serde_derive = "1"
-memchr = "2"
-bytecount = "0.3"
-single = "1"
+pest-deconstruct = "0.2"
+nafi-ast = { path = "../ast/" }

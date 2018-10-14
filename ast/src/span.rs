@@ -74,10 +74,11 @@ impl<'a> Span<'a> {
     /// In debug mode this check is approximated via a UTF-8 well-formedness check.
     pub unsafe fn from_slice(slice: &'a str, offset: u32) -> Self {
         let source = {
-            let ptr = slice.as_ptr().offset(offset as isize);
+            debug_assert_eq!(offset as isize as u32, offset);
+            let ptr = slice.as_ptr().offset(-(offset as isize));
             let bytes = slice::from_raw_parts(ptr, slice.len() + offset as usize);
             if cfg!(debug_assertions) {
-                str::from_utf8(bytes).expect("Invalid string")
+                str::from_utf8(bytes).expect("Invalid slice")
             } else {
                 str::from_utf8_unchecked(bytes)
             }
