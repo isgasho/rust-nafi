@@ -1,4 +1,5 @@
 language: rust
+rust: beta
 conditions: v1
 
 # https://levans.fr/rust_travis_cache.html
@@ -26,7 +27,6 @@ matrix:
 
   include:
     - name: tests
-      rust: beta
       script:
         - cargo test --all
         - cargo doc --all --no-deps
@@ -43,8 +43,7 @@ matrix:
     - name: coverage
       rust: nightly-2018-10-13
       sudo: required
-      env:
-        - RUSTFLAGS="--cfg procmacro2_semver_exempt"
+      env: RUSTFLAGS="--cfg procmacro2_semver_exempt"
       addons:
         apt:
           packages:
@@ -54,7 +53,8 @@ matrix:
         - cargo install-update -i cargo-tarpaulin cargo-update
       script:
         - cargo tarpaulin --out Xml
-        - bash <(curl -s https://codecov.io/bash)
+      after_success:
+      - bash <(curl -s https://codecov.io/bash)
 
     - stage: deploy
       script: cargo doc --all --no-deps
