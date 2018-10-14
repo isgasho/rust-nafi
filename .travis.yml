@@ -22,9 +22,7 @@ branches:
 matrix:
   fast_finish: true
   allow_failures:
-    - rust: nightly
-    - install:
-      - cargo install cargo-tarpaulin
+    - name: coverage
 
   include:
     - name: tests
@@ -43,7 +41,7 @@ matrix:
         - cargo fmt -- --check
 
     - name: coverage
-      rust: nightly
+      rust: nightly-2018-10-13
       sudo: required
       env:
         - RUSTFLAGS="--cfg procmacro2_semver_exempt"
@@ -51,14 +49,11 @@ matrix:
         apt:
           packages:
             - libssl-dev
-            - pkg-config
-            - cmake
-            - zlib1g-dev
       install:
         - cargo install cargo-update || true
         - cargo install-update -i cargo-tarpaulin cargo-update
       script:
-        - cargo +nightly tarpaulin --verbose --out Xml
+        - cargo tarpaulin --out Xml
         - bash <(curl -s https://codecov.io/bash)
 
     - stage: deploy
