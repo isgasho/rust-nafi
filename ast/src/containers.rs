@@ -6,7 +6,7 @@ use crate::{
     terminals::{Identifier, IntegerLiteral},
     Spanned,
 };
-use pest_deconstruct::FromPest;
+use pest_ast::FromPest;
 use serde::Serialize;
 
 /// The expression is the basic unit of computation.
@@ -24,7 +24,7 @@ use serde::Serialize;
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize, Spanned, FromPest)]
-#[pest(rule = "Rule::Expression")]
+#[pest_ast(rule(Rule::Expression))]
 #[allow(missing_docs)]
 pub enum Expression<'a> {
     FunctionExpression(FunctionExpression<'a>),
@@ -48,7 +48,7 @@ pub enum Expression<'a> {
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize, Spanned, FromPest)]
-#[pest(rule = "Rule::Statement")]
+#[pest_ast(rule(Rule::Statement))]
 #[allow(missing_docs)]
 pub enum Statement<'a> {
     Expression(Expression<'a>),

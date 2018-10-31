@@ -1,7 +1,7 @@
 //! The terminal nodes of the Nafi grammar.
 
 use crate::{parser::Rule, Span, Spanned};
-use pest_deconstruct::FromPest;
+use pest_ast::FromPest;
 use serde::Serialize;
 
 /// A name referring to some place that information can be stored.
@@ -14,8 +14,9 @@ use serde::Serialize;
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize, Spanned, FromPest)]
-#[pest(rule = "Rule::Identifier")]
+#[pest_ast(rule(Rule::Identifier))]
 pub struct Identifier<'a> {
+    #[pest_ast(outer(with(Into::into)))]
     span: Span<'a>,
 }
 
@@ -28,7 +29,8 @@ pub struct Identifier<'a> {
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize, Spanned, FromPest)]
-#[pest(rule = "Rule::IntegerLiteral")]
+#[pest_ast(rule(Rule::IntegerLiteral))]
 pub struct IntegerLiteral<'a> {
+    #[pest_ast(outer(with(Into::into)))]
     span: Span<'a>,
 }

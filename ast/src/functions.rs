@@ -7,7 +7,7 @@ use crate::{
     terminals::Identifier,
     Span, Spanned,
 };
-use pest_deconstruct::FromPest;
+use pest_ast::FromPest;
 use serde::Serialize;
 
 /// A function expression is a brace-delimited block of code representing a callable function.
@@ -27,8 +27,9 @@ use serde::Serialize;
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize, Spanned, FromPest)]
-#[pest(rule = "Rule::FunctionExpression")]
+#[pest_ast(rule(Rule::FunctionExpression))]
 pub struct FunctionExpression<'a> {
+    #[pest_ast(outer(with(Into::into)))]
     span: Span<'a>,
     arguments: Vec<FunctionExpressionArgument<'a>>,
     statements: Vec<Statement<'a>>,
@@ -47,8 +48,9 @@ pub struct FunctionExpression<'a> {
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize, Spanned, FromPest)]
-#[pest(rule = "Rule::FunctionExpressionArgument")]
+#[pest_ast(rule(Rule::FunctionExpressionArgument))]
 pub struct FunctionExpressionArgument<'a> {
+    #[pest_ast(outer(with(Into::into)))]
     span: Span<'a>,
     name: Identifier<'a>,
     r#type: Option<Box<Path<'a>>>,
@@ -69,8 +71,9 @@ pub struct FunctionExpressionArgument<'a> {
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize, Spanned, FromPest)]
-#[pest(rule = "Rule::FunctionCall")]
+#[pest_ast(rule(Rule::FunctionCall))]
 pub struct FunctionCall<'a> {
+    #[pest_ast(outer(with(Into::into)))]
     span: Span<'a>,
     path: Identifier<'a>,
     arguments: Vec<FunctionCallArgument<'a>>,
@@ -91,8 +94,9 @@ pub struct FunctionCall<'a> {
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize, Spanned, FromPest)]
-#[pest(rule = "Rule::FunctionCallArgument")]
+#[pest_ast(rule(Rule::FunctionCallArgument))]
 pub struct FunctionCallArgument<'a> {
+    #[pest_ast(outer(with(Into::into)))]
     span: Span<'a>,
     name: Option<Identifier<'a>>,
     value: Box<Expression<'a>>,
@@ -116,10 +120,11 @@ pub struct FunctionCallArgument<'a> {
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize, Spanned, FromPest)]
-#[pest(rule = "Rule::FunctionDeclaration")]
+#[pest_ast(rule(Rule::FunctionDeclaration))]
 pub struct FunctionDeclaration<'a> {
+    #[pest_ast(outer(with(Into::into)))]
     span: Span<'a>,
-    #[pest(parse, rule = "Rule::Keyword__function")]
+    #[pest_ast(inner(rule(Rule::Keyword__function), with(Into::into)))]
     keyword_function: Span<'a>,
     name: Identifier<'a>,
     arguments: Vec<FunctionDeclarationArgument<'a>>,
@@ -141,8 +146,9 @@ pub struct FunctionDeclaration<'a> {
 /// ```
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[derive(Serialize, Spanned, FromPest)]
-#[pest(rule = "Rule::FunctionDeclarationArgument")]
+#[pest_ast(rule(Rule::FunctionDeclarationArgument))]
 pub struct FunctionDeclarationArgument<'a> {
+    #[pest_ast(outer(with(Into::into)))]
     span: Span<'a>,
     name: Option<Identifier<'a>>,
     r#type: Box<Path<'a>>,

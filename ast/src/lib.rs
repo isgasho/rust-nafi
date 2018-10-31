@@ -93,8 +93,6 @@
 
 #![warn(missing_docs)]
 
-mod pest_deconstruct_shimming;
-
 pub mod containers;
 pub mod functions;
 pub mod paths;
