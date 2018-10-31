@@ -8,5 +8,5 @@ edition = "2018"
 
 [dependencies]
 pest = "2"
-pest-deconstruct = "0.2"
+from-pest = "0.3"
 nafi-ast = { path = "../ast/" }
