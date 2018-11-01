@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["parse",""]],"mod":[["ast","Abstract Syntax Tree for the Nafi programming language."]]});

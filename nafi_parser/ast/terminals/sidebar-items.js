@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Identifier","A name referring to some place that information can be stored."],["IntegerLiteral","An integer in the source code."]]});
